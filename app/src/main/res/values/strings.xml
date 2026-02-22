@@ -22,10 +22,9 @@
     <string name="success_login">Login successful!</string>
     
     <!-- Dashboard Screen -->
-    <string name="dashboard_title">Dashboard</string>
-    <string name="dashboard_welcome">Welcome to your Financial Dashboard</string>
-    <string name="dashboard_placeholder">Your financial overview will appear here. Start by adding bills, savings goals, and expenses.</string>
-    <string name="btn_logout">Logout</string>
+ <string name="btn_logout">Logout</string>
+    <string name="menu_my_profile">My Profile</string>
+    <string name="menu_logout">Logout</string>
     <string name="btn_add_bill">Add Bill</string>
     <string name="btn_add_savings">Add Savings Goal</string>
     <string name="btn_add_expense">Add Expense</string>
