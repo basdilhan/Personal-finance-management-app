@@ -5,11 +5,13 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.PopupMenu;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
 
 /**
@@ -20,6 +22,8 @@ public class DashboardActivity extends AppCompatActivity {
 
     private MaterialButton btnLogout;
     private View actionAddExpense, actionAddIncome, actionAddBill, actionAddGoal;
+    private TextView buttonViewAllBills;
+    private BottomNavigationView bottomNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +39,8 @@ public class DashboardActivity extends AppCompatActivity {
      */
     private void initializeViews() {
         btnLogout = findViewById(R.id.button_logout);
+        bottomNavigationView = findViewById(R.id.bottom_navigation);
+        buttonViewAllBills = findViewById(R.id.button_view_all_bills);
 
         // Initialize Quick Action buttons
         actionAddExpense = findViewById(R.id.action_add_expense);
@@ -89,6 +95,49 @@ public class DashboardActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        // View All Bills button
+        buttonViewAllBills.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(DashboardActivity.this, BillsActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        // Bottom Navigation
+        setupBottomNavigation();
+    }
+
+    /**
+     * Setup bottom navigation item selection listener
+     */
+    private void setupBottomNavigation() {
+        bottomNavigationView.setOnItemSelectedListener(menuItem -> {
+            int itemId = menuItem.getItemId();
+            if (itemId == R.id.nav_home) {
+                // Already on home, no action needed
+                return true;
+            } else if (itemId == R.id.nav_expenses) {
+                Intent intent = new Intent(DashboardActivity.this, ExpensesActivity.class);
+                startActivity(intent);
+                return true;
+            } else if (itemId == R.id.nav_bills) {
+                Intent intent = new Intent(DashboardActivity.this, BillsActivity.class);
+                startActivity(intent);
+                return true;
+            } else if (itemId == R.id.nav_goals) {
+                Toast.makeText(DashboardActivity.this, "Goals coming soon", Toast.LENGTH_SHORT).show();
+                return true;
+            } else if (itemId == R.id.nav_profile) {
+                Toast.makeText(DashboardActivity.this, "Profile coming soon", Toast.LENGTH_SHORT).show();
+                return true;
+            }
+            return false;
+        });
+
+        // Set Home as selected by default
+        bottomNavigationView.setSelectedItemId(R.id.nav_home);
     }
 
     /**

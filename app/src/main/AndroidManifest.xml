@@ -25,6 +25,8 @@
         <activity android:name=".RegisterActivity" android:exported="false" />
         <activity android:name=".ForgotPasswordActivity" android:exported="false" />
         <activity android:name=".DashboardActivity" android:exported="false" />
+        <activity android:name=".ExpensesActivity" android:exported="false" />
+        <activity android:name=".BillsActivity" android:exported="false" />
         <activity android:name=".AddExpenseActivity" android:exported="false" />
         <activity android:name=".AddIncomeActivity" android:exported="false" />
         <activity android:name=".AddBillActivity" android:exported="false" />
