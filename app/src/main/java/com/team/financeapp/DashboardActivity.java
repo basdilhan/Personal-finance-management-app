@@ -127,7 +127,8 @@ public class DashboardActivity extends AppCompatActivity {
                 startActivity(intent);
                 return true;
             } else if (itemId == R.id.nav_goals) {
-                Toast.makeText(DashboardActivity.this, "Goals coming soon", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(DashboardActivity.this, GoalsActivity.class);
+                startActivity(intent);
                 return true;
             } else if (itemId == R.id.nav_profile) {
                 Toast.makeText(DashboardActivity.this, "Profile coming soon", Toast.LENGTH_SHORT).show();
