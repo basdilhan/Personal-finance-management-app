@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="accent">#F59E0B</color>
+    <color name="accent_dark">#D97706</color>
+    <color name="accent_overlay">#FFF7ED</color>
+    <color name="background">#F8FAFC</color>
+    <color name="background_light">#FFFFFF</color>
+    <color name="black">#FF000000</color>
+    <color name="card_background">#FFFFFF</color>
+    <color name="card_background_light">#FFFFFF</color>
+    <color name="divider">#E2E8F0</color>
+    <color name="error">#EF4444</color>
+    <color name="gradient_end">#A5B4FC</color>
+    <color name="gradient_mid">#818CF8</color>
+    <color name="gradient_start">#6366F1</color>
+    <color name="grey_dark">#475569</color>
+    <color name="grey_light">#E2E8F0</color>
+    <color name="grey_medium">#94A3B8</color>
+    <color name="info">#3B82F6</color>
+    <color name="primary">#6366F1</color>
+    <color name="primary_dark">#4F46E5</color>
+    <color name="primary_light">#818CF8</color>
+    <color name="primary_overlay">#EEF2FF</color>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="success">#10B981</color>
+    <color name="success_dark">#059669</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="surface_elevated">#F1F5F9</color>
+    <color name="teal_200">#FF80CBC4</color>
+    <color name="teal_700">#FF00897B</color>
+    <color name="text_hint">#94A3B8</color>
+    <color name="text_on_card">#334155</color>
+    <color name="text_on_primary">#FFFFFF</color>
+    <color name="text_primary">#1E293B</color>
+    <color name="text_secondary">#64748B</color>
+    <color name="warning">#F97316</color>
+    <color name="white">#FFFFFFFF</color>
+    <string name="app_name">DreamSaver</string>
+    <string name="bills_title">Bills</string>
+    <string name="btn_add_bill">Add Bill</string>
+    <string name="btn_add_expense">Add Expense</string>
+    <string name="btn_add_savings">Add Savings Goal</string>
+    <string name="btn_get_started">Get Started</string>
+    <string name="btn_login">Sign In</string>
+    <string name="btn_logout">Logout</string>
+    <string name="btn_register">Create Account</string>
+    <string name="cancel">Cancel</string>
+    <string name="error_confirm_password_empty">Please confirm your password</string>
+    <string name="error_empty_email">Please enter your email</string>
+    <string name="error_empty_name">Please enter your full name</string>
+    <string name="error_empty_password">Please enter your password</string>
+    <string name="error_generic">Something went wrong. Please try again.</string>
+    <string name="error_invalid_email">Please enter a valid email address</string>
+    <string name="error_name_too_short">Full name must be at least 3 characters</string>
+    <string name="error_password_mismatch">Passwords do not match</string>
+    <string name="error_password_too_short">Password must be at least 6 characters</string>
+    <string name="expense_history_title">Expense History</string>
+    <string name="hint_confirm_password">Confirm Password</string>
+    <string name="hint_email">Email Address</string>
+    <string name="hint_full_name">Full Name</string>
+    <string name="hint_password">Password</string>
+    <string name="home_features">Features:\n• Track bills and get reminders\n• Create and monitor savings goals\n• Simple budget overview\n• Expense tracking\n\nTap Get Started to begin your financial journey.</string>
+    <string name="home_subtitle">Bill Reminder &amp; Savings Tracker</string>
+    <string name="home_title">Personal Finance Manager</string>
+    <string name="loading">Loading…</string>
+    <string name="login_subtitle">Sign in to continue</string>
+    <string name="login_title">Welcome Back to DreamSaver</string>
+    <string name="menu_logout">Logout</string>
+    <string name="menu_my_profile">My Profile</string>
+    <string name="no_bills">No bills to track\nAll your bills will appear here</string>
+    <string name="no_expenses">No expenses yet\nStart adding expenses to track your spending</string>
+    <string name="ok">OK</string>
+    <string name="password_requirements">Password must be at least 6 characters</string>
+    <string name="register_subtitle">Join DreamSaver today</string>
+    <string name="register_title">Create Account</string>
+    <string name="success_login">Login successful!</string>
+    <string name="success_registration">Account created successfully!</string>
+    <string name="text_already_have_account">Already have an account? <b>Login</b></string>
+    <string name="text_forgot_password">Forgot Password?</string>
+    <string name="text_register">Don\'t have an account? <b>Register</b></string>
+    <string name="total_due_amount">Total Due Amount</string>
+    <string name="total_this_month">Total This Month</string>
+    <style name="Base.Theme.FinanceApp" parent="Theme.Material3.Dark.NoActionBar">
+        
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryVariant">@color/primary_dark</item>
+        <item name="colorOnPrimary">@color/text_on_primary</item>
+        
+        
+        <item name="colorSecondary">@color/accent</item>
+        <item name="colorSecondaryVariant">@color/accent_dark</item>
+        <item name="colorOnSecondary">@color/white</item>
+        
+        
+        <item name="android:colorBackground">@color/background</item>
+        <item name="colorSurface">@color/surface</item>
+        <item name="colorSurfaceVariant">@color/surface_elevated</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        
+        
+        <item name="android:statusBarColor">@color/background</item>
+        <item name="android:navigationBarColor">@color/background</item>
+        <item name="android:windowLightStatusBar">false</item>
+        
+        
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
+        <item name="android:textColorHint">@color/text_hint</item>
+        
+        
+        <item name="materialButtonStyle">@style/Widget.FinanceApp.Button</item>
+        <item name="textInputStyle">@style/Widget.FinanceApp.TextInputLayout</item>
+        <item name="materialCardViewStyle">@style/Widget.FinanceApp.Card</item>
+    </style>
+    <style name="Theme.FinanceApp" parent="Base.Theme.FinanceApp"/>
+    <style name="Widget.FinanceApp.Button" parent="Widget.Material3.Button">
+        <item name="android:textColor">@color/white</item>
+        <item name="backgroundTint">@color/primary</item>
+        <item name="cornerRadius">8dp</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="fontFamily">sans-serif-medium</item>
+    </style>
+    <style name="Widget.FinanceApp.Card" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardCornerRadius">12dp</item>
+        <item name="cardElevation">4dp</item>
+        <item name="cardBackgroundColor">@color/card_background</item>
+    </style>
+    <style name="Widget.FinanceApp.TextInputLayout" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeColor">@color/primary</item>
+        <item name="hintTextColor">@color/text_secondary</item>
+        <item name="android:textColorHint">@color/text_hint</item>
+    </style>
+</resources>

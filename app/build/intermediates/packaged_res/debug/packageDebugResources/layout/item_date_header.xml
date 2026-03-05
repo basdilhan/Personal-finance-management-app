@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingVertical="16dp"
+    android:paddingHorizontal="16dp">
+
+    <!-- Timeline Indicator -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:layout_marginEnd="16dp">
+
+        <!-- Timeline Dot (larger for header) -->
+        <View
+            android:id="@+id/timeline_dot"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:background="@drawable/circle_primary"
+            android:layout_gravity="center_horizontal" />
+
+        <!-- Timeline Line (shown except for last item) -->
+        <View
+            android:layout_width="2dp"
+            android:layout_height="24dp"
+            android:background="@color/primary"
+            android:layout_marginTop="8dp" />
+    </LinearLayout>
+
+    <!-- Date Label -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <!-- Day name and date -->
+        <TextView
+            android:id="@+id/tv_date_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Today\nFeb 15"
+            android:textColor="@color/primary"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:lineSpacingExtra="4sp" />
+    </LinearLayout>
+</LinearLayout>
