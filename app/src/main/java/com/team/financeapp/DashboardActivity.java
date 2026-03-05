@@ -19,6 +19,7 @@ import com.google.android.material.button.MaterialButton;
 public class DashboardActivity extends AppCompatActivity {
 
     private MaterialButton btnLogout;
+    private View actionAddExpense, actionAddIncome, actionAddBill, actionAddGoal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +35,12 @@ public class DashboardActivity extends AppCompatActivity {
      */
     private void initializeViews() {
         btnLogout = findViewById(R.id.button_logout);
+
+        // Initialize Quick Action buttons
+        actionAddExpense = findViewById(R.id.action_add_expense);
+        actionAddIncome = findViewById(R.id.action_add_income);
+        actionAddBill = findViewById(R.id.action_add_bill);
+        actionAddGoal = findViewById(R.id.action_add_goal);
     }
 
     /**
@@ -44,6 +51,42 @@ public class DashboardActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 showLogoutDropdown(v);
+            }
+        });
+
+        // Quick Action: Add Expense
+        actionAddExpense.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(DashboardActivity.this, AddExpenseActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        // Quick Action: Add Income
+        actionAddIncome.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(DashboardActivity.this, AddIncomeActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        // Quick Action: Add Bill
+        actionAddBill.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(DashboardActivity.this, AddBillActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        // Quick Action: Add Goal
+        actionAddGoal.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(DashboardActivity.this, AddGoalActivity.class);
+                startActivity(intent);
             }
         });
     }

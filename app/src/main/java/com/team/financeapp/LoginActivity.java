@@ -66,7 +66,7 @@ public class LoginActivity extends AppCompatActivity {
         textForgotPassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(LoginActivity.this, "Password recovery coming soon", Toast.LENGTH_SHORT).show();
+                navigateToForgotPassword();
             }
         });
     }
@@ -131,6 +131,14 @@ public class LoginActivity extends AppCompatActivity {
      */
     private void navigateToRegister() {
         Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+        startActivity(intent);
+    }
+
+    /**
+     * Navigate to Forgot Password activity
+     */
+    private void navigateToForgotPassword() {
+        Intent intent = new Intent(LoginActivity.this, ForgotPasswordActivity.class);
         startActivity(intent);
     }
 }

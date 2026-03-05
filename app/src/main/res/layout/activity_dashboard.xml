@@ -91,7 +91,7 @@
                                     android:id="@+id/dashboard_welcome"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Juan Dela Cruz"
+                                    android:text="Saman Kumara"
                                     android:textColor="@color/white"
                                     android:textSize="18sp"
                                     android:textStyle="bold"
@@ -187,7 +187,7 @@
                                         android:id="@+id/text_total_balance"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="₱45,850.00"
+                                        android:text="LKR 285,750.00"
                                         android:textColor="#1E293B"
                                         android:textSize="32sp"
                                         android:textStyle="bold"
@@ -288,7 +288,7 @@
                                             android:id="@+id/text_income_amount"
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
-                                            android:text="₱32,500"
+                                            android:text="LKR 185,000"
                                             android:textColor="#10B981"
                                             android:textSize="17sp"
                                             android:textStyle="bold"
@@ -342,7 +342,7 @@
                                             android:id="@+id/text_expenses_amount"
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
-                                            android:text="₱15,450"
+                                            android:text="LKR 72,500"
                                             android:textColor="#EF4444"
                                             android:textSize="17sp"
                                             android:textStyle="bold"
@@ -653,7 +653,7 @@
                                     android:id="@+id/text_goal_name"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="New Laptop"
+                                    android:text="Family Savings Fund"
                                     android:textColor="#1E293B"
                                     android:textSize="16sp"
                                     android:textStyle="bold" />
@@ -722,7 +722,7 @@
                                     android:id="@+id/text_goal_current"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="₱15,000"
+                                    android:text="LKR 150,000"
                                     android:textColor="#6366F1"
                                     android:textSize="15sp"
                                     android:textStyle="bold" />
@@ -743,7 +743,7 @@
                                     android:id="@+id/text_goal_target"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="₱50,000"
+                                    android:text="LKR 500,000"
                                     android:textColor="#94A3B8"
                                     android:textSize="14sp" />
                             </LinearLayout>
@@ -878,7 +878,7 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="₱1,200"
+                                    android:text="LKR 1,200"
                                     android:textColor="#1E293B"
                                     android:textSize="17sp"
                                     android:textStyle="bold" />
@@ -958,7 +958,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="₱800"
+                                android:text="LKR 800"
                                 android:textColor="#1E293B"
                                 android:textSize="17sp"
                                 android:textStyle="bold" />
@@ -1022,7 +1022,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="₱1,599"
+                                android:text="LKR 6,990"
                                 android:textColor="#1E293B"
                                 android:textSize="17sp"
                                 android:textStyle="bold" />
