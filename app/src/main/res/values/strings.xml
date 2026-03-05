@@ -1,0 +1,52 @@
+<resources>
+    <!-- App Name -->
+    <string name="app_name">DreamSaver</string>
+
+    <!-- Home Screen -->
+    <string name="home_title">Personal Finance Manager</string>
+    <string name="home_subtitle">Bill Reminder &amp; Savings Tracker</string>
+    <string name="home_features">Features:\n• Track bills and get reminders\n• Create and monitor savings goals\n• Simple budget overview\n• Expense tracking\n\nTap Get Started to begin your financial journey.</string>
+    <string name="btn_get_started">Get Started</string>
+    
+    <!-- Login Screen -->
+    <string name="login_title">Welcome Back to DreamSaver</string>
+    <string name="login_subtitle">Sign in to continue</string>
+    <string name="hint_email">Email Address</string>
+    <string name="hint_password">Password</string>
+    <string name="btn_login">Sign In</string>
+    <string name="text_forgot_password">Forgot Password?</string>
+    <string name="text_register">Don\'t have an account? <b>Register</b></string>
+    <string name="error_empty_email">Please enter your email</string>
+    <string name="error_empty_password">Please enter your password</string>
+    <string name="error_invalid_email">Please enter a valid email address</string>
+    <string name="success_login">Login successful!</string>
+    
+    <!-- Dashboard Screen -->
+ <string name="btn_logout">Logout</string>
+    <string name="menu_my_profile">My Profile</string>
+    <string name="menu_logout">Logout</string>
+    <string name="btn_add_bill">Add Bill</string>
+    <string name="btn_add_savings">Add Savings Goal</string>
+    <string name="btn_add_expense">Add Expense</string>
+    
+    <!-- Register Screen -->
+    <string name="register_title">Create Account</string>
+    <string name="register_subtitle">Join DreamSaver today</string>
+    <string name="hint_full_name">Full Name</string>
+    <string name="hint_confirm_password">Confirm Password</string>
+    <string name="password_requirements">Password must be at least 6 characters</string>
+    <string name="btn_register">Create Account</string>
+    <string name="text_already_have_account">Already have an account? <b>Login</b></string>
+    <string name="error_empty_name">Please enter your full name</string>
+    <string name="error_name_too_short">Full name must be at least 3 characters</string>
+    <string name="error_password_too_short">Password must be at least 6 characters</string>
+    <string name="error_confirm_password_empty">Please confirm your password</string>
+    <string name="error_password_mismatch">Passwords do not match</string>
+    <string name="success_registration">Account created successfully!</string>
+    
+    <!-- General -->
+    <string name="loading">Loading…</string>
+    <string name="error_generic">Something went wrong. Please try again.</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+</resources>
