@@ -10,7 +10,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!-- Header -->
+        <!-- Header Section -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -24,8 +24,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
                 android:orientation="horizontal"
+                android:gravity="center_vertical"
                 android:layout_marginBottom="24dp">
 
                 <com.google.android.material.button.MaterialButton
@@ -33,18 +33,18 @@
                     style="@style/Widget.Material3.Button.OutlinedButton"
                     android:layout_width="44dp"
                     android:layout_height="44dp"
-                    android:background="@drawable/circle_translucent"
-                    android:contentDescription="Back"
                     android:insetTop="0dp"
                     android:insetBottom="0dp"
                     android:insetLeft="0dp"
                     android:insetRight="0dp"
+                    android:background="@drawable/circle_translucent"
+                    android:contentDescription="Back"
                     android:minWidth="0dp"
                     android:minHeight="0dp"
                     app:icon="@drawable/ic_chevron_right"
+                    app:iconTint="@color/white"
                     app:iconGravity="textStart"
                     app:iconPadding="0dp"
-                    app:iconTint="@color/white"
                     android:scaleX="-1" />
 
                 <LinearLayout
@@ -57,7 +57,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Savings Goals"
+                        android:text="Expense History"
                         android:textColor="@color/white"
                         android:textSize="24sp"
                         android:textStyle="bold" />
@@ -66,77 +66,69 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="Build your future one step at a time"
+                        android:text="Track where your money goes"
                         android:textColor="@color/white"
                         android:textSize="13sp"
                         android:alpha="0.9" />
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- Total Saved Card -->
+            <!-- Total Amount Card -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:elevation="8dp"
-                app:cardBackgroundColor="@color/white"
-                app:cardCornerRadius="16dp">
+                app:cardCornerRadius="16dp"
+                app:cardBackgroundColor="@color/white">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="20dp"
-                    android:gravity="center_horizontal">
+                    android:padding="20dp">
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Total Saved"
+                        android:text="Total This Month"
                         android:textColor="@color/text_secondary"
                         android:textSize="14sp"
                         android:alpha="0.85" />
 
                     <TextView
-                        android:id="@+id/tv_total_saved"
-                        android:layout_width="wrap_content"
+                        android:id="@+id/tv_total_amount"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="LKR 0"
-                        android:textColor="@color/primary"
+                        android:text="LKR 0.00"
+                        android:textColor="@color/text_primary"
                         android:textSize="32sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/tv_active_goals_count"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="0 active goals"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="12sp" />
+                        android:textStyle="bold"
+                        android:layout_marginTop="8dp" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
         </LinearLayout>
 
-        <!-- Goals List and Empty State -->
+        <!-- Expenses List and Empty State -->
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1">
 
+            <!-- Expenses RecyclerView -->
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_goals"
+                android:id="@+id/rv_expenses"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:clipToPadding="false"
                 android:paddingStart="16dp"
                 android:paddingTop="16dp"
                 android:paddingEnd="16dp"
                 android:paddingBottom="20dp"
+                android:clipToPadding="false"
                 android:scrollbars="vertical" />
 
+            <!-- Empty State Message -->
             <TextView
-                android:id="@+id/tv_no_goals"
+                android:id="@+id/tv_no_expenses"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -145,12 +137,12 @@
                 android:background="@drawable/card_rounded_white"
                 android:gravity="center"
                 android:lineSpacingExtra="4dp"
-                android:padding="24dp"
-                android:text="No savings goals yet.&#10;Start saving for your dreams!"
-                android:textAlignment="center"
+                android:text="No expenses yet&#10;Start adding expenses to track your spending"
                 android:textColor="@color/text_secondary"
                 android:textSize="16sp"
-                android:visibility="gone" />
+                android:textAlignment="center"
+                android:visibility="gone"
+                android:padding="24dp" />
         </FrameLayout>
     </LinearLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
