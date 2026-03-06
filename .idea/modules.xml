@@ -2,8 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/FinanceApp.iml" filepath="$PROJECT_DIR$/.idea/modules/FinanceApp.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/FinanceApp.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/FinanceApp.app.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/FinanceApp.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/FinanceApp.app.androidTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/FinanceApp.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/FinanceApp.app.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/FinanceApp.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/FinanceApp.app.unitTest.iml" />
