@@ -104,19 +104,15 @@ public class IncomeHistoryActivity extends AppCompatActivity {
             int itemId = menuItem.getItemId();
             if (itemId == R.id.nav_home) {
                 startActivity(new Intent(IncomeHistoryActivity.this, DashboardActivity.class));
-                finish();
                 return true;
             } else if (itemId == R.id.nav_expenses) {
                 startActivity(new Intent(IncomeHistoryActivity.this, ExpensesActivity.class));
-                finish();
                 return true;
             } else if (itemId == R.id.nav_bills) {
                 startActivity(new Intent(IncomeHistoryActivity.this, BillsActivity.class));
-                finish();
                 return true;
             } else if (itemId == R.id.nav_goals) {
                 startActivity(new Intent(IncomeHistoryActivity.this, GoalsActivity.class));
-                finish();
                 return true;
             } else if (itemId == R.id.nav_income_history) {
                 return true;

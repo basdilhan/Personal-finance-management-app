@@ -236,6 +236,10 @@ public class DashboardActivity extends AppCompatActivity {
                 Intent intent = new Intent(DashboardActivity.this, GoalsActivity.class);
                 startActivity(intent);
                 return true;
+            } else if (itemId == R.id.nav_income_history) {
+                Intent intent = new Intent(DashboardActivity.this, IncomeHistoryActivity.class);
+                startActivity(intent);
+                return true;
             } else if (itemId == R.id.nav_profile) {
                 Toast.makeText(DashboardActivity.this, "Profile coming soon", Toast.LENGTH_SHORT).show();
                 return true;

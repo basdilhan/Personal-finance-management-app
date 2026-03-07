@@ -101,17 +101,14 @@ public class BillsActivity extends AppCompatActivity {
             int itemId = menuItem.getItemId();
             if (itemId == R.id.nav_home) {
                 startActivity(new Intent(BillsActivity.this, DashboardActivity.class));
-                finish();
                 return true;
             } else if (itemId == R.id.nav_expenses) {
                 startActivity(new Intent(BillsActivity.this, ExpensesActivity.class));
-                finish();
                 return true;
             } else if (itemId == R.id.nav_bills) {
                 return true;
             } else if (itemId == R.id.nav_goals) {
                 startActivity(new Intent(BillsActivity.this, GoalsActivity.class));
-                finish();
                 return true;
             } else if (itemId == R.id.nav_profile) {
                 Toast.makeText(BillsActivity.this, "Profile coming soon", Toast.LENGTH_SHORT).show();

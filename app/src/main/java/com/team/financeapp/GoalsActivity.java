@@ -115,15 +115,12 @@ public class GoalsActivity extends AppCompatActivity implements GoalAdapter.OnGo
             int itemId = menuItem.getItemId();
             if (itemId == R.id.nav_home) {
                 startActivity(new Intent(GoalsActivity.this, DashboardActivity.class));
-                finish();
                 return true;
             } else if (itemId == R.id.nav_expenses) {
                 startActivity(new Intent(GoalsActivity.this, ExpensesActivity.class));
-                finish();
                 return true;
             } else if (itemId == R.id.nav_bills) {
                 startActivity(new Intent(GoalsActivity.this, BillsActivity.class));
-                finish();
                 return true;
             } else if (itemId == R.id.nav_goals) {
                 // Already on Goals page

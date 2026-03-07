@@ -101,17 +101,14 @@ public class ExpensesActivity extends AppCompatActivity {
             int itemId = menuItem.getItemId();
             if (itemId == R.id.nav_home) {
                 startActivity(new Intent(ExpensesActivity.this, DashboardActivity.class));
-                finish();
                 return true;
             } else if (itemId == R.id.nav_expenses) {
                 return true;
             } else if (itemId == R.id.nav_bills) {
                 startActivity(new Intent(ExpensesActivity.this, BillsActivity.class));
-                finish();
                 return true;
             } else if (itemId == R.id.nav_goals) {
                 startActivity(new Intent(ExpensesActivity.this, GoalsActivity.class));
-                finish();
                 return true;
             } else if (itemId == R.id.nav_profile) {
                 Toast.makeText(ExpensesActivity.this, "Profile coming soon", Toast.LENGTH_SHORT).show();
