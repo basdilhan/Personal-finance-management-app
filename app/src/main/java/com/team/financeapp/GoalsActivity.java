@@ -12,7 +12,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -37,7 +36,6 @@ public class GoalsActivity extends AppCompatActivity implements GoalAdapter.OnGo
     private GoalAdapter goalAdapter;
     private MaterialButton btnLogout;
     private FloatingActionButton fabAddGoal;
-    private BottomNavigationView bottomNavigationView;
     private ChipGroup chipGroupFilter;
     private List<Goal> goalsList;
     private List<Goal> allGoalsList; // Keep original list for filtering
@@ -49,17 +47,10 @@ public class GoalsActivity extends AppCompatActivity implements GoalAdapter.OnGo
 
         initializeViews();
         setupRecyclerView();
-        setupBottomNavigation();
+        BottomNavigationFragment.attach(this, R.id.bottom_navigation_container, R.id.nav_goals);
         setupFilterChips();
         loadGoals();
         calculateTotalSaved();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        // Refresh when returning to this activity
-        bottomNavigationView.setSelectedItemId(R.id.nav_goals);
     }
 
     /**
@@ -74,7 +65,6 @@ public class GoalsActivity extends AppCompatActivity implements GoalAdapter.OnGo
         rvGoals = findViewById(R.id.rv_goals);
         btnLogout = findViewById(R.id.btn_logout);
         fabAddGoal = findViewById(R.id.fab_add_goal);
-        bottomNavigationView = findViewById(R.id.bottom_navigation);
         chipGroupFilter = findViewById(R.id.chip_group_filter);
 
         // Setup logout button
@@ -104,36 +94,6 @@ public class GoalsActivity extends AppCompatActivity implements GoalAdapter.OnGo
                 }
             });
         }
-    }
-
-    /**
-     * Setup bottom navigation
-     */
-    private void setupBottomNavigation() {
-        bottomNavigationView.setSelectedItemId(R.id.nav_goals);
-        bottomNavigationView.setOnItemSelectedListener(menuItem -> {
-            int itemId = menuItem.getItemId();
-            if (itemId == R.id.nav_home) {
-                startActivity(new Intent(GoalsActivity.this, DashboardActivity.class));
-                finish();
-                return true;
-            } else if (itemId == R.id.nav_expenses) {
-                startActivity(new Intent(GoalsActivity.this, ExpensesActivity.class));
-                finish();
-                return true;
-            } else if (itemId == R.id.nav_bills) {
-                startActivity(new Intent(GoalsActivity.this, BillsActivity.class));
-                finish();
-                return true;
-            } else if (itemId == R.id.nav_goals) {
-                // Already on Goals page
-                return true;
-            } else if (itemId == R.id.nav_profile) {
-                Toast.makeText(GoalsActivity.this, "Profile coming soon", Toast.LENGTH_SHORT).show();
-                return true;
-            }
-            return false;
-        });
     }
 
     /**

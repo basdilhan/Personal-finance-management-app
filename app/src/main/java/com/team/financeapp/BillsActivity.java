@@ -12,7 +12,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -36,7 +35,6 @@ public class BillsActivity extends AppCompatActivity {
     private BillAdapter billAdapter;
     private MaterialButton btnLogout;
     private FloatingActionButton fabAddBill;
-    private BottomNavigationView bottomNavigationView;
     private ChipGroup chipGroupFilter;
     private List<Bill> billsList;
     private List<Bill> allBillsList;
@@ -48,16 +46,10 @@ public class BillsActivity extends AppCompatActivity {
 
         initializeViews();
         setupRecyclerView();
-        setupBottomNavigation();
+        BottomNavigationFragment.attach(this, R.id.bottom_navigation_container, R.id.nav_bills);
         setupFilterChips();
         loadBills();
         calculateTotalDue();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        bottomNavigationView.setSelectedItemId(R.id.nav_bills);
     }
 
     /**
@@ -71,7 +63,6 @@ public class BillsActivity extends AppCompatActivity {
         rvBills = findViewById(R.id.rv_bills);
         btnLogout = findViewById(R.id.btn_logout);
         fabAddBill = findViewById(R.id.fab_add_bill);
-        bottomNavigationView = findViewById(R.id.bottom_navigation);
         chipGroupFilter = findViewById(R.id.chip_group_filter);
 
         // Setup logout button
@@ -90,35 +81,6 @@ public class BillsActivity extends AppCompatActivity {
                 startActivity(intent);
             });
         }
-    }
-
-    /**
-     * Setup bottom navigation
-     */
-    private void setupBottomNavigation() {
-        bottomNavigationView.setSelectedItemId(R.id.nav_bills);
-        bottomNavigationView.setOnItemSelectedListener(menuItem -> {
-            int itemId = menuItem.getItemId();
-            if (itemId == R.id.nav_home) {
-                startActivity(new Intent(BillsActivity.this, DashboardActivity.class));
-                finish();
-                return true;
-            } else if (itemId == R.id.nav_expenses) {
-                startActivity(new Intent(BillsActivity.this, ExpensesActivity.class));
-                finish();
-                return true;
-            } else if (itemId == R.id.nav_bills) {
-                return true;
-            } else if (itemId == R.id.nav_goals) {
-                startActivity(new Intent(BillsActivity.this, GoalsActivity.class));
-                finish();
-                return true;
-            } else if (itemId == R.id.nav_profile) {
-                Toast.makeText(BillsActivity.this, "Profile coming soon", Toast.LENGTH_SHORT).show();
-                return true;
-            }
-            return false;
-        });
     }
 
     /**
