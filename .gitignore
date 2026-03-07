@@ -1,0 +1,32 @@
+# Gradle files
+.gradle/
+build/
+*.apk
+*.ap_
+*.dex
+
+# Local properties
+local.properties
+
+# IDE files
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Build outputs
+*.log
+bin/
+gen/
+
+# Misc
+.classpath
+.project
+.settings/
+

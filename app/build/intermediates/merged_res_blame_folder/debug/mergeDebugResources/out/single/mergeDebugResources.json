@@ -1,0 +1,366 @@
+[
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\mipmap-xhdpi_ic_launcher_round.webp.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\mipmap-xhdpi\\ic_launcher_round.webp"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_ic_expenses_nav.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\ic_expenses_nav.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_action_button_goal.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\action_button_goal.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_alert_background.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\alert_background.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_ic_logout.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\ic_logout.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\mipmap-xxxhdpi_ic_launcher.webp.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\mipmap-xxxhdpi\\ic_launcher.webp"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_circle_white.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\circle_white.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\mipmap-xxxhdpi_ic_launcher_round.webp.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\mipmap-xxxhdpi\\ic_launcher_round.webp"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_circle_blue_light.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\circle_blue_light.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_ic_key.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\ic_key.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\layout_activity_add_bill.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\layout\\activity_add_bill.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\mipmap-xxhdpi_ic_launcher_round.webp.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\mipmap-xxhdpi\\ic_launcher_round.webp"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_circle_purple_light.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\circle_purple_light.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_progress_track.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\progress_track.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\layout_activity_add_income.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\layout\\activity_add_income.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\mipmap-mdpi_ic_launcher.webp.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\mipmap-mdpi\\ic_launcher.webp"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\mipmap-xhdpi_ic_launcher.webp.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\mipmap-xhdpi\\ic_launcher.webp"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_circle_border_white.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\circle_border_white.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_ic_arrow_down.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\ic_arrow_down.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_circle_red.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\circle_red.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_ic_notification.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\ic_notification.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_circle_translucent.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\circle_translucent.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\mipmap-hdpi_ic_launcher_round.webp.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\mipmap-hdpi\\ic_launcher_round.webp"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\layout_activity_dashboard.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\layout\\activity_dashboard.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_circle_danger_light.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\circle_danger_light.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_ic_edit.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\ic_edit.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_ic_arrow_up.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\ic_arrow_up.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_action_button_income.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\action_button_income.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_ic_finance.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\ic_finance.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_circle_success_light.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\circle_success_light.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_circle_primary_light.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\circle_primary_light.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\mipmap-anydpi-v26\\ic_launcher_round.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_progress_bar.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\progress_bar.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_gradient_header.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\gradient_header.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_badge_primary.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\badge_primary.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_ic_lightbulb.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\ic_lightbulb.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_ic_receipt.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\ic_receipt.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_ic_add.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\ic_add.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_ic_bills.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\ic_bills.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\xml_data_extraction_rules.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\xml\\data_extraction_rules.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_circle_background.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\circle_background.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_badge_success.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\badge_success.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_ic_wifi.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\ic_wifi.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_ic_target.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\ic_target.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_card_elevated.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\card_elevated.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\layout_activity_home.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\layout\\activity_home.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_ic_lock_open.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\ic_lock_open.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\menu_menu_logout.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\menu\\menu_logout.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_ic_wallet.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\ic_wallet.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_ic_water.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\ic_water.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\mipmap-hdpi_ic_launcher.webp.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\mipmap-hdpi\\ic_launcher.webp"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\layout_activity_login.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\layout\\activity_login.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\layout_activity_add_expense.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\layout\\activity_add_expense.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_ic_calendar.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\ic_calendar.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\mipmap-anydpi-v26\\ic_launcher.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_ic_chevron_right.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\ic_chevron_right.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_ic_launcher_background.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\ic_launcher_background.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\menu_bottom_nav_menu.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\menu\\bottom_nav_menu.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_action_button_bill.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\action_button_bill.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_ic_launcher_foreground.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\ic_launcher_foreground.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_ic_electricity.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\ic_electricity.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_button_gradient.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\button_gradient.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_action_button_expense.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\action_button_expense.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\mipmap-mdpi_ic_launcher_round.webp.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\mipmap-mdpi\\ic_launcher_round.webp"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_ic_goals.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\ic_goals.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_progress_indicator.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\progress_indicator.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_card_background.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\card_background.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\xml_backup_rules.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\xml\\backup_rules.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_ic_person.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\ic_person.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_ic_expenses.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\ic_expenses.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_circle_urgent.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\circle_urgent.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\layout_activity_profile.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\layout\\activity_profile.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\layout_activity_add_goal.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\layout\\activity_add_goal.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_circle_yellow_light.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\circle_yellow_light.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_divider_gradient.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\divider_gradient.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_rounded_background.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\rounded_background.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\color_bottom_nav_color.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\color\\bottom_nav_color.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_ic_savings.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\ic_savings.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_ic_home.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\ic_home.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_ic_back.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\ic_back.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_ic_laptop.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\ic_laptop.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\layout_activity_register.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\layout\\activity_register.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_circle_warning.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\circle_warning.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_button_accent.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\button_accent.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_ic_profile.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\ic_profile.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_ic_trending_up.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\ic_trending_up.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\layout_activity_main.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\layout\\activity_main.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\layout_activity_forgot_password.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\layout\\activity_forgot_password.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\mipmap-xxhdpi_ic_launcher.webp.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\mipmap-xxhdpi\\ic_launcher.webp"
+    },
+    {
+        "merged": "com.team.financeapp-debug-31:/layout_activity_edit_profile.xml.flat",
+        "source": "com.team.financeapp-main-33:/layout/activity_edit_profile.xml"
+    },
+    {
+        "merged": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-debug-31:\\drawable_card_rounded_white.xml.flat",
+        "source": "C:\\Users\\pulin\\.gradle\\daemon\\8.9\\com.team.financeapp-main-33:\\drawable\\card_rounded_white.xml"
+    }
+]
