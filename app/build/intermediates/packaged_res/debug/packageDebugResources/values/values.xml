@@ -38,6 +38,10 @@
     <color name="warning">#F97316</color>
     <color name="white">#FFFFFFFF</color>
     <string name="app_name">DreamSaver</string>
+    <string name="bills_empty_state">No bills to track\nAll your bills will appear here</string>
+    <string name="bills_subtitle">Keep upcoming payments under control</string>
+    <string name="bills_title">Bills</string>
+    <string name="bills_total_due_label">Total Due Amount</string>
     <string name="btn_add_bill">Add Bill</string>
     <string name="btn_add_expense">Add Expense</string>
     <string name="btn_add_savings">Add Savings Goal</string>
@@ -46,6 +50,7 @@
     <string name="btn_logout">Logout</string>
     <string name="btn_register">Create Account</string>
     <string name="cancel">Cancel</string>
+    <string name="cd_back">Go back</string>
     <string name="error_confirm_password_empty">Please confirm your password</string>
     <string name="error_empty_email">Please enter your email</string>
     <string name="error_empty_name">Please enter your full name</string>
@@ -55,6 +60,14 @@
     <string name="error_name_too_short">Full name must be at least 3 characters</string>
     <string name="error_password_mismatch">Passwords do not match</string>
     <string name="error_password_too_short">Password must be at least 6 characters</string>
+    <string name="expenses_empty_state">No expenses yet\nStart adding expenses to track your spending</string>
+    <string name="expenses_subtitle">Track where your money goes</string>
+    <string name="expenses_title">Expense History</string>
+    <string name="expenses_total_month_label">Total This Month</string>
+    <string name="goals_empty_state">No savings goals yet.\nStart saving for your dreams!</string>
+    <string name="goals_subtitle">Build your future one step at a time</string>
+    <string name="goals_title">Savings Goals</string>
+    <string name="goals_total_saved_label">Total Saved</string>
     <string name="hint_confirm_password">Confirm Password</string>
     <string name="hint_email">Email Address</string>
     <string name="hint_full_name">Full Name</string>
@@ -73,9 +86,9 @@
     <string name="register_title">Create Account</string>
     <string name="success_login">Login successful!</string>
     <string name="success_registration">Account created successfully!</string>
-    <string name="text_already_have_account">Already have an account? <b>Login</b></string>
+    <string name="text_already_have_account">Already have an account? &lt;b>Login&lt;/b></string>
     <string name="text_forgot_password">Forgot Password?</string>
-    <string name="text_register">Don\'t have an account? <b>Register</b></string>
+    <string name="text_register">Don\'t have an account? &lt;b>Register&lt;/b></string>
     <style name="Base.Theme.FinanceApp" parent="Theme.Material3.Dark.NoActionBar">
         
         <item name="colorPrimary">@color/primary</item>

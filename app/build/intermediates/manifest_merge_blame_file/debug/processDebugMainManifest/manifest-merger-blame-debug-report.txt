@@ -9,181 +9,211 @@
 9        android:targetSdkVersion="34" />
 10
 11    <permission
-11-->[androidx.core:core:1.9.0] C:\Users\pulin\.gradle\caches\8.9\transforms\d285940d5a89d5f9888cb07359ce0eb7\transformed\core-1.9.0\AndroidManifest.xml:22:5-24:47
+11-->[androidx.core:core:1.9.0] C:\Users\ASUS\.gradle\caches\9.2.1\transforms\2cadb1ba6d5ae1b98b26571e5cb15d0d\workspace\transformed\core-1.9.0\AndroidManifest.xml:22:5-24:47
 12        android:name="com.team.financeapp.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
-12-->[androidx.core:core:1.9.0] C:\Users\pulin\.gradle\caches\8.9\transforms\d285940d5a89d5f9888cb07359ce0eb7\transformed\core-1.9.0\AndroidManifest.xml:23:9-81
+12-->[androidx.core:core:1.9.0] C:\Users\ASUS\.gradle\caches\9.2.1\transforms\2cadb1ba6d5ae1b98b26571e5cb15d0d\workspace\transformed\core-1.9.0\AndroidManifest.xml:23:9-81
 13        android:protectionLevel="signature" />
-13-->[androidx.core:core:1.9.0] C:\Users\pulin\.gradle\caches\8.9\transforms\d285940d5a89d5f9888cb07359ce0eb7\transformed\core-1.9.0\AndroidManifest.xml:24:9-44
+13-->[androidx.core:core:1.9.0] C:\Users\ASUS\.gradle\caches\9.2.1\transforms\2cadb1ba6d5ae1b98b26571e5cb15d0d\workspace\transformed\core-1.9.0\AndroidManifest.xml:24:9-44
 14
 15    <uses-permission android:name="com.team.financeapp.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
-15-->[androidx.core:core:1.9.0] C:\Users\pulin\.gradle\caches\8.9\transforms\d285940d5a89d5f9888cb07359ce0eb7\transformed\core-1.9.0\AndroidManifest.xml:26:5-97
-15-->[androidx.core:core:1.9.0] C:\Users\pulin\.gradle\caches\8.9\transforms\d285940d5a89d5f9888cb07359ce0eb7\transformed\core-1.9.0\AndroidManifest.xml:26:22-94
+15-->[androidx.core:core:1.9.0] C:\Users\ASUS\.gradle\caches\9.2.1\transforms\2cadb1ba6d5ae1b98b26571e5cb15d0d\workspace\transformed\core-1.9.0\AndroidManifest.xml:26:5-97
+15-->[androidx.core:core:1.9.0] C:\Users\ASUS\.gradle\caches\9.2.1\transforms\2cadb1ba6d5ae1b98b26571e5cb15d0d\workspace\transformed\core-1.9.0\AndroidManifest.xml:26:22-94
 16
 17    <application
-17-->C:\Users\pulin\OneDrive\Desktop\mobile DW\Personal-finance-management-app\app\src\main\AndroidManifest.xml:6:5-34:19
+17-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:5:5-38:19
 18        android:allowBackup="true"
-18-->C:\Users\pulin\OneDrive\Desktop\mobile DW\Personal-finance-management-app\app\src\main\AndroidManifest.xml:7:9-35
+18-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:6:9-35
 19        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
-19-->[androidx.core:core:1.9.0] C:\Users\pulin\.gradle\caches\8.9\transforms\d285940d5a89d5f9888cb07359ce0eb7\transformed\core-1.9.0\AndroidManifest.xml:28:18-86
+19-->[androidx.core:core:1.9.0] C:\Users\ASUS\.gradle\caches\9.2.1\transforms\2cadb1ba6d5ae1b98b26571e5cb15d0d\workspace\transformed\core-1.9.0\AndroidManifest.xml:28:18-86
 20        android:dataExtractionRules="@xml/data_extraction_rules"
-20-->C:\Users\pulin\OneDrive\Desktop\mobile DW\Personal-finance-management-app\app\src\main\AndroidManifest.xml:8:9-65
+20-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:7:9-65
 21        android:debuggable="true"
 22        android:extractNativeLibs="false"
 23        android:fullBackupContent="@xml/backup_rules"
-23-->C:\Users\pulin\OneDrive\Desktop\mobile DW\Personal-finance-management-app\app\src\main\AndroidManifest.xml:9:9-54
+23-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:8:9-54
 24        android:icon="@mipmap/ic_launcher"
-24-->C:\Users\pulin\OneDrive\Desktop\mobile DW\Personal-finance-management-app\app\src\main\AndroidManifest.xml:10:9-43
+24-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:9:9-43
 25        android:label="@string/app_name"
-25-->C:\Users\pulin\OneDrive\Desktop\mobile DW\Personal-finance-management-app\app\src\main\AndroidManifest.xml:11:9-41
+25-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:10:9-41
 26        android:roundIcon="@mipmap/ic_launcher_round"
-26-->C:\Users\pulin\OneDrive\Desktop\mobile DW\Personal-finance-management-app\app\src\main\AndroidManifest.xml:12:9-54
+26-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:11:9-54
 27        android:supportsRtl="true"
-27-->C:\Users\pulin\OneDrive\Desktop\mobile DW\Personal-finance-management-app\app\src\main\AndroidManifest.xml:13:9-35
+27-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:12:9-35
 28        android:theme="@style/Theme.FinanceApp" >
-28-->C:\Users\pulin\OneDrive\Desktop\mobile DW\Personal-finance-management-app\app\src\main\AndroidManifest.xml:14:9-48
+28-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:13:9-48
 29        <activity
-29-->C:\Users\pulin\OneDrive\Desktop\mobile DW\Personal-finance-management-app\app\src\main\AndroidManifest.xml:15:9-23:20
+29-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:14:9-22:20
 30            android:name="com.team.financeapp.HomeActivity"
-30-->C:\Users\pulin\OneDrive\Desktop\mobile DW\Personal-finance-management-app\app\src\main\AndroidManifest.xml:16:13-41
+30-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:15:13-41
 31            android:exported="true" >
-31-->C:\Users\pulin\OneDrive\Desktop\mobile DW\Personal-finance-management-app\app\src\main\AndroidManifest.xml:17:13-36
+31-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:16:13-36
 32            <intent-filter>
-32-->C:\Users\pulin\OneDrive\Desktop\mobile DW\Personal-finance-management-app\app\src\main\AndroidManifest.xml:18:13-22:29
+32-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:17:13-21:29
 33                <action android:name="android.intent.action.MAIN" />
-33-->C:\Users\pulin\OneDrive\Desktop\mobile DW\Personal-finance-management-app\app\src\main\AndroidManifest.xml:19:17-69
-33-->C:\Users\pulin\OneDrive\Desktop\mobile DW\Personal-finance-management-app\app\src\main\AndroidManifest.xml:19:25-66
+33-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:18:17-69
+33-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:18:25-66
 34
 35                <category android:name="android.intent.category.LAUNCHER" />
-35-->C:\Users\pulin\OneDrive\Desktop\mobile DW\Personal-finance-management-app\app\src\main\AndroidManifest.xml:21:17-77
-35-->C:\Users\pulin\OneDrive\Desktop\mobile DW\Personal-finance-management-app\app\src\main\AndroidManifest.xml:21:27-74
+35-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:20:17-77
+35-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:20:27-74
 36            </intent-filter>
 37        </activity>
 38        <activity
-38-->C:\Users\pulin\OneDrive\Desktop\mobile DW\Personal-finance-management-app\app\src\main\AndroidManifest.xml:24:9-76
+38-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:23:9-76
 39            android:name="com.team.financeapp.LoginActivity"
-39-->C:\Users\pulin\OneDrive\Desktop\mobile DW\Personal-finance-management-app\app\src\main\AndroidManifest.xml:24:19-48
+39-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:23:19-48
 40            android:exported="false" />
-40-->C:\Users\pulin\OneDrive\Desktop\mobile DW\Personal-finance-management-app\app\src\main\AndroidManifest.xml:24:49-73
+40-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:23:49-73
 41        <activity
-41-->C:\Users\pulin\OneDrive\Desktop\mobile DW\Personal-finance-management-app\app\src\main\AndroidManifest.xml:25:9-79
+41-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:24:9-79
 42            android:name="com.team.financeapp.RegisterActivity"
-42-->C:\Users\pulin\OneDrive\Desktop\mobile DW\Personal-finance-management-app\app\src\main\AndroidManifest.xml:25:19-51
+42-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:24:19-51
 43            android:exported="false" />
-43-->C:\Users\pulin\OneDrive\Desktop\mobile DW\Personal-finance-management-app\app\src\main\AndroidManifest.xml:25:52-76
+43-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:24:52-76
 44        <activity
-44-->C:\Users\pulin\OneDrive\Desktop\mobile DW\Personal-finance-management-app\app\src\main\AndroidManifest.xml:26:9-85
+44-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:25:9-85
 45            android:name="com.team.financeapp.ForgotPasswordActivity"
-45-->C:\Users\pulin\OneDrive\Desktop\mobile DW\Personal-finance-management-app\app\src\main\AndroidManifest.xml:26:19-57
+45-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:25:19-57
 46            android:exported="false" />
-46-->C:\Users\pulin\OneDrive\Desktop\mobile DW\Personal-finance-management-app\app\src\main\AndroidManifest.xml:26:58-82
+46-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:25:58-82
 47        <activity
-47-->C:\Users\pulin\OneDrive\Desktop\mobile DW\Personal-finance-management-app\app\src\main\AndroidManifest.xml:27:9-80
+47-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:26:9-80
 48            android:name="com.team.financeapp.DashboardActivity"
-48-->C:\Users\pulin\OneDrive\Desktop\mobile DW\Personal-finance-management-app\app\src\main\AndroidManifest.xml:27:19-52
+48-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:26:19-52
 49            android:exported="false" />
-49-->C:\Users\pulin\OneDrive\Desktop\mobile DW\Personal-finance-management-app\app\src\main\AndroidManifest.xml:27:53-77
+49-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:26:53-77
 50        <activity
-50-->C:\Users\pulin\OneDrive\Desktop\mobile DW\Personal-finance-management-app\app\src\main\AndroidManifest.xml:28:9-81
-51            android:name="com.team.financeapp.AddExpenseActivity"
-51-->C:\Users\pulin\OneDrive\Desktop\mobile DW\Personal-finance-management-app\app\src\main\AndroidManifest.xml:28:19-53
+50-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:27:9-79
+51            android:name="com.team.financeapp.ExpensesActivity"
+51-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:27:19-51
 52            android:exported="false" />
-52-->C:\Users\pulin\OneDrive\Desktop\mobile DW\Personal-finance-management-app\app\src\main\AndroidManifest.xml:28:54-78
+52-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:27:52-76
 53        <activity
-53-->C:\Users\pulin\OneDrive\Desktop\mobile DW\Personal-finance-management-app\app\src\main\AndroidManifest.xml:29:9-80
-54            android:name="com.team.financeapp.AddIncomeActivity"
-54-->C:\Users\pulin\OneDrive\Desktop\mobile DW\Personal-finance-management-app\app\src\main\AndroidManifest.xml:29:19-52
+53-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:28:9-76
+54            android:name="com.team.financeapp.BillsActivity"
+54-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:28:19-48
 55            android:exported="false" />
-55-->C:\Users\pulin\OneDrive\Desktop\mobile DW\Personal-finance-management-app\app\src\main\AndroidManifest.xml:29:53-77
+55-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:28:49-73
 56        <activity
-56-->C:\Users\pulin\OneDrive\Desktop\mobile DW\Personal-finance-management-app\app\src\main\AndroidManifest.xml:30:9-78
-57            android:name="com.team.financeapp.AddBillActivity"
-57-->C:\Users\pulin\OneDrive\Desktop\mobile DW\Personal-finance-management-app\app\src\main\AndroidManifest.xml:30:19-50
+56-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:29:9-76
+57            android:name="com.team.financeapp.GoalsActivity"
+57-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:29:19-48
 58            android:exported="false" />
-58-->C:\Users\pulin\OneDrive\Desktop\mobile DW\Personal-finance-management-app\app\src\main\AndroidManifest.xml:30:51-75
+58-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:29:49-73
 59        <activity
-59-->C:\Users\pulin\OneDrive\Desktop\mobile DW\Personal-finance-management-app\app\src\main\AndroidManifest.xml:31:9-78
-60            android:name="com.team.financeapp.AddGoalActivity"
-60-->C:\Users\pulin\OneDrive\Desktop\mobile DW\Personal-finance-management-app\app\src\main\AndroidManifest.xml:31:19-50
+59-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:30:9-78
+60            android:name="com.team.financeapp.ProfileActivity"
+60-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:30:19-50
 61            android:exported="false" />
-61-->C:\Users\pulin\OneDrive\Desktop\mobile DW\Personal-finance-management-app\app\src\main\AndroidManifest.xml:31:51-75
+61-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:30:51-75
 62        <activity
-62-->C:\Users\pulin\OneDrive\Desktop\mobile DW\Personal-finance-management-app\app\src\main\AndroidManifest.xml:32:9-78
-63            android:name="com.team.financeapp.ProfileActivity"
-63-->C:\Users\pulin\OneDrive\Desktop\mobile DW\Personal-finance-management-app\app\src\main\AndroidManifest.xml:32:19-50
+62-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:31:9-82
+63            android:name="com.team.financeapp.EditProfileActivity"
+63-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:31:19-54
 64            android:exported="false" />
-64-->C:\Users\pulin\OneDrive\Desktop\mobile DW\Personal-finance-management-app\app\src\main\AndroidManifest.xml:32:51-75
+64-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:31:55-79
 65        <activity
-65-->C:\Users\pulin\OneDrive\Desktop\mobile DW\Personal-finance-management-app\app\src\main\AndroidManifest.xml:33:9-82
-66            android:name="com.team.financeapp.EditProfileActivity"
-66-->C:\Users\pulin\OneDrive\Desktop\mobile DW\Personal-finance-management-app\app\src\main\AndroidManifest.xml:33:19-54
+65-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:32:9-81
+66            android:name="com.team.financeapp.AddExpenseActivity"
+66-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:32:19-53
 67            android:exported="false" />
-67-->C:\Users\pulin\OneDrive\Desktop\mobile DW\Personal-finance-management-app\app\src\main\AndroidManifest.xml:33:55-79
-68
-69        <provider
-69-->[androidx.emoji2:emoji2:1.2.0] C:\Users\pulin\.gradle\caches\8.9\transforms\700ead7210242c6eec7af1d4fb07eb20\transformed\emoji2-1.2.0\AndroidManifest.xml:24:9-32:20
-70            android:name="androidx.startup.InitializationProvider"
-70-->[androidx.emoji2:emoji2:1.2.0] C:\Users\pulin\.gradle\caches\8.9\transforms\700ead7210242c6eec7af1d4fb07eb20\transformed\emoji2-1.2.0\AndroidManifest.xml:25:13-67
-71            android:authorities="com.team.financeapp.androidx-startup"
-71-->[androidx.emoji2:emoji2:1.2.0] C:\Users\pulin\.gradle\caches\8.9\transforms\700ead7210242c6eec7af1d4fb07eb20\transformed\emoji2-1.2.0\AndroidManifest.xml:26:13-68
-72            android:exported="false" >
-72-->[androidx.emoji2:emoji2:1.2.0] C:\Users\pulin\.gradle\caches\8.9\transforms\700ead7210242c6eec7af1d4fb07eb20\transformed\emoji2-1.2.0\AndroidManifest.xml:27:13-37
-73            <meta-data
-73-->[androidx.emoji2:emoji2:1.2.0] C:\Users\pulin\.gradle\caches\8.9\transforms\700ead7210242c6eec7af1d4fb07eb20\transformed\emoji2-1.2.0\AndroidManifest.xml:29:13-31:52
-74                android:name="androidx.emoji2.text.EmojiCompatInitializer"
-74-->[androidx.emoji2:emoji2:1.2.0] C:\Users\pulin\.gradle\caches\8.9\transforms\700ead7210242c6eec7af1d4fb07eb20\transformed\emoji2-1.2.0\AndroidManifest.xml:30:17-75
-75                android:value="androidx.startup" />
-75-->[androidx.emoji2:emoji2:1.2.0] C:\Users\pulin\.gradle\caches\8.9\transforms\700ead7210242c6eec7af1d4fb07eb20\transformed\emoji2-1.2.0\AndroidManifest.xml:31:17-49
-76            <meta-data
-76-->[androidx.lifecycle:lifecycle-process:2.6.1] C:\Users\pulin\.gradle\caches\8.9\transforms\3e2804399d86e15c245f68f4d4eef62f\transformed\lifecycle-process-2.6.1\AndroidManifest.xml:29:13-31:52
-77                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
-77-->[androidx.lifecycle:lifecycle-process:2.6.1] C:\Users\pulin\.gradle\caches\8.9\transforms\3e2804399d86e15c245f68f4d4eef62f\transformed\lifecycle-process-2.6.1\AndroidManifest.xml:30:17-78
-78                android:value="androidx.startup" />
-78-->[androidx.lifecycle:lifecycle-process:2.6.1] C:\Users\pulin\.gradle\caches\8.9\transforms\3e2804399d86e15c245f68f4d4eef62f\transformed\lifecycle-process-2.6.1\AndroidManifest.xml:31:17-49
-79            <meta-data
-79-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\pulin\.gradle\caches\8.9\transforms\a35523d6448d1d8086e25fe48b59a496\transformed\profileinstaller-1.3.0\AndroidManifest.xml:29:13-31:52
-80                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
-80-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\pulin\.gradle\caches\8.9\transforms\a35523d6448d1d8086e25fe48b59a496\transformed\profileinstaller-1.3.0\AndroidManifest.xml:30:17-85
-81                android:value="androidx.startup" />
-81-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\pulin\.gradle\caches\8.9\transforms\a35523d6448d1d8086e25fe48b59a496\transformed\profileinstaller-1.3.0\AndroidManifest.xml:31:17-49
-82        </provider>
+67-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:32:54-78
+68        <activity
+68-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:33:9-80
+69            android:name="com.team.financeapp.AddIncomeActivity"
+69-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:33:19-52
+70            android:exported="false" />
+70-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:33:53-77
+71        <activity
+71-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:34:9-84
+72            android:name="com.team.financeapp.IncomeHistoryActivity"
+72-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:34:19-56
+73            android:exported="false" />
+73-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:34:57-81
+74        <activity
+74-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:35:9-78
+75            android:name="com.team.financeapp.AddBillActivity"
+75-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:35:19-50
+76            android:exported="false" />
+76-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:35:51-75
+77        <activity
+77-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:36:9-78
+78            android:name="com.team.financeapp.AddGoalActivity"
+78-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:36:19-50
+79            android:exported="false" />
+79-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:36:51-75
+80        <activity
+80-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:37:9-82
+81            android:name="com.team.financeapp.GoalDetailsActivity"
+81-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:37:19-54
+82            android:exported="false" />
+82-->D:\HDSE\MAD\App\Personal-finance-management-app-dev\Personal-finance-management-app-dev\app\src\main\AndroidManifest.xml:37:55-79
 83
-84        <receiver
-84-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\pulin\.gradle\caches\8.9\transforms\a35523d6448d1d8086e25fe48b59a496\transformed\profileinstaller-1.3.0\AndroidManifest.xml:34:9-52:20
-85            android:name="androidx.profileinstaller.ProfileInstallReceiver"
-85-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\pulin\.gradle\caches\8.9\transforms\a35523d6448d1d8086e25fe48b59a496\transformed\profileinstaller-1.3.0\AndroidManifest.xml:35:13-76
-86            android:directBootAware="false"
-86-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\pulin\.gradle\caches\8.9\transforms\a35523d6448d1d8086e25fe48b59a496\transformed\profileinstaller-1.3.0\AndroidManifest.xml:36:13-44
-87            android:enabled="true"
-87-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\pulin\.gradle\caches\8.9\transforms\a35523d6448d1d8086e25fe48b59a496\transformed\profileinstaller-1.3.0\AndroidManifest.xml:37:13-35
-88            android:exported="true"
-88-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\pulin\.gradle\caches\8.9\transforms\a35523d6448d1d8086e25fe48b59a496\transformed\profileinstaller-1.3.0\AndroidManifest.xml:38:13-36
-89            android:permission="android.permission.DUMP" >
-89-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\pulin\.gradle\caches\8.9\transforms\a35523d6448d1d8086e25fe48b59a496\transformed\profileinstaller-1.3.0\AndroidManifest.xml:39:13-57
-90            <intent-filter>
-90-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\pulin\.gradle\caches\8.9\transforms\a35523d6448d1d8086e25fe48b59a496\transformed\profileinstaller-1.3.0\AndroidManifest.xml:40:13-42:29
-91                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
-91-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\pulin\.gradle\caches\8.9\transforms\a35523d6448d1d8086e25fe48b59a496\transformed\profileinstaller-1.3.0\AndroidManifest.xml:41:17-91
-91-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\pulin\.gradle\caches\8.9\transforms\a35523d6448d1d8086e25fe48b59a496\transformed\profileinstaller-1.3.0\AndroidManifest.xml:41:25-88
-92            </intent-filter>
-93            <intent-filter>
-93-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\pulin\.gradle\caches\8.9\transforms\a35523d6448d1d8086e25fe48b59a496\transformed\profileinstaller-1.3.0\AndroidManifest.xml:43:13-45:29
-94                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
-94-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\pulin\.gradle\caches\8.9\transforms\a35523d6448d1d8086e25fe48b59a496\transformed\profileinstaller-1.3.0\AndroidManifest.xml:44:17-85
-94-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\pulin\.gradle\caches\8.9\transforms\a35523d6448d1d8086e25fe48b59a496\transformed\profileinstaller-1.3.0\AndroidManifest.xml:44:25-82
-95            </intent-filter>
-96            <intent-filter>
-96-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\pulin\.gradle\caches\8.9\transforms\a35523d6448d1d8086e25fe48b59a496\transformed\profileinstaller-1.3.0\AndroidManifest.xml:46:13-48:29
-97                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
-97-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\pulin\.gradle\caches\8.9\transforms\a35523d6448d1d8086e25fe48b59a496\transformed\profileinstaller-1.3.0\AndroidManifest.xml:47:17-88
-97-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\pulin\.gradle\caches\8.9\transforms\a35523d6448d1d8086e25fe48b59a496\transformed\profileinstaller-1.3.0\AndroidManifest.xml:47:25-85
-98            </intent-filter>
-99            <intent-filter>
-99-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\pulin\.gradle\caches\8.9\transforms\a35523d6448d1d8086e25fe48b59a496\transformed\profileinstaller-1.3.0\AndroidManifest.xml:49:13-51:29
-100                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
-100-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\pulin\.gradle\caches\8.9\transforms\a35523d6448d1d8086e25fe48b59a496\transformed\profileinstaller-1.3.0\AndroidManifest.xml:50:17-95
-100-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\pulin\.gradle\caches\8.9\transforms\a35523d6448d1d8086e25fe48b59a496\transformed\profileinstaller-1.3.0\AndroidManifest.xml:50:25-92
-101            </intent-filter>
-102        </receiver>
-103    </application>
-104
-105</manifest>
+84        <provider
+84-->[androidx.emoji2:emoji2:1.2.0] C:\Users\ASUS\.gradle\caches\9.2.1\transforms\4121e619418aa9b3dd3b38656544cf09\workspace\transformed\emoji2-1.2.0\AndroidManifest.xml:24:9-32:20
+85            android:name="androidx.startup.InitializationProvider"
+85-->[androidx.emoji2:emoji2:1.2.0] C:\Users\ASUS\.gradle\caches\9.2.1\transforms\4121e619418aa9b3dd3b38656544cf09\workspace\transformed\emoji2-1.2.0\AndroidManifest.xml:25:13-67
+86            android:authorities="com.team.financeapp.androidx-startup"
+86-->[androidx.emoji2:emoji2:1.2.0] C:\Users\ASUS\.gradle\caches\9.2.1\transforms\4121e619418aa9b3dd3b38656544cf09\workspace\transformed\emoji2-1.2.0\AndroidManifest.xml:26:13-68
+87            android:exported="false" >
+87-->[androidx.emoji2:emoji2:1.2.0] C:\Users\ASUS\.gradle\caches\9.2.1\transforms\4121e619418aa9b3dd3b38656544cf09\workspace\transformed\emoji2-1.2.0\AndroidManifest.xml:27:13-37
+88            <meta-data
+88-->[androidx.emoji2:emoji2:1.2.0] C:\Users\ASUS\.gradle\caches\9.2.1\transforms\4121e619418aa9b3dd3b38656544cf09\workspace\transformed\emoji2-1.2.0\AndroidManifest.xml:29:13-31:52
+89                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+89-->[androidx.emoji2:emoji2:1.2.0] C:\Users\ASUS\.gradle\caches\9.2.1\transforms\4121e619418aa9b3dd3b38656544cf09\workspace\transformed\emoji2-1.2.0\AndroidManifest.xml:30:17-75
+90                android:value="androidx.startup" />
+90-->[androidx.emoji2:emoji2:1.2.0] C:\Users\ASUS\.gradle\caches\9.2.1\transforms\4121e619418aa9b3dd3b38656544cf09\workspace\transformed\emoji2-1.2.0\AndroidManifest.xml:31:17-49
+91            <meta-data
+91-->[androidx.lifecycle:lifecycle-process:2.6.1] C:\Users\ASUS\.gradle\caches\9.2.1\transforms\fd74d1bc06a84c03d9d86793fdcaa3eb\workspace\transformed\lifecycle-process-2.6.1\AndroidManifest.xml:29:13-31:52
+92                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+92-->[androidx.lifecycle:lifecycle-process:2.6.1] C:\Users\ASUS\.gradle\caches\9.2.1\transforms\fd74d1bc06a84c03d9d86793fdcaa3eb\workspace\transformed\lifecycle-process-2.6.1\AndroidManifest.xml:30:17-78
+93                android:value="androidx.startup" />
+93-->[androidx.lifecycle:lifecycle-process:2.6.1] C:\Users\ASUS\.gradle\caches\9.2.1\transforms\fd74d1bc06a84c03d9d86793fdcaa3eb\workspace\transformed\lifecycle-process-2.6.1\AndroidManifest.xml:31:17-49
+94            <meta-data
+94-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\ASUS\.gradle\caches\9.2.1\transforms\9c5abe0dd944f29ef7176afbd7dc1ec2\workspace\transformed\profileinstaller-1.3.0\AndroidManifest.xml:29:13-31:52
+95                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+95-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\ASUS\.gradle\caches\9.2.1\transforms\9c5abe0dd944f29ef7176afbd7dc1ec2\workspace\transformed\profileinstaller-1.3.0\AndroidManifest.xml:30:17-85
+96                android:value="androidx.startup" />
+96-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\ASUS\.gradle\caches\9.2.1\transforms\9c5abe0dd944f29ef7176afbd7dc1ec2\workspace\transformed\profileinstaller-1.3.0\AndroidManifest.xml:31:17-49
+97        </provider>
+98
+99        <receiver
+99-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\ASUS\.gradle\caches\9.2.1\transforms\9c5abe0dd944f29ef7176afbd7dc1ec2\workspace\transformed\profileinstaller-1.3.0\AndroidManifest.xml:34:9-52:20
+100            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+100-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\ASUS\.gradle\caches\9.2.1\transforms\9c5abe0dd944f29ef7176afbd7dc1ec2\workspace\transformed\profileinstaller-1.3.0\AndroidManifest.xml:35:13-76
+101            android:directBootAware="false"
+101-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\ASUS\.gradle\caches\9.2.1\transforms\9c5abe0dd944f29ef7176afbd7dc1ec2\workspace\transformed\profileinstaller-1.3.0\AndroidManifest.xml:36:13-44
+102            android:enabled="true"
+102-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\ASUS\.gradle\caches\9.2.1\transforms\9c5abe0dd944f29ef7176afbd7dc1ec2\workspace\transformed\profileinstaller-1.3.0\AndroidManifest.xml:37:13-35
+103            android:exported="true"
+103-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\ASUS\.gradle\caches\9.2.1\transforms\9c5abe0dd944f29ef7176afbd7dc1ec2\workspace\transformed\profileinstaller-1.3.0\AndroidManifest.xml:38:13-36
+104            android:permission="android.permission.DUMP" >
+104-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\ASUS\.gradle\caches\9.2.1\transforms\9c5abe0dd944f29ef7176afbd7dc1ec2\workspace\transformed\profileinstaller-1.3.0\AndroidManifest.xml:39:13-57
+105            <intent-filter>
+105-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\ASUS\.gradle\caches\9.2.1\transforms\9c5abe0dd944f29ef7176afbd7dc1ec2\workspace\transformed\profileinstaller-1.3.0\AndroidManifest.xml:40:13-42:29
+106                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+106-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\ASUS\.gradle\caches\9.2.1\transforms\9c5abe0dd944f29ef7176afbd7dc1ec2\workspace\transformed\profileinstaller-1.3.0\AndroidManifest.xml:41:17-91
+106-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\ASUS\.gradle\caches\9.2.1\transforms\9c5abe0dd944f29ef7176afbd7dc1ec2\workspace\transformed\profileinstaller-1.3.0\AndroidManifest.xml:41:25-88
+107            </intent-filter>
+108            <intent-filter>
+108-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\ASUS\.gradle\caches\9.2.1\transforms\9c5abe0dd944f29ef7176afbd7dc1ec2\workspace\transformed\profileinstaller-1.3.0\AndroidManifest.xml:43:13-45:29
+109                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+109-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\ASUS\.gradle\caches\9.2.1\transforms\9c5abe0dd944f29ef7176afbd7dc1ec2\workspace\transformed\profileinstaller-1.3.0\AndroidManifest.xml:44:17-85
+109-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\ASUS\.gradle\caches\9.2.1\transforms\9c5abe0dd944f29ef7176afbd7dc1ec2\workspace\transformed\profileinstaller-1.3.0\AndroidManifest.xml:44:25-82
+110            </intent-filter>
+111            <intent-filter>
+111-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\ASUS\.gradle\caches\9.2.1\transforms\9c5abe0dd944f29ef7176afbd7dc1ec2\workspace\transformed\profileinstaller-1.3.0\AndroidManifest.xml:46:13-48:29
+112                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+112-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\ASUS\.gradle\caches\9.2.1\transforms\9c5abe0dd944f29ef7176afbd7dc1ec2\workspace\transformed\profileinstaller-1.3.0\AndroidManifest.xml:47:17-88
+112-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\ASUS\.gradle\caches\9.2.1\transforms\9c5abe0dd944f29ef7176afbd7dc1ec2\workspace\transformed\profileinstaller-1.3.0\AndroidManifest.xml:47:25-85
+113            </intent-filter>
+114            <intent-filter>
+114-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\ASUS\.gradle\caches\9.2.1\transforms\9c5abe0dd944f29ef7176afbd7dc1ec2\workspace\transformed\profileinstaller-1.3.0\AndroidManifest.xml:49:13-51:29
+115                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+115-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\ASUS\.gradle\caches\9.2.1\transforms\9c5abe0dd944f29ef7176afbd7dc1ec2\workspace\transformed\profileinstaller-1.3.0\AndroidManifest.xml:50:17-95
+115-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\ASUS\.gradle\caches\9.2.1\transforms\9c5abe0dd944f29ef7176afbd7dc1ec2\workspace\transformed\profileinstaller-1.3.0\AndroidManifest.xml:50:25-92
+116            </intent-filter>
+117        </receiver>
+118    </application>
+119
+120</manifest>

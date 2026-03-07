@@ -48,10 +48,28 @@
             android:name="com.team.financeapp.DashboardActivity"
             android:exported="false" />
         <activity
+            android:name="com.team.financeapp.ExpensesActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.team.financeapp.BillsActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.team.financeapp.GoalsActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.team.financeapp.ProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.team.financeapp.EditProfileActivity"
+            android:exported="false" />
+        <activity
             android:name="com.team.financeapp.AddExpenseActivity"
             android:exported="false" />
         <activity
             android:name="com.team.financeapp.AddIncomeActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.team.financeapp.IncomeHistoryActivity"
             android:exported="false" />
         <activity
             android:name="com.team.financeapp.AddBillActivity"
@@ -60,10 +78,7 @@
             android:name="com.team.financeapp.AddGoalActivity"
             android:exported="false" />
         <activity
-            android:name="com.team.financeapp.ProfileActivity"
-            android:exported="false" />
-        <activity
-            android:name="com.team.financeapp.EditProfileActivity"
+            android:name="com.team.financeapp.GoalDetailsActivity"
             android:exported="false" />
 
         <provider
