@@ -20,58 +20,77 @@
             android:paddingTop="20dp"
             android:paddingBottom="24dp">
 
-            <!-- Back Button and Title -->
+            <!-- Top Navigation Bar (Menu, Profile, Logout only) -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:layout_marginBottom="24dp">
+                android:layout_marginBottom="20dp">
 
+                <!-- Hamburger Menu Button (Left) -->
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_back"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:id="@+id/btn_menu"
+                    style="@style/Widget.Material3.Button.IconButton"
                     android:layout_width="44dp"
                     android:layout_height="44dp"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
-                    android:insetLeft="0dp"
-                    android:insetRight="0dp"
                     android:background="@drawable/circle_translucent"
-                    android:contentDescription="@string/cd_back"
-                    android:minWidth="0dp"
-                    android:minHeight="0dp"
-                    app:icon="@drawable/ic_chevron_right"
+                    android:contentDescription="Menu"
+                    app:icon="@drawable/ic_menu"
                     app:iconTint="@color/white"
                     app:iconGravity="textStart"
-                    app:iconPadding="0dp"
-                    android:scaleX="-1" />
+                    app:iconPadding="0dp" />
 
-                <LinearLayout
+                <!-- Spacer -->
+                <View
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:layout_marginStart="16dp">
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/bills_title"
-                        android:textColor="@color/white"
-                        android:textSize="24sp"
-                        android:textStyle="bold" />
+                <!-- Profile Button (Right) -->
+                <ImageView
+                    android:id="@+id/btn_profile"
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/circle_translucent"
+                    android:src="@drawable/ic_person"
+                    android:padding="10dp"
+                    android:scaleType="centerInside"
+                    android:contentDescription="Profile" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="@string/bills_subtitle"
-                        android:textColor="@color/white"
-                        android:textSize="13sp"
-                        android:alpha="0.9" />
-                </LinearLayout>
+                <!-- Logout Button (Right) -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_logout"
+                    style="@style/Widget.Material3.Button.IconButton"
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:background="@drawable/circle_translucent"
+                    android:contentDescription="Logout"
+                    app:icon="@drawable/ic_logout"
+                    app:iconTint="@color/white"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp" />
             </LinearLayout>
+
+            <!-- Title Section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/bills_title"
+                android:textColor="@color/white"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="24dp"
+                android:text="@string/bills_subtitle"
+                android:textColor="@color/white"
+                android:textSize="13sp"
+                android:alpha="0.9" />
 
             <!-- Total Due Amount Card -->
             <androidx.cardview.widget.CardView

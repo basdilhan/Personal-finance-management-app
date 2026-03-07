@@ -1,9 +1,15 @@
 package com.team.financeapp;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -24,7 +30,9 @@ public class BillsActivity extends AppCompatActivity {
     private TextView tvNoBills;
     private RecyclerView rvBills;
     private BillAdapter billAdapter;
-    private MaterialButton btnBack;
+    private MaterialButton btnMenu;
+    private MaterialButton btnLogout;
+    private ImageView btnProfile;
     private List<Bill> billsList;
 
     @Override
@@ -45,15 +53,94 @@ public class BillsActivity extends AppCompatActivity {
         tvTotalDueAmount = findViewById(R.id.tv_total_due_amount);
         tvNoBills = findViewById(R.id.tv_no_bills);
         rvBills = findViewById(R.id.rv_bills);
-        btnBack = findViewById(R.id.btn_back);
+        btnMenu = findViewById(R.id.btn_menu);
+        btnLogout = findViewById(R.id.btn_logout);
+        btnProfile = findViewById(R.id.btn_profile);
 
-        // Setup back button
-        btnBack.setOnClickListener(new View.OnClickListener() {
+        // Setup hamburger menu button
+        btnMenu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onBackPressed();
+                showNavigationMenu(v);
             }
         });
+
+        // Setup logout button
+        btnLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showLogoutConfirmation();
+            }
+        });
+
+        // Setup profile button
+        btnProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(BillsActivity.this, "Profile coming soon", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    /**
+     * Show navigation dropdown menu
+     */
+    private void showNavigationMenu(View anchor) {
+        PopupMenu popupMenu = new PopupMenu(this, anchor);
+        popupMenu.getMenuInflater().inflate(R.menu.menu_navigation, popupMenu.getMenu());
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                int id = item.getItemId();
+                if (id == R.id.nav_dashboard) {
+                    startActivity(new Intent(BillsActivity.this, DashboardActivity.class));
+                    finish();
+                    return true;
+                } else if (id == R.id.nav_expenses) {
+                    startActivity(new Intent(BillsActivity.this, ExpensesActivity.class));
+                    finish();
+                    return true;
+                } else if (id == R.id.nav_bills) {
+                    // Already on Bills page
+                    return true;
+                } else if (id == R.id.nav_goals) {
+                    startActivity(new Intent(BillsActivity.this, GoalsActivity.class));
+                    finish();
+                    return true;
+                } else if (id == R.id.nav_profile) {
+                    Toast.makeText(BillsActivity.this, "Profile coming soon", Toast.LENGTH_SHORT).show();
+                    return true;
+                } else if (id == R.id.nav_logout) {
+                    showLogoutConfirmation();
+                    return true;
+                }
+                return false;
+            }
+        });
+        popupMenu.show();
+    }
+
+    /**
+     * Show logout confirmation dialog
+     */
+    private void showLogoutConfirmation() {
+        new AlertDialog.Builder(this)
+                .setTitle("Logout")
+                .setMessage("Are you sure you want to logout?")
+                .setPositiveButton("Yes", (dialog, which) -> handleLogout())
+                .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
+                .show();
+    }
+
+    /**
+     * Handle logout action
+     */
+    private void handleLogout() {
+        Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(BillsActivity.this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 
     /**

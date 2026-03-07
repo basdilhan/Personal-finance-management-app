@@ -8,6 +8,7 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -23,6 +24,7 @@ public class DashboardActivity extends AppCompatActivity {
     private MaterialButton btnLogout;
     private View actionAddExpense, actionAddIncome, actionAddBill, actionAddGoal;
     private TextView buttonViewAllBills;
+    private TextView buttonViewAllGoals;
     private BottomNavigationView bottomNavigationView;
 
     @Override
@@ -32,6 +34,7 @@ public class DashboardActivity extends AppCompatActivity {
 
         initializeViews();
         setupClickListeners();
+        setupBackPressedCallback();
     }
 
     /**
@@ -41,6 +44,7 @@ public class DashboardActivity extends AppCompatActivity {
         btnLogout = findViewById(R.id.button_logout);
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         buttonViewAllBills = findViewById(R.id.button_view_all_bills);
+        buttonViewAllGoals = findViewById(R.id.btn_view_all_goals);
 
         // Initialize Quick Action buttons
         actionAddExpense = findViewById(R.id.action_add_expense);
@@ -101,6 +105,15 @@ public class DashboardActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(DashboardActivity.this, BillsActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        // View All Goals button
+        buttonViewAllGoals.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(DashboardActivity.this, GoalsActivity.class);
                 startActivity(intent);
             }
         });
@@ -185,5 +198,17 @@ public class DashboardActivity extends AppCompatActivity {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
+    }
+
+    /**
+     * Setup back button callback to show logout confirmation
+     */
+    private void setupBackPressedCallback() {
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                showLogoutConfirmation();
+            }
+        });
     }
 }
