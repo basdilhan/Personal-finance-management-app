@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.team.financeapp">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <application
         android:allowBackup="true"
@@ -30,6 +29,7 @@
         <activity android:name=".GoalsActivity" android:exported="false" />
         <activity android:name=".AddExpenseActivity" android:exported="false" />
         <activity android:name=".AddIncomeActivity" android:exported="false" />
+        <activity android:name=".IncomeHistoryActivity" android:exported="false" />
         <activity android:name=".AddBillActivity" android:exported="false" />
         <activity android:name=".AddGoalActivity" android:exported="false" />
         <activity android:name=".GoalDetailsActivity" android:exported="false" />

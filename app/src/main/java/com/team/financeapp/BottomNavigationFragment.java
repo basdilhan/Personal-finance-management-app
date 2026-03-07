@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
@@ -86,11 +85,6 @@ public class BottomNavigationFragment extends Fragment {
     }
 
     private boolean handleNavigation(@IdRes int itemId) {
-        if (itemId == R.id.nav_profile) {
-            Toast.makeText(requireContext(), "Profile coming soon", Toast.LENGTH_SHORT).show();
-            return true;
-        }
-
         if (itemId == selectedItemId) {
             return true;
         }
@@ -119,6 +113,9 @@ public class BottomNavigationFragment extends Fragment {
         }
         if (itemId == R.id.nav_goals) {
             return GoalsActivity.class;
+        }
+        if (itemId == R.id.nav_income_history) {
+            return IncomeHistoryActivity.class;
         }
         return null;
     }
