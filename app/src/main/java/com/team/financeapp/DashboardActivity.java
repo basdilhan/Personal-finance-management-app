@@ -25,6 +25,7 @@ public class DashboardActivity extends AppCompatActivity {
     private View actionAddExpense, actionAddIncome, actionAddBill, actionAddGoal;
     private TextView buttonViewAllBills;
     private TextView buttonViewAllGoals;
+    private View profileAvatar;
     private BottomNavigationView bottomNavigationView;
 
     @Override
@@ -42,6 +43,7 @@ public class DashboardActivity extends AppCompatActivity {
      */
     private void initializeViews() {
         btnLogout = findViewById(R.id.button_logout);
+        profileAvatar = findViewById(R.id.profile_avatar);
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         buttonViewAllBills = findViewById(R.id.button_view_all_bills);
         buttonViewAllGoals = findViewById(R.id.btn_view_all_goals);
@@ -64,6 +66,14 @@ public class DashboardActivity extends AppCompatActivity {
             }
         });
 
+        // Profile avatar click listener - Navigate to ProfileActivity
+        profileAvatar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(DashboardActivity.this, ProfileActivity.class);
+                startActivity(intent);
+            }
+        });
 
         // Quick Action: Add Expense
         actionAddExpense.setOnClickListener(new View.OnClickListener() {
