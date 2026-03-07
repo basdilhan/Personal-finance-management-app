@@ -72,6 +72,10 @@
         "source": "com.team.financeapp-main-32:/drawable/ic_launcher_foreground.xml"
     },
     {
+        "merged": "com.team.financeapp-debug-30:/anim_slide_in_right.xml.flat",
+        "source": "com.team.financeapp-main-32:/anim/slide_in_right.xml"
+    },
+    {
         "merged": "com.team.financeapp-debug-30:/drawable_circle_danger_light.xml.flat",
         "source": "com.team.financeapp-main-32:/drawable/circle_danger_light.xml"
     },
@@ -86,6 +90,10 @@
     {
         "merged": "com.team.financeapp-debug-30:/drawable_badge_primary.xml.flat",
         "source": "com.team.financeapp-main-32:/drawable/badge_primary.xml"
+    },
+    {
+        "merged": "com.team.financeapp-debug-30:/anim_slide_out_right.xml.flat",
+        "source": "com.team.financeapp-main-32:/anim/slide_out_right.xml"
     },
     {
         "merged": "com.team.financeapp-debug-30:/layout_activity_add_expense.xml.flat",
@@ -118,6 +126,10 @@
     {
         "merged": "com.team.financeapp-debug-30:/drawable_action_button_income.xml.flat",
         "source": "com.team.financeapp-main-32:/drawable/action_button_income.xml"
+    },
+    {
+        "merged": "com.team.financeapp-debug-30:/anim_slide_out_left.xml.flat",
+        "source": "com.team.financeapp-main-32:/anim/slide_out_left.xml"
     },
     {
         "merged": "com.team.financeapp-debug-30:/drawable_ic_arrow_down.xml.flat",
@@ -250,6 +262,10 @@
     {
         "merged": "com.team.financeapp-debug-30:/mipmap-hdpi_ic_launcher.webp.flat",
         "source": "com.team.financeapp-main-32:/mipmap-hdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "com.team.financeapp-debug-30:/anim_slide_in_left.xml.flat",
+        "source": "com.team.financeapp-main-32:/anim/slide_in_left.xml"
     },
     {
         "merged": "com.team.financeapp-debug-30:/drawable_card_elevated.xml.flat",
