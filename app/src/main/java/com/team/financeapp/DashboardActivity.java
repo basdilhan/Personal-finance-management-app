@@ -19,7 +19,6 @@ import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.PercentFormatter;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
@@ -35,7 +34,6 @@ public class DashboardActivity extends AppCompatActivity {
     private View actionAddExpense, actionAddIncome, actionAddBill, actionAddGoal;
     private TextView buttonViewAllBills;
     private TextView buttonViewAllGoals;
-    private BottomNavigationView bottomNavigationView;
     private PieChart pieChartExpenses;
 
     @Override
@@ -44,6 +42,7 @@ public class DashboardActivity extends AppCompatActivity {
         setContentView(R.layout.activity_dashboard);
 
         initializeViews();
+        BottomNavigationFragment.attach(this, R.id.bottom_navigation_container, R.id.nav_home);
         setupClickListeners();
         setupBackPressedCallback();
         setupPieChart();
@@ -54,7 +53,6 @@ public class DashboardActivity extends AppCompatActivity {
      */
     private void initializeViews() {
         btnLogout = findViewById(R.id.button_logout);
-        bottomNavigationView = findViewById(R.id.bottom_navigation);
         buttonViewAllBills = findViewById(R.id.button_view_all_bills);
         buttonViewAllGoals = findViewById(R.id.btn_view_all_goals);
         pieChartExpenses = findViewById(R.id.pie_chart_expenses);
@@ -200,40 +198,6 @@ public class DashboardActivity extends AppCompatActivity {
             }
         });
 
-        // Bottom Navigation
-        setupBottomNavigation();
-    }
-
-    /**
-     * Setup bottom navigation item selection listener
-     */
-    private void setupBottomNavigation() {
-        bottomNavigationView.setOnItemSelectedListener(menuItem -> {
-            int itemId = menuItem.getItemId();
-            if (itemId == R.id.nav_home) {
-                // Already on home, no action needed
-                return true;
-            } else if (itemId == R.id.nav_expenses) {
-                Intent intent = new Intent(DashboardActivity.this, ExpensesActivity.class);
-                startActivity(intent);
-                return true;
-            } else if (itemId == R.id.nav_bills) {
-                Intent intent = new Intent(DashboardActivity.this, BillsActivity.class);
-                startActivity(intent);
-                return true;
-            } else if (itemId == R.id.nav_goals) {
-                Intent intent = new Intent(DashboardActivity.this, GoalsActivity.class);
-                startActivity(intent);
-                return true;
-            } else if (itemId == R.id.nav_profile) {
-                Toast.makeText(DashboardActivity.this, "Profile coming soon", Toast.LENGTH_SHORT).show();
-                return true;
-            }
-            return false;
-        });
-
-        // Set Home as selected by default
-        bottomNavigationView.setSelectedItemId(R.id.nav_home);
     }
 
     /**

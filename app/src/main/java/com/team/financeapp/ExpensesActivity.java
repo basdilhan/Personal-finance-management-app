@@ -12,7 +12,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -36,7 +35,6 @@ public class ExpensesActivity extends AppCompatActivity {
     private ExpenseAdapter expenseAdapter;
     private MaterialButton btnLogout;
     private FloatingActionButton fabAddExpense;
-    private BottomNavigationView bottomNavigationView;
     private ChipGroup chipGroupFilter;
     private List<Expense> expensesList;
     private List<Expense> allExpensesList;
@@ -48,16 +46,10 @@ public class ExpensesActivity extends AppCompatActivity {
 
         initializeViews();
         setupRecyclerView();
-        setupBottomNavigation();
+        BottomNavigationFragment.attach(this, R.id.bottom_navigation_container, R.id.nav_expenses);
         setupFilterChips();
         loadExpenses();
         calculateTotalAmount();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        bottomNavigationView.setSelectedItemId(R.id.nav_expenses);
     }
 
     /**
@@ -71,7 +63,6 @@ public class ExpensesActivity extends AppCompatActivity {
         rvExpenses = findViewById(R.id.rv_expenses);
         btnLogout = findViewById(R.id.btn_logout);
         fabAddExpense = findViewById(R.id.fab_add_expense);
-        bottomNavigationView = findViewById(R.id.bottom_navigation);
         chipGroupFilter = findViewById(R.id.chip_group_filter);
 
         // Setup logout button
@@ -90,35 +81,6 @@ public class ExpensesActivity extends AppCompatActivity {
                 startActivity(intent);
             });
         }
-    }
-
-    /**
-     * Setup bottom navigation
-     */
-    private void setupBottomNavigation() {
-        bottomNavigationView.setSelectedItemId(R.id.nav_expenses);
-        bottomNavigationView.setOnItemSelectedListener(menuItem -> {
-            int itemId = menuItem.getItemId();
-            if (itemId == R.id.nav_home) {
-                startActivity(new Intent(ExpensesActivity.this, DashboardActivity.class));
-                finish();
-                return true;
-            } else if (itemId == R.id.nav_expenses) {
-                return true;
-            } else if (itemId == R.id.nav_bills) {
-                startActivity(new Intent(ExpensesActivity.this, BillsActivity.class));
-                finish();
-                return true;
-            } else if (itemId == R.id.nav_goals) {
-                startActivity(new Intent(ExpensesActivity.this, GoalsActivity.class));
-                finish();
-                return true;
-            } else if (itemId == R.id.nav_profile) {
-                Toast.makeText(ExpensesActivity.this, "Profile coming soon", Toast.LENGTH_SHORT).show();
-                return true;
-            }
-            return false;
-        });
     }
 
     /**
