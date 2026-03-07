@@ -52,6 +52,12 @@ public class ExpensesActivity extends AppCompatActivity {
         calculateTotalAmount();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        BottomNavigationFragment.attach(this, R.id.bottom_navigation_container, R.id.nav_expenses);
+    }
+
     /**
      * Initialize all view components
      */
