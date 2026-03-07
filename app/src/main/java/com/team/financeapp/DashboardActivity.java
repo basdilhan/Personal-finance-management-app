@@ -34,11 +34,7 @@ public class DashboardActivity extends AppCompatActivity {
     private View actionAddExpense, actionAddIncome, actionAddBill, actionAddGoal;
     private TextView buttonViewAllBills;
     private TextView buttonViewAllGoals;
-<<<<<<< HEAD
-=======
     private View profileAvatar;
-    private BottomNavigationView bottomNavigationView;
->>>>>>> puli
     private PieChart pieChartExpenses;
 
     @Override
@@ -58,11 +54,7 @@ public class DashboardActivity extends AppCompatActivity {
      */
     private void initializeViews() {
         btnLogout = findViewById(R.id.button_logout);
-<<<<<<< HEAD
-=======
         profileAvatar = findViewById(R.id.profile_avatar);
-        bottomNavigationView = findViewById(R.id.bottom_navigation);
->>>>>>> puli
         buttonViewAllBills = findViewById(R.id.button_view_all_bills);
         buttonViewAllGoals = findViewById(R.id.btn_view_all_goals);
         pieChartExpenses = findViewById(R.id.pie_chart_expenses);
