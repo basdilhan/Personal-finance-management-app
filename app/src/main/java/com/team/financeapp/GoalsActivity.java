@@ -2,10 +2,8 @@ package com.team.financeapp;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.PopupMenu;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -14,27 +12,35 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.chip.ChipGroup;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Activity for displaying all savings goals
  * Shows goals with progress tracking and target dates
  */
-public class GoalsActivity extends AppCompatActivity {
+public class GoalsActivity extends AppCompatActivity implements GoalAdapter.OnGoalClickListener {
 
     private TextView tvTotalSaved;
     private TextView tvActiveGoalsCount;
     private TextView tvNoGoals;
+    private LinearLayout emptyStateContainer;
+    private MaterialButton btnCreateFirstGoal;
     private RecyclerView rvGoals;
     private GoalAdapter goalAdapter;
-    private MaterialButton btnMenu;
     private MaterialButton btnLogout;
-    private ImageView btnProfile;
+    private FloatingActionButton fabAddGoal;
+    private BottomNavigationView bottomNavigationView;
+    private ChipGroup chipGroupFilter;
     private List<Goal> goalsList;
+    private List<Goal> allGoalsList; // Keep original list for filtering
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,8 +49,17 @@ public class GoalsActivity extends AppCompatActivity {
 
         initializeViews();
         setupRecyclerView();
+        setupBottomNavigation();
+        setupFilterChips();
         loadGoals();
         calculateTotalSaved();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Refresh when returning to this activity
+        bottomNavigationView.setSelectedItemId(R.id.nav_goals);
     }
 
     /**
@@ -54,18 +69,13 @@ public class GoalsActivity extends AppCompatActivity {
         tvTotalSaved = findViewById(R.id.tv_total_saved);
         tvActiveGoalsCount = findViewById(R.id.tv_active_goals_count);
         tvNoGoals = findViewById(R.id.tv_no_goals);
+        emptyStateContainer = findViewById(R.id.empty_state_container);
+        btnCreateFirstGoal = findViewById(R.id.btn_create_first_goal);
         rvGoals = findViewById(R.id.rv_goals);
-        btnMenu = findViewById(R.id.btn_menu);
         btnLogout = findViewById(R.id.btn_logout);
-        btnProfile = findViewById(R.id.btn_profile);
-
-        // Setup hamburger menu button
-        btnMenu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showNavigationMenu(v);
-            }
-        });
+        fabAddGoal = findViewById(R.id.fab_add_goal);
+        bottomNavigationView = findViewById(R.id.bottom_navigation);
+        chipGroupFilter = findViewById(R.id.chip_group_filter);
 
         // Setup logout button
         btnLogout.setOnClickListener(new View.OnClickListener() {
@@ -75,51 +85,99 @@ public class GoalsActivity extends AppCompatActivity {
             }
         });
 
-        // Setup profile button
-        btnProfile.setOnClickListener(new View.OnClickListener() {
+        // Setup FAB
+        fabAddGoal.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(GoalsActivity.this, "Profile coming soon", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(GoalsActivity.this, AddGoalActivity.class);
+                startActivity(intent);
             }
+        });
+
+        // Setup Create First Goal button (empty state)
+        if (btnCreateFirstGoal != null) {
+            btnCreateFirstGoal.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(GoalsActivity.this, AddGoalActivity.class);
+                    startActivity(intent);
+                }
+            });
+        }
+    }
+
+    /**
+     * Setup bottom navigation
+     */
+    private void setupBottomNavigation() {
+        bottomNavigationView.setSelectedItemId(R.id.nav_goals);
+        bottomNavigationView.setOnItemSelectedListener(menuItem -> {
+            int itemId = menuItem.getItemId();
+            if (itemId == R.id.nav_home) {
+                startActivity(new Intent(GoalsActivity.this, DashboardActivity.class));
+                finish();
+                return true;
+            } else if (itemId == R.id.nav_expenses) {
+                startActivity(new Intent(GoalsActivity.this, ExpensesActivity.class));
+                finish();
+                return true;
+            } else if (itemId == R.id.nav_bills) {
+                startActivity(new Intent(GoalsActivity.this, BillsActivity.class));
+                finish();
+                return true;
+            } else if (itemId == R.id.nav_goals) {
+                // Already on Goals page
+                return true;
+            } else if (itemId == R.id.nav_profile) {
+                Toast.makeText(GoalsActivity.this, "Profile coming soon", Toast.LENGTH_SHORT).show();
+                return true;
+            }
+            return false;
         });
     }
 
     /**
-     * Show navigation dropdown menu
+     * Setup filter chips
      */
-    private void showNavigationMenu(View anchor) {
-        PopupMenu popupMenu = new PopupMenu(this, anchor);
-        popupMenu.getMenuInflater().inflate(R.menu.menu_navigation, popupMenu.getMenu());
-        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                int id = item.getItemId();
-                if (id == R.id.nav_dashboard) {
-                    startActivity(new Intent(GoalsActivity.this, DashboardActivity.class));
-                    finish();
-                    return true;
-                } else if (id == R.id.nav_expenses) {
-                    startActivity(new Intent(GoalsActivity.this, ExpensesActivity.class));
-                    finish();
-                    return true;
-                } else if (id == R.id.nav_bills) {
-                    startActivity(new Intent(GoalsActivity.this, BillsActivity.class));
-                    finish();
-                    return true;
-                } else if (id == R.id.nav_goals) {
-                    // Already on Goals page
-                    return true;
-                } else if (id == R.id.nav_profile) {
-                    Toast.makeText(GoalsActivity.this, "Profile coming soon", Toast.LENGTH_SHORT).show();
-                    return true;
-                } else if (id == R.id.nav_logout) {
-                    showLogoutConfirmation();
-                    return true;
-                }
-                return false;
-            }
+    private void setupFilterChips() {
+        chipGroupFilter.setOnCheckedStateChangeListener((group, checkedIds) -> {
+            if (checkedIds.isEmpty()) return;
+
+            int checkedId = checkedIds.get(0);
+            filterGoals(checkedId);
         });
-        popupMenu.show();
+    }
+
+    /**
+     * Filter goals based on selected chip
+     */
+    private void filterGoals(int chipId) {
+        if (allGoalsList == null) return;
+
+        List<Goal> filteredList;
+
+        if (chipId == R.id.chip_all) {
+            filteredList = new ArrayList<>(allGoalsList);
+        } else if (chipId == R.id.chip_in_progress) {
+            filteredList = allGoalsList.stream()
+                    .filter(g -> g.getProgressPercentage() < 100)
+                    .collect(Collectors.toList());
+        } else if (chipId == R.id.chip_completed) {
+            filteredList = allGoalsList.stream()
+                    .filter(g -> g.getProgressPercentage() >= 100)
+                    .collect(Collectors.toList());
+        } else if (chipId == R.id.chip_near_target) {
+            filteredList = allGoalsList.stream()
+                    .filter(g -> g.getProgressPercentage() >= 75 && g.getProgressPercentage() < 100)
+                    .collect(Collectors.toList());
+        } else {
+            filteredList = new ArrayList<>(allGoalsList);
+        }
+
+        goalsList.clear();
+        goalsList.addAll(filteredList);
+        goalAdapter.updateGoals(goalsList);
+        updateEmptyState();
     }
 
     /**
@@ -150,10 +208,97 @@ public class GoalsActivity extends AppCompatActivity {
      */
     private void setupRecyclerView() {
         goalsList = new ArrayList<>();
-        goalAdapter = new GoalAdapter(goalsList);
+        allGoalsList = new ArrayList<>();
+        goalAdapter = new GoalAdapter(goalsList, this);
 
         rvGoals.setLayoutManager(new LinearLayoutManager(this));
         rvGoals.setAdapter(goalAdapter);
+    }
+
+    /**
+     * Handle goal item click - open details
+     */
+    @Override
+    public void onGoalClick(Goal goal) {
+        Intent intent = new Intent(this, GoalDetailsActivity.class);
+        intent.putExtra(GoalDetailsActivity.EXTRA_GOAL_ID, goal.getId());
+        intent.putExtra(GoalDetailsActivity.EXTRA_GOAL_NAME, goal.getName());
+        intent.putExtra(GoalDetailsActivity.EXTRA_GOAL_DESCRIPTION, goal.getDescription());
+        intent.putExtra(GoalDetailsActivity.EXTRA_GOAL_TARGET_AMOUNT, goal.getTargetAmount());
+        intent.putExtra(GoalDetailsActivity.EXTRA_GOAL_CURRENT_AMOUNT, goal.getCurrentAmount());
+        intent.putExtra(GoalDetailsActivity.EXTRA_GOAL_TARGET_DATE, goal.getTargetDate());
+        intent.putExtra(GoalDetailsActivity.EXTRA_GOAL_CATEGORY, goal.getCategory());
+        intent.putExtra(GoalDetailsActivity.EXTRA_GOAL_ICON, goal.getCategoryIcon());
+        startActivity(intent);
+    }
+
+    /**
+     * Handle goal item long click - show options menu
+     */
+    @Override
+    public void onGoalLongClick(Goal goal) {
+        new AlertDialog.Builder(this)
+                .setTitle(goal.getName())
+                .setItems(new String[]{"View Details", "Edit", "Delete"}, (dialog, which) -> {
+                    switch (which) {
+                        case 0: // View Details
+                            onGoalClick(goal);
+                            break;
+                        case 1: // Edit - pass all goal data
+                            Intent editIntent = new Intent(this, AddGoalActivity.class);
+                            editIntent.putExtra(AddGoalActivity.EXTRA_EDIT_MODE, true);
+                            editIntent.putExtra(AddGoalActivity.EXTRA_GOAL_ID, goal.getId());
+                            editIntent.putExtra(AddGoalActivity.EXTRA_GOAL_NAME, goal.getName());
+                            editIntent.putExtra(AddGoalActivity.EXTRA_GOAL_DESCRIPTION, goal.getDescription());
+                            editIntent.putExtra(AddGoalActivity.EXTRA_GOAL_TARGET_AMOUNT, goal.getTargetAmount());
+                            editIntent.putExtra(AddGoalActivity.EXTRA_GOAL_CURRENT_AMOUNT, goal.getCurrentAmount());
+                            editIntent.putExtra(AddGoalActivity.EXTRA_GOAL_TARGET_DATE, goal.getTargetDate());
+                            editIntent.putExtra(AddGoalActivity.EXTRA_GOAL_CATEGORY, goal.getCategory());
+                            startActivity(editIntent);
+                            break;
+                        case 2: // Delete
+                            showDeleteConfirmation(goal);
+                            break;
+                    }
+                })
+                .show();
+    }
+
+    /**
+     * Show delete confirmation dialog
+     */
+    private void showDeleteConfirmation(Goal goal) {
+        new AlertDialog.Builder(this)
+                .setTitle("Delete Goal")
+                .setMessage("Are you sure you want to delete \"" + goal.getName() + "\"?")
+                .setPositiveButton("Delete", (dialog, which) -> {
+                    goalAdapter.removeGoal(goal.getId());
+                    allGoalsList.removeIf(g -> g.getId() == goal.getId());
+                    calculateTotalSaved();
+                    updateEmptyState();
+                    Toast.makeText(this, "Goal deleted", Toast.LENGTH_SHORT).show();
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    /**
+     * Update empty state visibility
+     */
+    private void updateEmptyState() {
+        if (goalsList.isEmpty()) {
+            if (emptyStateContainer != null) {
+                emptyStateContainer.setVisibility(View.VISIBLE);
+            }
+            tvNoGoals.setVisibility(View.GONE);
+            rvGoals.setVisibility(View.GONE);
+        } else {
+            if (emptyStateContainer != null) {
+                emptyStateContainer.setVisibility(View.GONE);
+            }
+            tvNoGoals.setVisibility(View.GONE);
+            rvGoals.setVisibility(View.VISIBLE);
+        }
     }
 
     /**
@@ -162,6 +307,7 @@ public class GoalsActivity extends AppCompatActivity {
      */
     private void loadGoals() {
         goalsList.clear();
+        allGoalsList.clear();
 
         // Create sample goals for testing
         Calendar calendar = Calendar.getInstance();
@@ -181,7 +327,7 @@ public class GoalsActivity extends AppCompatActivity {
                 R.drawable.ic_laptop,
                 R.drawable.circle_primary_light
         );
-        goalsList.add(laptopGoal);
+        allGoalsList.add(laptopGoal);
 
         // Dream Car - December 2027
         calendar.set(Calendar.YEAR, 2027);
@@ -198,7 +344,7 @@ public class GoalsActivity extends AppCompatActivity {
                 R.drawable.ic_car,
                 R.drawable.circle_purple_light
         );
-        goalsList.add(carGoal);
+        allGoalsList.add(carGoal);
 
         // Vacation Fund - September 2026
         calendar.set(Calendar.YEAR, 2026);
@@ -215,7 +361,7 @@ public class GoalsActivity extends AppCompatActivity {
                 R.drawable.ic_savings,
                 R.drawable.circle_success_light
         );
-        goalsList.add(vacationGoal);
+        allGoalsList.add(vacationGoal);
 
         // Emergency Fund - Ongoing
         calendar.set(Calendar.YEAR, 2025);
@@ -232,16 +378,11 @@ public class GoalsActivity extends AppCompatActivity {
                 R.drawable.ic_wallet,
                 R.drawable.circle_warning
         );
-        goalsList.add(emergencyGoal);
+        allGoalsList.add(emergencyGoal);
 
-        if (goalsList.isEmpty()) {
-            tvNoGoals.setVisibility(View.VISIBLE);
-            rvGoals.setVisibility(View.GONE);
-        } else {
-            tvNoGoals.setVisibility(View.GONE);
-            rvGoals.setVisibility(View.VISIBLE);
-            goalAdapter.updateGoals(goalsList);
-        }
+        goalsList.addAll(allGoalsList);
+        goalAdapter.updateGoals(goalsList);
+        updateEmptyState();
     }
 
     /**
@@ -250,12 +391,12 @@ public class GoalsActivity extends AppCompatActivity {
     private void calculateTotalSaved() {
         double totalSaved = 0;
 
-        for (Goal goal : goalsList) {
+        for (Goal goal : allGoalsList) {
             totalSaved += goal.getCurrentAmount();
         }
 
-        tvTotalSaved.setText(String.format("LKR%.0f", totalSaved));
-        tvActiveGoalsCount.setText(goalsList.size() + " active goals");
+        tvTotalSaved.setText(String.format("LKR %.0f", totalSaved));
+        tvActiveGoalsCount.setText(allGoalsList.size() + " active goals");
     }
 
     /**

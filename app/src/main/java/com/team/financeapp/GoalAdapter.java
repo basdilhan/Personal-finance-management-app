@@ -10,6 +10,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.card.MaterialCardView;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -21,9 +23,27 @@ import java.util.Locale;
 public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalViewHolder> {
 
     private List<Goal> goals;
+    private OnGoalClickListener listener;
+
+    /**
+     * Interface for handling goal item clicks
+     */
+    public interface OnGoalClickListener {
+        void onGoalClick(Goal goal);
+        void onGoalLongClick(Goal goal);
+    }
 
     public GoalAdapter(List<Goal> goals) {
         this.goals = goals;
+    }
+
+    public GoalAdapter(List<Goal> goals, OnGoalClickListener listener) {
+        this.goals = goals;
+        this.listener = listener;
+    }
+
+    public void setOnGoalClickListener(OnGoalClickListener listener) {
+        this.listener = listener;
     }
 
     @NonNull
@@ -69,6 +89,27 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalViewHolder
         // Set remaining amount
         holder.tvRemainingAmount.setText(String.format("LKR%.0f", goal.getRemainingAmount()));
         holder.tvRemainingLabel.setText("To Go");
+
+        // Set click listeners on the card
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (listener != null) {
+                    listener.onGoalClick(goal);
+                }
+            }
+        });
+
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if (listener != null) {
+                    listener.onGoalLongClick(goal);
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
     @Override
@@ -82,6 +123,19 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalViewHolder
     public void updateGoals(List<Goal> newGoals) {
         this.goals = newGoals;
         notifyDataSetChanged();
+    }
+
+    /**
+     * Remove a goal by ID
+     */
+    public void removeGoal(int goalId) {
+        for (int i = 0; i < goals.size(); i++) {
+            if (goals.get(i).getId() == goalId) {
+                goals.remove(i);
+                notifyItemRemoved(i);
+                break;
+            }
+        }
     }
 
     /**
