@@ -1,21 +1,26 @@
 package com.team.financeapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.chip.ChipGroup;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
+import java.util.stream.Collectors;
 
 /**
  * Activity for displaying expense history with timeline view
@@ -25,10 +30,16 @@ public class ExpensesActivity extends AppCompatActivity {
 
     private TextView tvTotalAmount;
     private TextView tvNoExpenses;
+    private LinearLayout emptyStateContainer;
+    private MaterialButton btnAddFirstExpense;
     private RecyclerView rvExpenses;
     private ExpenseAdapter expenseAdapter;
-    private MaterialButton btnBack;
+    private MaterialButton btnLogout;
+    private FloatingActionButton fabAddExpense;
+    private BottomNavigationView bottomNavigationView;
+    private ChipGroup chipGroupFilter;
     private List<Expense> expensesList;
+    private List<Expense> allExpensesList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,8 +48,16 @@ public class ExpensesActivity extends AppCompatActivity {
 
         initializeViews();
         setupRecyclerView();
+        setupBottomNavigation();
+        setupFilterChips();
         loadExpenses();
         calculateTotalAmount();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        bottomNavigationView.setSelectedItemId(R.id.nav_expenses);
     }
 
     /**
@@ -47,16 +66,160 @@ public class ExpensesActivity extends AppCompatActivity {
     private void initializeViews() {
         tvTotalAmount = findViewById(R.id.tv_total_amount);
         tvNoExpenses = findViewById(R.id.tv_no_expenses);
+        emptyStateContainer = findViewById(R.id.empty_state_container);
+        btnAddFirstExpense = findViewById(R.id.btn_add_first_expense);
         rvExpenses = findViewById(R.id.rv_expenses);
-        btnBack = findViewById(R.id.btn_back);
+        btnLogout = findViewById(R.id.btn_logout);
+        fabAddExpense = findViewById(R.id.fab_add_expense);
+        bottomNavigationView = findViewById(R.id.bottom_navigation);
+        chipGroupFilter = findViewById(R.id.chip_group_filter);
 
-        // Setup back button
-        btnBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
+        // Setup logout button
+        btnLogout.setOnClickListener(v -> showLogoutConfirmation());
+
+        // Setup FAB
+        fabAddExpense.setOnClickListener(v -> {
+            Intent intent = new Intent(ExpensesActivity.this, AddExpenseActivity.class);
+            startActivity(intent);
         });
+
+        // Setup Add First Expense button (empty state)
+        if (btnAddFirstExpense != null) {
+            btnAddFirstExpense.setOnClickListener(v -> {
+                Intent intent = new Intent(ExpensesActivity.this, AddExpenseActivity.class);
+                startActivity(intent);
+            });
+        }
+    }
+
+    /**
+     * Setup bottom navigation
+     */
+    private void setupBottomNavigation() {
+        bottomNavigationView.setSelectedItemId(R.id.nav_expenses);
+        bottomNavigationView.setOnItemSelectedListener(menuItem -> {
+            int itemId = menuItem.getItemId();
+            if (itemId == R.id.nav_home) {
+                startActivity(new Intent(ExpensesActivity.this, DashboardActivity.class));
+                finish();
+                return true;
+            } else if (itemId == R.id.nav_expenses) {
+                return true;
+            } else if (itemId == R.id.nav_bills) {
+                startActivity(new Intent(ExpensesActivity.this, BillsActivity.class));
+                finish();
+                return true;
+            } else if (itemId == R.id.nav_goals) {
+                startActivity(new Intent(ExpensesActivity.this, GoalsActivity.class));
+                finish();
+                return true;
+            } else if (itemId == R.id.nav_profile) {
+                Toast.makeText(ExpensesActivity.this, "Profile coming soon", Toast.LENGTH_SHORT).show();
+                return true;
+            }
+            return false;
+        });
+    }
+
+    /**
+     * Setup filter chips
+     */
+    private void setupFilterChips() {
+        chipGroupFilter.setOnCheckedStateChangeListener((group, checkedIds) -> {
+            if (checkedIds.isEmpty()) return;
+            int checkedId = checkedIds.get(0);
+            filterExpenses(checkedId);
+        });
+    }
+
+    /**
+     * Filter expenses based on selected chip
+     */
+    private void filterExpenses(int chipId) {
+        if (allExpensesList == null) return;
+
+        List<Expense> filteredList;
+        Calendar now = Calendar.getInstance();
+
+        if (chipId == R.id.chip_all) {
+            filteredList = new ArrayList<>(allExpensesList);
+        } else if (chipId == R.id.chip_this_month) {
+            int currentMonth = now.get(Calendar.MONTH);
+            int currentYear = now.get(Calendar.YEAR);
+            filteredList = allExpensesList.stream()
+                    .filter(e -> {
+                        Calendar cal = Calendar.getInstance();
+                        cal.setTimeInMillis(e.getDate());
+                        return cal.get(Calendar.MONTH) == currentMonth && cal.get(Calendar.YEAR) == currentYear;
+                    })
+                    .collect(Collectors.toList());
+        } else if (chipId == R.id.chip_last_7_days) {
+            long sevenDaysAgo = now.getTimeInMillis() - (7L * 24 * 60 * 60 * 1000);
+            filteredList = allExpensesList.stream()
+                    .filter(e -> e.getDate() >= sevenDaysAgo)
+                    .collect(Collectors.toList());
+        } else if (chipId == R.id.chip_food) {
+            filteredList = allExpensesList.stream()
+                    .filter(e -> "Food".equalsIgnoreCase(e.getCategory()))
+                    .collect(Collectors.toList());
+        } else if (chipId == R.id.chip_transport) {
+            filteredList = allExpensesList.stream()
+                    .filter(e -> "Transport".equalsIgnoreCase(e.getCategory()))
+                    .collect(Collectors.toList());
+        } else if (chipId == R.id.chip_housing) {
+            filteredList = allExpensesList.stream()
+                    .filter(e -> "Housing".equalsIgnoreCase(e.getCategory()))
+                    .collect(Collectors.toList());
+        } else {
+            filteredList = new ArrayList<>(allExpensesList);
+        }
+
+        expensesList.clear();
+        expensesList.addAll(filteredList);
+        expenseAdapter.updateExpenses(expensesList);
+        updateEmptyState();
+    }
+
+    /**
+     * Update empty state visibility
+     */
+    private void updateEmptyState() {
+        if (expensesList.isEmpty()) {
+            if (emptyStateContainer != null) {
+                emptyStateContainer.setVisibility(View.VISIBLE);
+            }
+            tvNoExpenses.setVisibility(View.GONE);
+            rvExpenses.setVisibility(View.GONE);
+        } else {
+            if (emptyStateContainer != null) {
+                emptyStateContainer.setVisibility(View.GONE);
+            }
+            tvNoExpenses.setVisibility(View.GONE);
+            rvExpenses.setVisibility(View.VISIBLE);
+        }
+    }
+
+    /**
+     * Show logout confirmation dialog
+     */
+    private void showLogoutConfirmation() {
+        new AlertDialog.Builder(this)
+                .setTitle("Logout")
+                .setMessage("Are you sure you want to logout?")
+                .setPositiveButton("Yes", (dialog, which) -> handleLogout())
+                .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
+                .show();
+    }
+
+    /**
+     * Handle logout action
+     */
+    private void handleLogout() {
+        Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(ExpensesActivity.this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 
     /**
@@ -64,6 +227,7 @@ public class ExpensesActivity extends AppCompatActivity {
      */
     private void setupRecyclerView() {
         expensesList = new ArrayList<>();
+        allExpensesList = new ArrayList<>();
         expenseAdapter = new ExpenseAdapter(expensesList);
 
         rvExpenses.setLayoutManager(new LinearLayoutManager(this));
@@ -72,11 +236,10 @@ public class ExpensesActivity extends AppCompatActivity {
 
     /**
      * Load expenses from database or local storage
-     * TODO: Replace with actual database/API calls
      */
     private void loadExpenses() {
-        // Sample data for demonstration
         expensesList.clear();
+        allExpensesList.clear();
 
         // Create sample expenses for testing
         Calendar calendar = Calendar.getInstance();
@@ -90,9 +253,9 @@ public class ExpensesActivity extends AppCompatActivity {
                 "Lunch at restaurant",
                 calendar.getTimeInMillis(),
                 "2:30 PM",
-                R.drawable.ic_receipt // Using receipt icon as placeholder
+                R.drawable.ic_receipt
         );
-        expensesList.add(expenseToday1);
+        allExpensesList.add(expenseToday1);
 
         // Another expense today
         calendar.set(Calendar.HOUR_OF_DAY, 10);
@@ -105,7 +268,7 @@ public class ExpensesActivity extends AppCompatActivity {
                 "10:00 AM",
                 R.drawable.ic_receipt
         );
-        expensesList.add(expenseToday2);
+        allExpensesList.add(expenseToday2);
 
         // Expense yesterday
         calendar.add(Calendar.DAY_OF_YEAR, -1);
@@ -119,10 +282,24 @@ public class ExpensesActivity extends AppCompatActivity {
                 "6:15 PM",
                 R.drawable.ic_receipt
         );
-        expensesList.add(expenseYesterday);
+        allExpensesList.add(expenseYesterday);
 
-        // More sample expenses
+        // Housing expense
         calendar.add(Calendar.DAY_OF_YEAR, -2);
+        calendar.set(Calendar.HOUR_OF_DAY, 9);
+        calendar.set(Calendar.MINUTE, 0);
+        Expense housingExpense = new Expense(
+                "Housing",
+                15000,
+                "Monthly rent",
+                calendar.getTimeInMillis(),
+                "9:00 AM",
+                R.drawable.ic_receipt
+        );
+        allExpensesList.add(housingExpense);
+
+        // Entertainment expense
+        calendar.add(Calendar.DAY_OF_YEAR, -1);
         calendar.set(Calendar.HOUR_OF_DAY, 12);
         calendar.set(Calendar.MINUTE, 45);
         Expense expenseOldDate = new Expense(
@@ -133,16 +310,11 @@ public class ExpensesActivity extends AppCompatActivity {
                 "12:45 PM",
                 R.drawable.ic_receipt
         );
-        expensesList.add(expenseOldDate);
+        allExpensesList.add(expenseOldDate);
 
-        if (expensesList.isEmpty()) {
-            tvNoExpenses.setVisibility(View.VISIBLE);
-            rvExpenses.setVisibility(View.GONE);
-        } else {
-            tvNoExpenses.setVisibility(View.GONE);
-            rvExpenses.setVisibility(View.VISIBLE);
-            expenseAdapter.updateExpenses(expensesList);
-        }
+        expensesList.addAll(allExpensesList);
+        expenseAdapter.updateExpenses(expensesList);
+        updateEmptyState();
     }
 
     /**
@@ -154,7 +326,7 @@ public class ExpensesActivity extends AppCompatActivity {
         int monthOfYear = currentMonth.get(Calendar.MONTH);
         int year = currentMonth.get(Calendar.YEAR);
 
-        for (Expense expense : expensesList) {
+        for (Expense expense : allExpensesList) {
             Calendar expenseCalendar = Calendar.getInstance();
             expenseCalendar.setTimeInMillis(expense.getDate());
 

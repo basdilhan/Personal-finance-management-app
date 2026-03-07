@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/nav_dashboard"
+        android:title="Dashboard"
+        android:icon="@drawable/ic_home"
+        app:iconTint="@color/primary" />
+
+    <item
+        android:id="@+id/nav_expenses"
+        android:title="Expenses"
+        android:icon="@drawable/ic_expenses_nav"
+        app:iconTint="@color/primary" />
+
+    <item
+        android:id="@+id/nav_bills"
+        android:title="Bills"
+        android:icon="@drawable/ic_receipt"
+        app:iconTint="@color/primary" />
+
+    <item
+        android:id="@+id/nav_goals"
+        android:title="Goals"
+        android:icon="@drawable/ic_goals"
+        app:iconTint="@color/primary" />
+
+    <group android:id="@+id/group_account">
+        <item
+            android:id="@+id/nav_profile"
+            android:title="My Profile"
+            android:icon="@drawable/ic_person"
+            app:iconTint="@color/accent" />
+
+        <item
+            android:id="@+id/nav_logout"
+            android:title="Logout"
+            android:icon="@drawable/ic_logout"
+            app:iconTint="@color/error" />
+    </group>
+
+</menu>
+
+
+

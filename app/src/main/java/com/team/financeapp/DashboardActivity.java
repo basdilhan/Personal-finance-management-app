@@ -1,6 +1,7 @@
 package com.team.financeapp;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -8,11 +9,21 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Dashboard activity displaying user's financial overview.
@@ -23,7 +34,9 @@ public class DashboardActivity extends AppCompatActivity {
     private MaterialButton btnLogout;
     private View actionAddExpense, actionAddIncome, actionAddBill, actionAddGoal;
     private TextView buttonViewAllBills;
+    private TextView buttonViewAllGoals;
     private BottomNavigationView bottomNavigationView;
+    private PieChart pieChartExpenses;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +45,8 @@ public class DashboardActivity extends AppCompatActivity {
 
         initializeViews();
         setupClickListeners();
+        setupBackPressedCallback();
+        setupPieChart();
     }
 
     /**
@@ -41,12 +56,83 @@ public class DashboardActivity extends AppCompatActivity {
         btnLogout = findViewById(R.id.button_logout);
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         buttonViewAllBills = findViewById(R.id.button_view_all_bills);
+        buttonViewAllGoals = findViewById(R.id.btn_view_all_goals);
+        pieChartExpenses = findViewById(R.id.pie_chart_expenses);
 
         // Initialize Quick Action buttons
         actionAddExpense = findViewById(R.id.action_add_expense);
         actionAddIncome = findViewById(R.id.action_add_income);
         actionAddBill = findViewById(R.id.action_add_bill);
         actionAddGoal = findViewById(R.id.action_add_goal);
+    }
+
+    /**
+     * Setup the expense categories pie chart
+     */
+    private void setupPieChart() {
+        if (pieChartExpenses == null) return;
+
+        // Configure chart appearance
+        pieChartExpenses.setUsePercentValues(true);
+        pieChartExpenses.getDescription().setEnabled(false);
+        pieChartExpenses.setExtraOffsets(20, 10, 20, 10);
+        pieChartExpenses.setDragDecelerationFrictionCoef(0.95f);
+        pieChartExpenses.setDrawHoleEnabled(true);
+        pieChartExpenses.setHoleColor(Color.WHITE);
+        pieChartExpenses.setTransparentCircleColor(Color.WHITE);
+        pieChartExpenses.setTransparentCircleAlpha(110);
+        pieChartExpenses.setHoleRadius(50f);
+        pieChartExpenses.setTransparentCircleRadius(55f);
+        pieChartExpenses.setDrawCenterText(true);
+        pieChartExpenses.setCenterText("Monthly\nExpenses");
+        pieChartExpenses.setCenterTextSize(14f);
+        pieChartExpenses.setCenterTextColor(Color.parseColor("#1E293B"));
+        pieChartExpenses.setRotationAngle(0);
+        pieChartExpenses.setRotationEnabled(true);
+        pieChartExpenses.setHighlightPerTapEnabled(true);
+        pieChartExpenses.setDrawEntryLabels(false); // Don't show labels on slices
+
+        // Configure legend - disable built-in legend (we use custom legend in XML)
+        Legend legend = pieChartExpenses.getLegend();
+        legend.setEnabled(false);
+
+        // Create sample expense data (without labels - only values)
+        List<PieEntry> entries = new ArrayList<>();
+        entries.add(new PieEntry(45f)); // Housing
+        entries.add(new PieEntry(25f)); // Food
+        entries.add(new PieEntry(15f)); // Transport
+        entries.add(new PieEntry(10f)); // Entertainment
+        entries.add(new PieEntry(5f));  // Other
+
+        // Create dataset with colors
+        PieDataSet dataSet = new PieDataSet(entries, "");
+        dataSet.setSliceSpace(3f);
+        dataSet.setSelectionShift(8f);
+
+        // Set colors for each category
+        int[] colors = {
+            Color.parseColor("#6366F1"), // Housing - Primary/Indigo
+            Color.parseColor("#10B981"), // Food - Green
+            Color.parseColor("#F59E0B"), // Transport - Orange
+            Color.parseColor("#8B5CF6"), // Entertainment - Purple
+            Color.parseColor("#94A3B8")  // Other - Gray
+        };
+        dataSet.setColors(colors);
+
+        // Configure value display - show percentages inside slices
+        dataSet.setValueTextSize(14f);
+        dataSet.setValueTextColor(Color.WHITE);
+        dataSet.setYValuePosition(PieDataSet.ValuePosition.INSIDE_SLICE);
+
+        // Create and set pie data
+        PieData data = new PieData(dataSet);
+        data.setValueFormatter(new PercentFormatter(pieChartExpenses));
+        data.setValueTextSize(14f);
+        data.setValueTextColor(Color.WHITE);
+
+        pieChartExpenses.setData(data);
+        pieChartExpenses.invalidate();
+        pieChartExpenses.animateY(1200);
     }
 
     /**
@@ -101,6 +187,15 @@ public class DashboardActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(DashboardActivity.this, BillsActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        // View All Goals button
+        buttonViewAllGoals.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(DashboardActivity.this, GoalsActivity.class);
                 startActivity(intent);
             }
         });
@@ -185,5 +280,17 @@ public class DashboardActivity extends AppCompatActivity {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
+    }
+
+    /**
+     * Setup back button callback to show logout confirmation
+     */
+    private void setupBackPressedCallback() {
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                showLogoutConfirmation();
+            }
+        });
     }
 }
