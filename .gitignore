@@ -30,3 +30,13 @@ gen/
 .project
 .settings/
 
+# Crash logs
+hs_err_pid*.log
+replay_pid*.log
+
+# VS Code
+.vscode/
+
+# gradle wrapper
+gradlew
+gradlew.bat
