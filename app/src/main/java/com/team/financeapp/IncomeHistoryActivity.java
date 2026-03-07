@@ -103,22 +103,29 @@ public class IncomeHistoryActivity extends AppCompatActivity {
         bottomNavigationView.setOnItemSelectedListener(menuItem -> {
             int itemId = menuItem.getItemId();
             if (itemId == R.id.nav_home) {
-                startActivity(new Intent(IncomeHistoryActivity.this, DashboardActivity.class));
+                navigateToTopLevel(DashboardActivity.class);
                 return true;
             } else if (itemId == R.id.nav_expenses) {
-                startActivity(new Intent(IncomeHistoryActivity.this, ExpensesActivity.class));
+                navigateToTopLevel(ExpensesActivity.class);
                 return true;
             } else if (itemId == R.id.nav_bills) {
-                startActivity(new Intent(IncomeHistoryActivity.this, BillsActivity.class));
+                navigateToTopLevel(BillsActivity.class);
                 return true;
             } else if (itemId == R.id.nav_goals) {
-                startActivity(new Intent(IncomeHistoryActivity.this, GoalsActivity.class));
+                navigateToTopLevel(GoalsActivity.class);
                 return true;
             } else if (itemId == R.id.nav_income_history) {
                 return true;
             }
             return false;
         });
+    }
+
+    private void navigateToTopLevel(Class<?> destination) {
+        Intent intent = new Intent(IncomeHistoryActivity.this, destination);
+        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        startActivity(intent);
+        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
     }
 
     private void setupFilterChips() {

@@ -30,12 +30,15 @@ import java.util.List;
  */
 public class DashboardActivity extends AppCompatActivity {
 
+    private static final long BACK_PRESS_EXIT_INTERVAL_MS = 2000;
+
     private MaterialButton btnLogout;
     private View actionAddExpense, actionAddIncome, actionAddBill, actionAddGoal;
     private TextView buttonViewAllBills;
     private TextView buttonViewAllGoals;
     private View profileAvatar;
     private PieChart pieChartExpenses;
+    private long lastBackPressedAt;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +50,12 @@ public class DashboardActivity extends AppCompatActivity {
         setupClickListeners();
         setupBackPressedCallback();
         setupPieChart();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        BottomNavigationFragment.attach(this, R.id.bottom_navigation_container, R.id.nav_home);
     }
 
     /**
@@ -258,14 +267,22 @@ public class DashboardActivity extends AppCompatActivity {
     }
 
     /**
-     * Setup back button callback to show logout confirmation
+     * Require a double back press to exit only when Dashboard is the root screen.
      */
     private void setupBackPressedCallback() {
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                showLogoutConfirmation();
+                long now = System.currentTimeMillis();
+                if (now - lastBackPressedAt < BACK_PRESS_EXIT_INTERVAL_MS) {
+                    finishAffinity();
+                    return;
+                }
+
+                lastBackPressedAt = now;
+                Toast.makeText(DashboardActivity.this, "Press back again to exit", Toast.LENGTH_SHORT).show();
             }
         });
     }
+
 }
