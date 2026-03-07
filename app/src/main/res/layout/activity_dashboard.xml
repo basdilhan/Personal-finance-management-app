@@ -577,6 +577,254 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
+                <!-- Expense Categories Pie Chart Section -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="28dp"
+                    android:text="Expense Breakdown"
+                    android:textColor="#1E293B"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif-medium" />
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_expense_chart"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="2dp"
+                    app:cardBackgroundColor="@color/white">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="20dp">
+
+                        <!-- Pie Chart Container -->
+                        <com.github.mikephil.charting.charts.PieChart
+                            android:id="@+id/pie_chart_expenses"
+                            android:layout_width="match_parent"
+                            android:layout_height="220dp" />
+
+                        <!-- Legend Title -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:text="Categories"
+                            android:textColor="#1E293B"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <!-- Legend Items - Row 1 -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginTop="12dp"
+                            android:baselineAligned="false">
+
+                            <!-- Housing -->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical">
+
+                                <View
+                                    android:layout_width="16dp"
+                                    android:layout_height="16dp"
+                                    android:background="@drawable/circle_primary" />
+
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"
+                                    android:layout_marginStart="8dp">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Housing"
+                                        android:textColor="#1E293B"
+                                        android:textSize="13sp"
+                                        android:textStyle="bold" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="45%"
+                                        android:textColor="#64748B"
+                                        android:textSize="12sp" />
+                                </LinearLayout>
+                            </LinearLayout>
+
+                            <!-- Food -->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical">
+
+                                <View
+                                    android:layout_width="16dp"
+                                    android:layout_height="16dp"
+                                    android:background="@drawable/circle_success_light" />
+
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"
+                                    android:layout_marginStart="8dp">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Food"
+                                        android:textColor="#1E293B"
+                                        android:textSize="13sp"
+                                        android:textStyle="bold" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="25%"
+                                        android:textColor="#64748B"
+                                        android:textSize="12sp" />
+                                </LinearLayout>
+                            </LinearLayout>
+
+                            <!-- Transport -->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical">
+
+                                <View
+                                    android:layout_width="16dp"
+                                    android:layout_height="16dp"
+                                    android:background="@drawable/circle_warning" />
+
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"
+                                    android:layout_marginStart="8dp">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Transport"
+                                        android:textColor="#1E293B"
+                                        android:textSize="13sp"
+                                        android:textStyle="bold" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="15%"
+                                        android:textColor="#64748B"
+                                        android:textSize="12sp" />
+                                </LinearLayout>
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <!-- Legend Items - Row 2 -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginTop="12dp"
+                            android:baselineAligned="false">
+
+                            <!-- Entertainment -->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical">
+
+                                <View
+                                    android:layout_width="16dp"
+                                    android:layout_height="16dp"
+                                    android:background="@drawable/circle_purple_light" />
+
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"
+                                    android:layout_marginStart="8dp">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Entertainment"
+                                        android:textColor="#1E293B"
+                                        android:textSize="13sp"
+                                        android:textStyle="bold" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="10%"
+                                        android:textColor="#64748B"
+                                        android:textSize="12sp" />
+                                </LinearLayout>
+                            </LinearLayout>
+
+                            <!-- Other -->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical">
+
+                                <View
+                                    android:layout_width="16dp"
+                                    android:layout_height="16dp"
+                                    android:background="@drawable/circle_translucent" />
+
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"
+                                    android:layout_marginStart="8dp">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Other"
+                                        android:textColor="#1E293B"
+                                        android:textSize="13sp"
+                                        android:textStyle="bold" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="5%"
+                                        android:textColor="#64748B"
+                                        android:textSize="12sp" />
+                                </LinearLayout>
+                            </LinearLayout>
+
+                            <!-- Empty space for alignment -->
+                            <View
+                                android:layout_width="0dp"
+                                android:layout_height="1dp"
+                                android:layout_weight="1" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
                 <!-- Savings Goal Section -->
                 <LinearLayout
                     android:layout_width="match_parent"

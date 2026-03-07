@@ -32,6 +32,7 @@
         <activity android:name=".AddIncomeActivity" android:exported="false" />
         <activity android:name=".AddBillActivity" android:exported="false" />
         <activity android:name=".AddGoalActivity" android:exported="false" />
+        <activity android:name=".GoalDetailsActivity" android:exported="false" />
     </application>
 
 </manifest>
