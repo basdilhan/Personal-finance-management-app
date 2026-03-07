@@ -52,6 +52,12 @@ public class BillsActivity extends AppCompatActivity {
         calculateTotalDue();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        BottomNavigationFragment.attach(this, R.id.bottom_navigation_container, R.id.nav_bills);
+    }
+
     /**
      * Initialize all view components
      */

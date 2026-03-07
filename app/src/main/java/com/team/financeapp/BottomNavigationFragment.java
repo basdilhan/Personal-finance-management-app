@@ -95,8 +95,10 @@ public class BottomNavigationFragment extends Fragment {
         }
 
         Activity hostActivity = requireActivity();
-        hostActivity.startActivity(new Intent(hostActivity, destination));
-        hostActivity.finish();
+        Intent intent = new Intent(hostActivity, destination);
+        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        hostActivity.startActivity(intent);
+        hostActivity.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
         return true;
     }
 

@@ -61,7 +61,7 @@
       <entry key="_D:/HDSE/MAD/App/Personal-finance-management-app-dev/Personal-finance-management-app-dev" value="3AW5XW5NbWdixOYnmsb36ekaGVF" />
     </persistenceIdMap>
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[LocalEmulator::path=C:\Users\pulin\.android\avd\Pixel_2.avd]" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[PhysicalDevice::serial=f4a4226f7d77]" />
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
@@ -120,7 +120,7 @@
     "RunOnceActivity.readMode.enableVisualFormatting": "true",
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
-    "git-widget-placeholder": "puli",
+    "git-widget-placeholder": "dev",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "D:/HDSE/MAD/App/Personal-finance-management-app-dev/Personal-finance-management-app-dev",
     "settings.editor.selected.configurable": "AndroidSdkUpdater"
