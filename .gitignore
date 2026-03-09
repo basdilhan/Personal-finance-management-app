@@ -1,15 +1,42 @@
-*.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
+# Gradle files
+.gradle/
+build/
+*.apk
+*.ap_
+*.dex
+
+# Local properties
 local.properties
+
+# IDE files
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Build outputs
+*.log
+bin/
+gen/
+
+# Misc
+.classpath
+.project
+.settings/
+
+# Crash logs
+hs_err_pid*.log
+replay_pid*.log
+
+# VS Code
+.vscode/
+
+# gradle wrapper
+gradlew
+gradlew.bat
