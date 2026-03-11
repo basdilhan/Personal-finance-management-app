@@ -1,7 +1,6 @@
 package com.team.financeapp;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -10,8 +9,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.ColorRes;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.Legend;
@@ -75,73 +76,68 @@ public class DashboardActivity extends AppCompatActivity {
         actionAddGoal = findViewById(R.id.action_add_goal);
     }
 
+    private int getColorCompat(@ColorRes int colorResId) {
+        return ContextCompat.getColor(this, colorResId);
+    }
+
     /**
      * Setup the expense categories pie chart
      */
     private void setupPieChart() {
         if (pieChartExpenses == null) return;
 
-        // Configure chart appearance
         pieChartExpenses.setUsePercentValues(true);
         pieChartExpenses.getDescription().setEnabled(false);
-        pieChartExpenses.setExtraOffsets(20, 10, 20, 10);
+        pieChartExpenses.setExtraOffsets(12f, 8f, 12f, 8f);
         pieChartExpenses.setDragDecelerationFrictionCoef(0.95f);
         pieChartExpenses.setDrawHoleEnabled(true);
-        pieChartExpenses.setHoleColor(Color.WHITE);
-        pieChartExpenses.setTransparentCircleColor(Color.WHITE);
-        pieChartExpenses.setTransparentCircleAlpha(110);
-        pieChartExpenses.setHoleRadius(50f);
-        pieChartExpenses.setTransparentCircleRadius(55f);
+        pieChartExpenses.setHoleColor(getColorCompat(R.color.dashboard_chart_hole));
+        pieChartExpenses.setTransparentCircleColor(getColorCompat(R.color.dashboard_chart_hole));
+        pieChartExpenses.setTransparentCircleAlpha(24);
+        pieChartExpenses.setHoleRadius(58f);
+        pieChartExpenses.setTransparentCircleRadius(63f);
         pieChartExpenses.setDrawCenterText(true);
         pieChartExpenses.setCenterText("Monthly\nExpenses");
-        pieChartExpenses.setCenterTextSize(14f);
-        pieChartExpenses.setCenterTextColor(Color.parseColor("#1E293B"));
-        pieChartExpenses.setRotationAngle(0);
-        pieChartExpenses.setRotationEnabled(true);
+        pieChartExpenses.setCenterTextSize(15f);
+        pieChartExpenses.setCenterTextColor(getColorCompat(R.color.dashboard_chart_center));
+        pieChartExpenses.setRotationEnabled(false);
         pieChartExpenses.setHighlightPerTapEnabled(true);
-        pieChartExpenses.setDrawEntryLabels(false); // Don't show labels on slices
+        pieChartExpenses.setDrawEntryLabels(false);
 
-        // Configure legend - disable built-in legend (we use custom legend in XML)
         Legend legend = pieChartExpenses.getLegend();
         legend.setEnabled(false);
 
-        // Create sample expense data (without labels - only values)
         List<PieEntry> entries = new ArrayList<>();
-        entries.add(new PieEntry(45f)); // Housing
-        entries.add(new PieEntry(25f)); // Food
-        entries.add(new PieEntry(15f)); // Transport
-        entries.add(new PieEntry(10f)); // Entertainment
-        entries.add(new PieEntry(5f));  // Other
+        entries.add(new PieEntry(45f));
+        entries.add(new PieEntry(25f));
+        entries.add(new PieEntry(15f));
+        entries.add(new PieEntry(10f));
+        entries.add(new PieEntry(5f));
 
-        // Create dataset with colors
         PieDataSet dataSet = new PieDataSet(entries, "");
         dataSet.setSliceSpace(3f);
-        dataSet.setSelectionShift(8f);
+        dataSet.setSelectionShift(6f);
+        dataSet.setColors(
+                getColorCompat(R.color.primary),
+                getColorCompat(R.color.success),
+                getColorCompat(R.color.accent),
+                getColorCompat(R.color.info),
+                getColorCompat(R.color.dashboard_chart_other)
+        );
 
-        // Set colors for each category
-        int[] colors = {
-            Color.parseColor("#6366F1"), // Housing - Primary/Indigo
-            Color.parseColor("#10B981"), // Food - Green
-            Color.parseColor("#F59E0B"), // Transport - Orange
-            Color.parseColor("#8B5CF6"), // Entertainment - Purple
-            Color.parseColor("#94A3B8")  // Other - Gray
-        };
-        dataSet.setColors(colors);
-
-        // Configure value display - show percentages inside slices
-        dataSet.setValueTextSize(14f);
-        dataSet.setValueTextColor(Color.WHITE);
+        dataSet.setValueTextSize(12f);
+        dataSet.setValueTextColor(getColorCompat(R.color.white));
         dataSet.setYValuePosition(PieDataSet.ValuePosition.INSIDE_SLICE);
 
-        // Create and set pie data
         PieData data = new PieData(dataSet);
         data.setValueFormatter(new PercentFormatter(pieChartExpenses));
-        data.setValueTextSize(14f);
-        data.setValueTextColor(Color.WHITE);
+        data.setValueTextSize(12f);
+        data.setValueTextColor(getColorCompat(R.color.white));
 
         pieChartExpenses.setData(data);
+        pieChartExpenses.highlightValues(null);
         pieChartExpenses.invalidate();
-        pieChartExpenses.animateY(1200);
+        pieChartExpenses.animateY(900);
     }
 
     /**
