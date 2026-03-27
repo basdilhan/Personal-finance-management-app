@@ -8,6 +8,14 @@
     <color name="black">#FF000000</color>
     <color name="card_background">#FFFFFF</color>
     <color name="card_background_light">#FFFFFF</color>
+    <color name="dashboard_chart_center">#1E293B</color>
+    <color name="dashboard_chart_hole">#FFFFFF</color>
+    <color name="dashboard_chart_other">#94A3B8</color>
+    <color name="dashboard_header_subtitle">#E0E7FF</color>
+    <color name="dashboard_insight_bg">#FFF7ED</color>
+    <color name="dashboard_insight_body">#B45309</color>
+    <color name="dashboard_insight_stroke">#FFEDD5</color>
+    <color name="dashboard_insight_title">#92400E</color>
     <color name="divider">#E2E8F0</color>
     <color name="error">#EF4444</color>
     <color name="gradient_end">#A5B4FC</color>
@@ -38,23 +46,54 @@
     <color name="warning">#F97316</color>
     <color name="white">#FFFFFFFF</color>
     <string name="app_name">DreamSaver</string>
+    <string name="bills_empty_state">No bills to track\nAll your bills will appear here</string>
+    <string name="bills_subtitle">Keep upcoming payments under control</string>
+    <string name="bills_title">Bills</string>
+    <string name="bills_total_due_label">Total Due Amount</string>
     <string name="btn_add_bill">Add Bill</string>
     <string name="btn_add_expense">Add Expense</string>
     <string name="btn_add_savings">Add Savings Goal</string>
     <string name="btn_get_started">Get Started</string>
+    <string name="btn_google_sign_in">Continue with Google</string>
     <string name="btn_login">Sign In</string>
     <string name="btn_logout">Logout</string>
     <string name="btn_register">Create Account</string>
     <string name="cancel">Cancel</string>
+    <string name="cd_back">Go back</string>
+    <string name="cd_notification_icon">Notification icon</string>
+    <string name="cd_notifications">Open notifications</string>
+    <string name="default_web_client_id" translatable="false">357423480737-43e3uqp3qoq20l5dv7fsfmmtiigl0h6d.apps.googleusercontent.com</string>
     <string name="error_confirm_password_empty">Please confirm your password</string>
     <string name="error_empty_email">Please enter your email</string>
     <string name="error_empty_name">Please enter your full name</string>
     <string name="error_empty_password">Please enter your password</string>
     <string name="error_generic">Something went wrong. Please try again.</string>
+    <string name="error_google_sign_in_cancelled">Google sign-in was cancelled</string>
+    <string name="error_google_sign_in_with_reason">Google sign-in failed (code %1$d)</string>
+    <string name="error_google_token">Could not get Google account token</string>
     <string name="error_invalid_email">Please enter a valid email address</string>
     <string name="error_name_too_short">Full name must be at least 3 characters</string>
     <string name="error_password_mismatch">Passwords do not match</string>
     <string name="error_password_too_short">Password must be at least 6 characters</string>
+    <string name="expenses_empty_state">No expenses yet\nStart adding expenses to track your spending</string>
+    <string name="expenses_subtitle">Track where your money goes</string>
+    <string name="expenses_title">Expense History</string>
+    <string name="expenses_total_month_label">Total This Month</string>
+    <string name="gcm_defaultSenderId" translatable="false">357423480737</string>
+    <string name="goal_active_count">%1$d active goals</string>
+    <string name="goal_progress_percent">%1$d%%</string>
+    <string name="goal_status_almost_there">Almost There</string>
+    <string name="goal_status_completed">Completed</string>
+    <string name="goal_status_in_progress">In Progress</string>
+    <string name="goals_empty_state">No savings goals yet.\nStart saving for your dreams!</string>
+    <string name="goals_subtitle">Build your future one step at a time</string>
+    <string name="goals_title">Savings Goals</string>
+    <string name="goals_total_saved_label">Total Saved</string>
+    <string name="google_api_key" translatable="false">AIzaSyCNHiJo8efnBZo-udUhTr4Acsz6lsuW460</string>
+    <string name="google_app_id" translatable="false">1:357423480737:android:1710dd5f3428eabb71d5e0</string>
+    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyCNHiJo8efnBZo-udUhTr4Acsz6lsuW460</string>
+    <string name="google_storage_bucket" translatable="false">financeapp-3.firebasestorage.app</string>
+    <string name="google_web_client_id">357423480737-43e3uqp3qoq20l5dv7fsfmmtiigl0h6d.apps.googleusercontent.com</string>
     <string name="hint_confirm_password">Confirm Password</string>
     <string name="hint_email">Email Address</string>
     <string name="hint_full_name">Full Name</string>
@@ -67,16 +106,22 @@
     <string name="login_title">Welcome Back to DreamSaver</string>
     <string name="menu_logout">Logout</string>
     <string name="menu_my_profile">My Profile</string>
+    <string name="notifications_empty">No notifications right now</string>
+    <string name="notifications_subtitle">Stay updated with reminders and insights</string>
+    <string name="notifications_title">Notifications</string>
     <string name="ok">OK</string>
     <string name="password_requirements">Password must be at least 6 characters</string>
+    <string name="project_id" translatable="false">financeapp-3</string>
     <string name="register_subtitle">Join DreamSaver today</string>
     <string name="register_title">Create Account</string>
+    <string name="settings_dark_theme">Dark Theme</string>
+    <string name="settings_dark_theme_subtitle">Enable dark colors across the app</string>
     <string name="success_login">Login successful!</string>
     <string name="success_registration">Account created successfully!</string>
-    <string name="text_already_have_account">Already have an account? <b>Login</b></string>
+    <string name="text_already_have_account">Already have an account? &lt;b>Login&lt;/b></string>
     <string name="text_forgot_password">Forgot Password?</string>
-    <string name="text_register">Don\'t have an account? <b>Register</b></string>
-    <style name="Base.Theme.FinanceApp" parent="Theme.Material3.Dark.NoActionBar">
+    <string name="text_register">Don\'t have an account? &lt;b>Register&lt;/b></string>
+    <style name="Base.Theme.FinanceApp" parent="Theme.Material3.DayNight.NoActionBar">
         
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryVariant">@color/primary_dark</item>
@@ -96,7 +141,7 @@
         
         <item name="android:statusBarColor">@color/background</item>
         <item name="android:navigationBarColor">@color/background</item>
-        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightStatusBar">true</item>
         
         
         <item name="android:textColorPrimary">@color/text_primary</item>

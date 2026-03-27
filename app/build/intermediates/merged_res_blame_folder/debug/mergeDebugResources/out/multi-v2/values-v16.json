@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.team.financeapp-mergeDebugResources-29:/values-v16/values-v16.xml",
+            "outputFile": "com.team.financeapp-mergeDebugResources-3:/values-v16/values-v16.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\pulin\\.gradle\\caches\\8.9\\transforms\\157a9ceb9d0f0b36243a86aad1aa5b78\\transformed\\appcompat-1.6.1\\res\\values-v16\\values-v16.xml",
+                    "source": "C:\\Users\\samudu\\.gradle\\caches\\9.1.0\\transforms\\ed2ecdb05fc107f100743c0666bbd2ac\\workspace\\transformed\\appcompat-1.6.1\\res\\values-v16\\values-v16.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",
@@ -23,7 +23,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\pulin\\.gradle\\caches\\8.9\\transforms\\d285940d5a89d5f9888cb07359ce0eb7\\transformed\\core-1.9.0\\res\\values-v16\\values-v16.xml",
+                    "source": "C:\\Users\\samudu\\.gradle\\caches\\9.1.0\\transforms\\a4a80d7ce457c6312d78783dcf02ed72\\workspace\\transformed\\core-1.9.0\\res\\values-v16\\values-v16.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",

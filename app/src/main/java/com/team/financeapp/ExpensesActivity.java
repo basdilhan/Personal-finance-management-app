@@ -15,6 +15,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.team.financeapp.auth.AuthManager;
+import com.team.financeapp.data.repository.ExpenseRepository;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -38,12 +40,16 @@ public class ExpensesActivity extends AppCompatActivity {
     private ChipGroup chipGroupFilter;
     private List<Expense> expensesList;
     private List<Expense> allExpensesList;
+    private AuthManager authManager;
+    private ExpenseRepository expenseRepository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_expenses);
 
+        authManager = new AuthManager();
+        expenseRepository = new ExpenseRepository(this);
         initializeViews();
         setupRecyclerView();
         BottomNavigationFragment.attach(this, R.id.bottom_navigation_container, R.id.nav_expenses);
@@ -56,6 +62,7 @@ public class ExpensesActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         BottomNavigationFragment.attach(this, R.id.bottom_navigation_container, R.id.nav_expenses);
+        loadExpenses();
     }
 
     /**
@@ -128,15 +135,20 @@ public class ExpensesActivity extends AppCompatActivity {
                     .collect(Collectors.toList());
         } else if (chipId == R.id.chip_food) {
             filteredList = allExpensesList.stream()
-                    .filter(e -> "Food".equalsIgnoreCase(e.getCategory()))
+                .filter(e -> e.getCategory() != null && e.getCategory().toLowerCase().contains("food"))
                     .collect(Collectors.toList());
         } else if (chipId == R.id.chip_transport) {
             filteredList = allExpensesList.stream()
-                    .filter(e -> "Transport".equalsIgnoreCase(e.getCategory()))
+                .filter(e -> e.getCategory() != null &&
+                    (e.getCategory().toLowerCase().contains("transport")
+                        || e.getCategory().toLowerCase().contains("fuel")))
                     .collect(Collectors.toList());
         } else if (chipId == R.id.chip_housing) {
             filteredList = allExpensesList.stream()
-                    .filter(e -> "Housing".equalsIgnoreCase(e.getCategory()))
+                .filter(e -> e.getCategory() != null &&
+                    (e.getCategory().toLowerCase().contains("housing")
+                        || e.getCategory().toLowerCase().contains("utilities")
+                        || e.getCategory().toLowerCase().contains("rent")))
                     .collect(Collectors.toList());
         } else {
             filteredList = new ArrayList<>(allExpensesList);
@@ -183,6 +195,7 @@ public class ExpensesActivity extends AppCompatActivity {
      * Handle logout action
      */
     private void handleLogout() {
+        authManager.signOut(this);
         Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(ExpensesActivity.this, LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -206,83 +219,35 @@ public class ExpensesActivity extends AppCompatActivity {
      * Load expenses from database or local storage
      */
     private void loadExpenses() {
-        expensesList.clear();
-        allExpensesList.clear();
+        String userId = authManager.getCurrentUserId();
+        if (userId == null || userId.isEmpty()) {
+            expensesList.clear();
+            allExpensesList.clear();
+            expenseAdapter.updateExpenses(expensesList);
+            updateEmptyState();
+            calculateTotalAmount();
+            return;
+        }
 
-        // Create sample expenses for testing
-        Calendar calendar = Calendar.getInstance();
+        expenseRepository.loadExpenses(userId, new ExpenseRepository.LoadExpensesCallback() {
+            @Override
+            public void onExpensesLoaded(List<Expense> expenses) {
+                allExpensesList.clear();
+                allExpensesList.addAll(expenses);
+                allExpensesList.sort((e1, e2) -> Long.compare(e2.getDate(), e1.getDate()));
 
-        // Expense today
-        calendar.set(Calendar.HOUR_OF_DAY, 14);
-        calendar.set(Calendar.MINUTE, 30);
-        Expense expenseToday1 = new Expense(
-                "Food",
-                450,
-                "Lunch at restaurant",
-                calendar.getTimeInMillis(),
-                "2:30 PM",
-                R.drawable.ic_receipt
-        );
-        allExpensesList.add(expenseToday1);
+                expensesList.clear();
+                expensesList.addAll(allExpensesList);
+                expenseAdapter.updateExpenses(expensesList);
+                updateEmptyState();
+                calculateTotalAmount();
+            }
 
-        // Another expense today
-        calendar.set(Calendar.HOUR_OF_DAY, 10);
-        calendar.set(Calendar.MINUTE, 0);
-        Expense expenseToday2 = new Expense(
-                "Transport",
-                120,
-                "Uber to office",
-                calendar.getTimeInMillis(),
-                "10:00 AM",
-                R.drawable.ic_receipt
-        );
-        allExpensesList.add(expenseToday2);
-
-        // Expense yesterday
-        calendar.add(Calendar.DAY_OF_YEAR, -1);
-        calendar.set(Calendar.HOUR_OF_DAY, 18);
-        calendar.set(Calendar.MINUTE, 15);
-        Expense expenseYesterday = new Expense(
-                "Groceries",
-                2350,
-                "Weekly groceries shopping",
-                calendar.getTimeInMillis(),
-                "6:15 PM",
-                R.drawable.ic_receipt
-        );
-        allExpensesList.add(expenseYesterday);
-
-        // Housing expense
-        calendar.add(Calendar.DAY_OF_YEAR, -2);
-        calendar.set(Calendar.HOUR_OF_DAY, 9);
-        calendar.set(Calendar.MINUTE, 0);
-        Expense housingExpense = new Expense(
-                "Housing",
-                15000,
-                "Monthly rent",
-                calendar.getTimeInMillis(),
-                "9:00 AM",
-                R.drawable.ic_receipt
-        );
-        allExpensesList.add(housingExpense);
-
-        // Entertainment expense
-        calendar.add(Calendar.DAY_OF_YEAR, -1);
-        calendar.set(Calendar.HOUR_OF_DAY, 12);
-        calendar.set(Calendar.MINUTE, 45);
-        Expense expenseOldDate = new Expense(
-                "Entertainment",
-                1200,
-                "Movie tickets",
-                calendar.getTimeInMillis(),
-                "12:45 PM",
-                R.drawable.ic_receipt
-        );
-        allExpensesList.add(expenseOldDate);
-
-        expensesList.addAll(allExpensesList);
-        expenseAdapter.updateExpenses(expensesList);
-        updateEmptyState();
+            @Override
+            public void onError(String message) {
+                Toast.makeText(ExpensesActivity.this, message, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     /**

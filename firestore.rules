@@ -1,0 +1,99 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function validSyncState(state) {
+      return state in ['PENDING', 'SYNCED', 'FAILED'];
+    }
+
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+    }
+
+    match /bills/{docId} {
+      allow create: if isSignedIn()
+        && isOwner(request.resource.data.userId)
+        && request.resource.data.amount is number
+        && request.resource.data.dueDate is int
+        && validSyncState(request.resource.data.syncState);
+
+      allow read, delete: if isOwner(resource.data.userId);
+
+      allow update: if isOwner(resource.data.userId)
+        && isOwner(request.resource.data.userId)
+        && request.resource.data.amount is number
+        && request.resource.data.dueDate is int
+        && validSyncState(request.resource.data.syncState);
+    }
+
+    match /expenses/{docId} {
+      allow create: if isSignedIn()
+        && isOwner(request.resource.data.userId)
+        && request.resource.data.amount is number
+        && request.resource.data.date is int
+        && validSyncState(request.resource.data.syncState);
+
+      allow read, delete: if isOwner(resource.data.userId);
+
+      allow update: if isOwner(resource.data.userId)
+        && isOwner(request.resource.data.userId)
+        && request.resource.data.amount is number
+        && request.resource.data.date is int
+        && validSyncState(request.resource.data.syncState);
+    }
+
+    match /goals/{docId} {
+      allow create: if isSignedIn()
+        && isOwner(request.resource.data.userId)
+        && request.resource.data.targetAmount is number
+        && request.resource.data.currentAmount is number
+        && validSyncState(request.resource.data.syncState);
+
+      allow read, delete: if isOwner(resource.data.userId);
+
+      allow update: if isOwner(resource.data.userId)
+        && isOwner(request.resource.data.userId)
+        && request.resource.data.targetAmount is number
+        && request.resource.data.currentAmount is number
+        && validSyncState(request.resource.data.syncState);
+    }
+
+    match /incomes/{docId} {
+      allow create: if isSignedIn()
+        && isOwner(request.resource.data.userId)
+        && request.resource.data.amount is number
+        && request.resource.data.date is int
+        && validSyncState(request.resource.data.syncState);
+
+      allow read, delete: if isOwner(resource.data.userId);
+
+      allow update: if isOwner(resource.data.userId)
+        && isOwner(request.resource.data.userId)
+        && request.resource.data.amount is number
+        && request.resource.data.date is int
+        && validSyncState(request.resource.data.syncState);
+    }
+
+    match /notifications/{docId} {
+      allow create: if isSignedIn() && isOwner(request.resource.data.userId);
+      allow read, update, delete: if isOwner(resource.data.userId);
+    }
+
+    match /summaries/{docId} {
+      allow read: if isOwner(resource.data.userId);
+      allow write: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

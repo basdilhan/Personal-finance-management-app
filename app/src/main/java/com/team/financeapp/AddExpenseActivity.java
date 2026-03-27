@@ -12,6 +12,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
+import com.team.financeapp.auth.AuthManager;
+import com.team.financeapp.data.repository.ExpenseRepository;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -27,6 +29,9 @@ public class AddExpenseActivity extends AppCompatActivity {
     private MaterialButton btnSave, btnCancel;
     private Calendar calendar;
     private SimpleDateFormat dateFormat;
+    private SimpleDateFormat timeFormat;
+    private AuthManager authManager;
+    private ExpenseRepository expenseRepository;
 
     // Sri Lankan expense categories
     private String[] expenseCategories = {
@@ -55,6 +60,8 @@ public class AddExpenseActivity extends AppCompatActivity {
         }
 
         initializeViews();
+        authManager = new AuthManager();
+        expenseRepository = new ExpenseRepository(this);
         setupCategoryDropdown();
         setupClickListeners();
     }
@@ -70,6 +77,7 @@ public class AddExpenseActivity extends AppCompatActivity {
         // Initialize calendar and date format
         calendar = Calendar.getInstance();
         dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        timeFormat = new SimpleDateFormat("hh:mm a", Locale.getDefault());
     }
 
     private void setupCategoryDropdown() {
@@ -136,7 +144,7 @@ public class AddExpenseActivity extends AppCompatActivity {
                 day
         );
 
-        datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis());
+        datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
         datePickerDialog.show();
     }
 
@@ -158,9 +166,63 @@ public class AddExpenseActivity extends AppCompatActivity {
             return;
         }
 
-        // TODO: Save to database
-        Toast.makeText(this, "Expense added: LKR " + amount, Toast.LENGTH_SHORT).show();
-        finish();
+        if (date.isEmpty()) {
+            etDate.setError("Please select expense date");
+            etDate.requestFocus();
+            return;
+        }
+
+        String userId = authManager.getCurrentUserId();
+        if (userId == null || userId.isEmpty()) {
+            Toast.makeText(this, "Please login again", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        double amountValue;
+        try {
+            amountValue = Double.parseDouble(amount);
+        } catch (NumberFormatException ex) {
+            etAmount.setError("Please enter a valid amount");
+            etAmount.requestFocus();
+            return;
+        }
+
+        long expenseDateMillis = calendar.getTimeInMillis();
+        Expense expense = new Expense(
+                category,
+                amountValue,
+                description,
+                expenseDateMillis,
+                timeFormat.format(calendar.getTime()),
+                resolveCategoryIcon(category)
+        );
+
+        expenseRepository.saveExpense(userId, expense, new ExpenseRepository.SaveExpenseCallback() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(AddExpenseActivity.this, "Expense added: LKR " + amount, Toast.LENGTH_SHORT).show();
+                finish();
+            }
+
+            @Override
+            public void onError(String message) {
+                Toast.makeText(AddExpenseActivity.this, message, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private int resolveCategoryIcon(String category) {
+        String normalized = category.toLowerCase(Locale.ROOT);
+        if (normalized.contains("utilities") || normalized.contains("electric") || normalized.contains("water")) {
+            return R.drawable.ic_electricity;
+        }
+        if (normalized.contains("internet") || normalized.contains("mobile")) {
+            return R.drawable.ic_wifi;
+        }
+        if (normalized.contains("transport") || normalized.contains("fuel")) {
+            return R.drawable.ic_water;
+        }
+        return R.drawable.ic_receipt;
     }
 
     @Override

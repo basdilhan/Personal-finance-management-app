@@ -2,7 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
+        android:name=".FinanceApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -35,6 +38,7 @@
         <activity android:name=".AddBillActivity" android:exported="false" />
         <activity android:name=".AddGoalActivity" android:exported="false" />
         <activity android:name=".GoalDetailsActivity" android:exported="false" />
+        <activity android:name=".NotificationsActivity" android:exported="false" />
     </application>
 
 </manifest>

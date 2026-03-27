@@ -10,8 +10,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.card.MaterialCardView;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -71,23 +69,29 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalViewHolder
         holder.ivCategoryIcon.setBackgroundResource(goal.getProgressCircleBackground());
         
         // Set progress percentage
-        int progress = goal.getProgressPercentage();
-        holder.tvProgressPercentage.setText(progress + "%");
+        int progress = Math.min(goal.getProgressPercentage(), 100);
+        holder.tvProgressPercentage.setText(holder.itemView.getContext().getString(R.string.goal_progress_percent, progress));
         holder.progressBar.setProgress(progress);
         
         // Set progress status
-        holder.tvProgressStatus.setText("Complete");
+        if (progress >= 100) {
+            holder.tvProgressStatus.setText(R.string.goal_status_completed);
+        } else if (progress >= 75) {
+            holder.tvProgressStatus.setText(R.string.goal_status_almost_there);
+        } else {
+            holder.tvProgressStatus.setText(R.string.goal_status_in_progress);
+        }
         
         // Set current amount
-        holder.tvCurrentAmount.setText(String.format("LKR%.0f", goal.getCurrentAmount()));
+        holder.tvCurrentAmount.setText(String.format(Locale.getDefault(), "LKR %.0f", goal.getCurrentAmount()));
         holder.tvCurrentLabel.setText("Current");
         
         // Set target amount
-        holder.tvTargetAmount.setText(String.format("LKR%.0f", goal.getTargetAmount()));
+        holder.tvTargetAmount.setText(String.format(Locale.getDefault(), "LKR %.0f", goal.getTargetAmount()));
         holder.tvTargetLabel.setText("Target");
         
         // Set remaining amount
-        holder.tvRemainingAmount.setText(String.format("LKR%.0f", goal.getRemainingAmount()));
+        holder.tvRemainingAmount.setText(String.format(Locale.getDefault(), "LKR %.0f", goal.getRemainingAmount()));
         holder.tvRemainingLabel.setText("To Go");
 
         // Set click listeners on the card

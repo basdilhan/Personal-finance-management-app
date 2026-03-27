@@ -2,12 +2,15 @@ package com.team.financeapp;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -30,6 +33,9 @@ public class GoalDetailsActivity extends AppCompatActivity {
     public static final String EXTRA_GOAL_TARGET_DATE = "goal_target_date";
     public static final String EXTRA_GOAL_CATEGORY = "goal_category";
     public static final String EXTRA_GOAL_ICON = "goal_icon";
+    public static final String EXTRA_UPDATED_GOAL_ID = "updated_goal_id";
+    public static final String EXTRA_UPDATED_CURRENT_AMOUNT = "updated_current_amount";
+    public static final String EXTRA_DELETED_GOAL_ID = "deleted_goal_id";
 
     private MaterialButton btnBack;
     private ImageView ivGoalIcon;
@@ -54,6 +60,7 @@ public class GoalDetailsActivity extends AppCompatActivity {
     private long targetDate;
     private String category;
     private int goalIcon;
+    private boolean savingsUpdated;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +71,7 @@ public class GoalDetailsActivity extends AppCompatActivity {
         initializeViews();
         populateData();
         setupClickListeners();
+        setupBackHandler();
     }
 
     /**
@@ -117,14 +125,15 @@ public class GoalDetailsActivity extends AppCompatActivity {
         if (targetAmount > 0) {
             progress = (int) ((currentAmount / targetAmount) * 100);
         }
-        tvProgressPercentage.setText(progress + "%");
+        progress = Math.min(progress, 100);
+        tvProgressPercentage.setText(getString(R.string.goal_progress_percent, progress));
         progressBar.setProgress(progress);
 
         // Set amounts
-        tvCurrentAmount.setText(String.format("LKR %.0f", currentAmount));
-        tvTargetAmount.setText(String.format("LKR %.0f", targetAmount));
+        tvCurrentAmount.setText(String.format(Locale.getDefault(), "LKR %.0f", currentAmount));
+        tvTargetAmount.setText(String.format(Locale.getDefault(), "LKR %.0f", targetAmount));
         double remaining = Math.max(0, targetAmount - currentAmount);
-        tvRemainingAmount.setText(String.format("LKR %.0f", remaining));
+        tvRemainingAmount.setText(String.format(Locale.getDefault(), "LKR %.0f", remaining));
 
         // Set description
         tvDescription.setText(goalDescription != null && !goalDescription.isEmpty()
@@ -135,8 +144,18 @@ public class GoalDetailsActivity extends AppCompatActivity {
             SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault());
             tvTargetDate.setText(dateFormat.format(new Date(targetDate)));
         } else {
-            tvTargetDate.setText("Not set");
+            tvTargetDate.setText("-");
         }
+    }
+
+    private void setupBackHandler() {
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                sendUpdatedGoalResultIfNeeded();
+                finish();
+            }
+        });
     }
 
     /**
@@ -146,6 +165,7 @@ public class GoalDetailsActivity extends AppCompatActivity {
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                sendUpdatedGoalResultIfNeeded();
                 finish();
             }
         });
@@ -186,8 +206,60 @@ public class GoalDetailsActivity extends AppCompatActivity {
      * Show dialog to add savings to this goal
      */
     private void showAddSavingsDialog() {
-        // Simple dialog to add savings - in a real app, this would be a more sophisticated input
-        Toast.makeText(this, "Add savings feature coming soon!", Toast.LENGTH_SHORT).show();
+        EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        input.setHint("Enter amount in LKR");
+
+        new AlertDialog.Builder(this)
+                .setTitle("Add Savings")
+                .setMessage("How much do you want to add to this goal?")
+                .setView(input)
+                .setPositiveButton("Add", (dialog, which) -> applySavings(input.getText().toString().trim()))
+                .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
+                .show();
+    }
+
+    private void applySavings(String amountText) {
+        if (amountText.isEmpty()) {
+            Toast.makeText(this, "Please enter an amount", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        double amountToAdd;
+        try {
+            amountToAdd = Double.parseDouble(amountText);
+        } catch (NumberFormatException ex) {
+            Toast.makeText(this, "Invalid amount", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (amountToAdd <= 0) {
+            Toast.makeText(this, "Amount should be greater than zero", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        currentAmount += amountToAdd;
+        savingsUpdated = true;
+        populateData();
+        sendUpdatedGoalResultIfNeeded();
+
+        String successMessage = String.format(Locale.getDefault(), "LKR %.0f added to %s", amountToAdd, goalName);
+        Toast.makeText(this, successMessage, Toast.LENGTH_SHORT).show();
+
+        if (currentAmount >= targetAmount && targetAmount > 0) {
+            Toast.makeText(this, "Congratulations! Goal reached.", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void sendUpdatedGoalResultIfNeeded() {
+        if (!savingsUpdated) {
+            return;
+        }
+
+        Intent resultIntent = new Intent();
+        resultIntent.putExtra(EXTRA_UPDATED_GOAL_ID, goalId);
+        resultIntent.putExtra(EXTRA_UPDATED_CURRENT_AMOUNT, currentAmount);
+        setResult(RESULT_OK, resultIntent);
     }
 
     /**
@@ -211,10 +283,11 @@ public class GoalDetailsActivity extends AppCompatActivity {
 
         // Set result to indicate deletion and go back
         Intent resultIntent = new Intent();
-        resultIntent.putExtra("deleted_goal_id", goalId);
+        resultIntent.putExtra(EXTRA_DELETED_GOAL_ID, goalId);
         setResult(RESULT_OK, resultIntent);
         finish();
     }
+
 }
 
 

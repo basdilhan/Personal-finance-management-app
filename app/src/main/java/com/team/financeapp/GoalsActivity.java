@@ -15,10 +15,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.team.financeapp.auth.AuthManager;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 /**
@@ -26,6 +28,8 @@ import java.util.stream.Collectors;
  * Shows goals with progress tracking and target dates
  */
 public class GoalsActivity extends AppCompatActivity implements GoalAdapter.OnGoalClickListener {
+
+    private static final int REQUEST_GOAL_DETAILS = 101;
 
     private TextView tvTotalSaved;
     private TextView tvActiveGoalsCount;
@@ -39,12 +43,14 @@ public class GoalsActivity extends AppCompatActivity implements GoalAdapter.OnGo
     private ChipGroup chipGroupFilter;
     private List<Goal> goalsList;
     private List<Goal> allGoalsList; // Keep original list for filtering
+    private AuthManager authManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_goals);
 
+        authManager = new AuthManager();
         initializeViews();
         setupRecyclerView();
         BottomNavigationFragment.attach(this, R.id.bottom_navigation_container, R.id.nav_goals);
@@ -162,6 +168,7 @@ public class GoalsActivity extends AppCompatActivity implements GoalAdapter.OnGo
      * Handle logout action
      */
     private void handleLogout() {
+        authManager.signOut(this);
         Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(GoalsActivity.this, LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -195,7 +202,53 @@ public class GoalsActivity extends AppCompatActivity implements GoalAdapter.OnGo
         intent.putExtra(GoalDetailsActivity.EXTRA_GOAL_TARGET_DATE, goal.getTargetDate());
         intent.putExtra(GoalDetailsActivity.EXTRA_GOAL_CATEGORY, goal.getCategory());
         intent.putExtra(GoalDetailsActivity.EXTRA_GOAL_ICON, goal.getCategoryIcon());
-        startActivity(intent);
+        startActivityForResult(intent, REQUEST_GOAL_DETAILS);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode != REQUEST_GOAL_DETAILS || resultCode != RESULT_OK || data == null) {
+            return;
+        }
+
+        int deletedGoalId = data.getIntExtra(GoalDetailsActivity.EXTRA_DELETED_GOAL_ID, -1);
+        if (deletedGoalId != -1) {
+            goalAdapter.removeGoal(deletedGoalId);
+            allGoalsList.removeIf(g -> g.getId() == deletedGoalId);
+            calculateTotalSaved();
+            updateEmptyState();
+            return;
+        }
+
+        int updatedGoalId = data.getIntExtra(GoalDetailsActivity.EXTRA_UPDATED_GOAL_ID, -1);
+        if (updatedGoalId != -1) {
+            double updatedCurrentAmount = data.getDoubleExtra(GoalDetailsActivity.EXTRA_UPDATED_CURRENT_AMOUNT, -1);
+            if (updatedCurrentAmount >= 0) {
+                updateGoalSavings(updatedGoalId, updatedCurrentAmount);
+            }
+        }
+    }
+
+    private void updateGoalSavings(int goalId, double updatedCurrentAmount) {
+        for (Goal goal : allGoalsList) {
+            if (goal.getId() == goalId) {
+                goal.setCurrentAmount(updatedCurrentAmount);
+                break;
+            }
+        }
+
+        for (Goal goal : goalsList) {
+            if (goal.getId() == goalId) {
+                goal.setCurrentAmount(updatedCurrentAmount);
+                break;
+            }
+        }
+
+        goalAdapter.notifyDataSetChanged();
+        calculateTotalSaved();
+        updateEmptyState();
     }
 
     /**
@@ -361,8 +414,8 @@ public class GoalsActivity extends AppCompatActivity implements GoalAdapter.OnGo
             totalSaved += goal.getCurrentAmount();
         }
 
-        tvTotalSaved.setText(String.format("LKR %.0f", totalSaved));
-        tvActiveGoalsCount.setText(allGoalsList.size() + " active goals");
+        tvTotalSaved.setText(String.format(Locale.getDefault(), "LKR %.0f", totalSaved));
+        tvActiveGoalsCount.setText(getString(R.string.goal_active_count, allGoalsList.size()));
     }
 
     /**

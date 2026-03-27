@@ -15,6 +15,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.team.financeapp.auth.AuthManager;
+import com.team.financeapp.data.repository.IncomeRepository;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -39,12 +41,16 @@ public class IncomeHistoryActivity extends AppCompatActivity {
     private IncomeAdapter incomeAdapter;
     private List<IncomeEntry> incomeList;
     private List<IncomeEntry> allIncomeList;
+    private AuthManager authManager;
+    private IncomeRepository incomeRepository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_income_history);
 
+        authManager = new AuthManager();
+        incomeRepository = new IncomeRepository(this);
         initializeViews();
         setupRecyclerView();
         setupBottomNavigation();
@@ -59,6 +65,7 @@ public class IncomeHistoryActivity extends AppCompatActivity {
         if (bottomNavigationView != null) {
             bottomNavigationView.setSelectedItemId(R.id.nav_income_history);
         }
+        loadIncomeHistory();
     }
 
     private void initializeViews() {
@@ -196,60 +203,35 @@ public class IncomeHistoryActivity extends AppCompatActivity {
     }
 
     private void loadIncomeHistory() {
-        incomeList.clear();
-        allIncomeList.clear();
+        String userId = authManager.getCurrentUserId();
+        if (userId == null || userId.isEmpty()) {
+            incomeList.clear();
+            allIncomeList.clear();
+            incomeAdapter.updateIncomes(incomeList);
+            updateEmptyState();
+            calculateTotalIncome();
+            return;
+        }
 
-        Calendar calendar = Calendar.getInstance();
+        incomeRepository.loadIncome(userId, new IncomeRepository.LoadIncomeCallback() {
+            @Override
+            public void onIncomeLoaded(List<IncomeEntry> incomes) {
+                allIncomeList.clear();
+                allIncomeList.addAll(incomes);
+                allIncomeList.sort((i1, i2) -> Long.compare(i2.getDate(), i1.getDate()));
 
-        calendar.set(Calendar.HOUR_OF_DAY, 9);
-        calendar.set(Calendar.MINUTE, 45);
-        allIncomeList.add(new IncomeEntry(
-                "Salary",
-                120000,
-                "Monthly salary credit",
-                calendar.getTimeInMillis(),
-                "9:45 AM",
-                R.drawable.ic_wallet
-        ));
+                incomeList.clear();
+                incomeList.addAll(allIncomeList);
+                incomeAdapter.updateIncomes(incomeList);
+                updateEmptyState();
+                calculateTotalIncome();
+            }
 
-        calendar.set(Calendar.HOUR_OF_DAY, 20);
-        calendar.set(Calendar.MINUTE, 10);
-        allIncomeList.add(new IncomeEntry(
-                "Freelance",
-                18500,
-                "Website design project",
-                calendar.getTimeInMillis(),
-                "8:10 PM",
-                R.drawable.ic_laptop
-        ));
-
-        calendar.add(Calendar.DAY_OF_YEAR, -3);
-        calendar.set(Calendar.HOUR_OF_DAY, 14);
-        calendar.set(Calendar.MINUTE, 20);
-        allIncomeList.add(new IncomeEntry(
-                "Business",
-                42000,
-                "Shop daily collection",
-                calendar.getTimeInMillis(),
-                "2:20 PM",
-                R.drawable.ic_savings
-        ));
-
-        calendar.add(Calendar.DAY_OF_YEAR, -2);
-        calendar.set(Calendar.HOUR_OF_DAY, 10);
-        calendar.set(Calendar.MINUTE, 5);
-        allIncomeList.add(new IncomeEntry(
-                "Salary",
-                120000,
-                "Allowance adjustment",
-                calendar.getTimeInMillis(),
-                "10:05 AM",
-                R.drawable.ic_wallet
-        ));
-
-        incomeList.addAll(allIncomeList);
-        incomeAdapter.updateIncomes(incomeList);
-        updateEmptyState();
+            @Override
+            public void onError(String message) {
+                Toast.makeText(IncomeHistoryActivity.this, message, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void calculateTotalIncome() {
@@ -279,6 +261,7 @@ public class IncomeHistoryActivity extends AppCompatActivity {
     }
 
     private void handleLogout() {
+        authManager.signOut(this);
         Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(IncomeHistoryActivity.this, LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

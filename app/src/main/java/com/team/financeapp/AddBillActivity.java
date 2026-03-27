@@ -12,6 +12,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
+import com.team.financeapp.auth.AuthManager;
+import com.team.financeapp.data.repository.BillRepository;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -27,6 +29,8 @@ public class AddBillActivity extends AppCompatActivity {
     private MaterialButton btnSave, btnCancel;
     private Calendar calendar;
     private SimpleDateFormat dateFormat;
+    private AuthManager authManager;
+    private BillRepository billRepository;
 
     // Common bill types in Sri Lanka
     private String[] billTypes = {
@@ -55,6 +59,8 @@ public class AddBillActivity extends AppCompatActivity {
         }
 
         initializeViews();
+        authManager = new AuthManager();
+        billRepository = new BillRepository(this);
         setupBillTypeDropdown();
         setupClickListeners();
     }
@@ -164,9 +170,90 @@ public class AddBillActivity extends AppCompatActivity {
             return;
         }
 
-        // TODO: Save to database
-        Toast.makeText(this, "Bill added: " + billName + " - LKR " + amount, Toast.LENGTH_SHORT).show();
-        finish();
+        if (dueDate.isEmpty()) {
+            etDueDate.setError("Please select due date");
+            etDueDate.requestFocus();
+            return;
+        }
+
+        String userId = authManager.getCurrentUserId();
+        if (userId == null || userId.isEmpty()) {
+            Toast.makeText(this, "Please login again", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        double amountValue;
+        try {
+            amountValue = Double.parseDouble(amount);
+        } catch (NumberFormatException ex) {
+            etAmount.setError("Please enter a valid amount");
+            etAmount.requestFocus();
+            return;
+        }
+
+        long dueDateMillis = calendar.getTimeInMillis();
+        String status = resolveStatus(dueDateMillis);
+        int indicator = resolveIndicator(status);
+
+        Bill bill = new Bill(
+                billName,
+                billType,
+                amountValue,
+                dueDateMillis,
+                billType,
+                resolveCategoryIcon(billType),
+                status,
+                indicator
+        );
+
+        billRepository.saveBill(userId, bill, new BillRepository.SaveBillCallback() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(AddBillActivity.this, "Bill added: " + billName + " - LKR " + amount, Toast.LENGTH_SHORT).show();
+                finish();
+            }
+
+            @Override
+            public void onError(String message) {
+                Toast.makeText(AddBillActivity.this, message, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private String resolveStatus(long dueDateMillis) {
+        long now = System.currentTimeMillis();
+        long days = (dueDateMillis - now) / (24L * 60L * 60L * 1000L);
+        if (days <= 3) {
+            return "urgent";
+        }
+        if (days <= 7) {
+            return "due_soon";
+        }
+        return "pending";
+    }
+
+    private int resolveIndicator(String status) {
+        if ("urgent".equals(status)) {
+            return R.drawable.circle_urgent;
+        }
+        if ("due_soon".equals(status)) {
+            return R.drawable.circle_warning;
+        }
+        return R.drawable.circle_blue_light;
+    }
+
+    private int resolveCategoryIcon(String billType) {
+        String normalized = billType.toLowerCase(Locale.ROOT);
+        if (normalized.contains("electric")) {
+            return R.drawable.ic_electricity;
+        }
+        if (normalized.contains("water")) {
+            return R.drawable.ic_water;
+        }
+        if (normalized.contains("internet") || normalized.contains("mobile")) {
+            return R.drawable.ic_wifi;
+        }
+        return R.drawable.ic_receipt;
     }
 
     @Override

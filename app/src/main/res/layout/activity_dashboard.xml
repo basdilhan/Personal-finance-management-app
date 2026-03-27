@@ -115,6 +115,7 @@
                                     android:layout_width="42dp"
                                     android:layout_height="42dp"
                                     android:background="@drawable/circle_translucent"
+                                    android:contentDescription="@string/cd_notifications"
                                     android:src="@drawable/ic_notification"
                                     android:padding="10dp"
                                     android:scaleType="centerInside" />
@@ -1064,6 +1065,7 @@
                                     android:background="@drawable/circle_yellow_light">
 
                                     <ImageView
+                                        android:id="@+id/image_bill_1_icon"
                                         android:layout_width="26dp"
                                         android:layout_height="26dp"
                                         android:layout_gravity="center"
@@ -1087,6 +1089,7 @@
                                 android:layout_marginStart="14dp">
 
                                 <TextView
+                                    android:id="@+id/text_bill_1_name"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Electricity Bill"
@@ -1107,6 +1110,7 @@
                                         android:background="@drawable/circle_red" />
 
                                     <TextView
+                                        android:id="@+id/text_bill_1_due"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="Due Tomorrow"
@@ -1124,6 +1128,7 @@
                                 android:gravity="end">
 
                                 <TextView
+                                    android:id="@+id/text_bill_1_amount"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="LKR 1,200"
@@ -1172,6 +1177,7 @@
                                 android:background="@drawable/circle_blue_light">
 
                                 <ImageView
+                                    android:id="@+id/image_bill_2_icon"
                                     android:layout_width="26dp"
                                     android:layout_height="26dp"
                                     android:layout_gravity="center"
@@ -1187,6 +1193,7 @@
                                 android:layout_marginStart="14dp">
 
                                 <TextView
+                                    android:id="@+id/text_bill_2_name"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Water Bill"
@@ -1195,6 +1202,7 @@
                                     android:textStyle="bold" />
 
                                 <TextView
+                                    android:id="@+id/text_bill_2_due"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Due in 5 days"
@@ -1204,6 +1212,7 @@
                             </LinearLayout>
 
                             <TextView
+                                android:id="@+id/text_bill_2_amount"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="LKR 800"
@@ -1236,6 +1245,7 @@
                                 android:background="@drawable/circle_purple_light">
 
                                 <ImageView
+                                    android:id="@+id/image_bill_3_icon"
                                     android:layout_width="26dp"
                                     android:layout_height="26dp"
                                     android:layout_gravity="center"
@@ -1251,6 +1261,7 @@
                                 android:layout_marginStart="14dp">
 
                                 <TextView
+                                    android:id="@+id/text_bill_3_name"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Internet Bill"
@@ -1259,6 +1270,7 @@
                                     android:textStyle="bold" />
 
                                 <TextView
+                                    android:id="@+id/text_bill_3_due"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Due in 12 days"
@@ -1268,6 +1280,7 @@
                             </LinearLayout>
 
                             <TextView
+                                android:id="@+id/text_bill_3_amount"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="LKR 6,990"

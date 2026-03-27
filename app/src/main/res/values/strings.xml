@@ -14,12 +14,17 @@
     <string name="hint_email">Email Address</string>
     <string name="hint_password">Password</string>
     <string name="btn_login">Sign In</string>
+    <string name="btn_google_sign_in">Continue with Google</string>
     <string name="text_forgot_password">Forgot Password?</string>
     <string name="text_register">Don\'t have an account? &lt;b&gt;Register&lt;/b&gt;</string>
     <string name="error_empty_email">Please enter your email</string>
     <string name="error_empty_password">Please enter your password</string>
     <string name="error_invalid_email">Please enter a valid email address</string>
     <string name="success_login">Login successful!</string>
+    <string name="error_google_sign_in_cancelled">Google sign-in was cancelled</string>
+    <string name="error_google_token">Could not get Google account token</string>
+    <string name="error_google_sign_in_with_reason">Google sign-in failed (code %1$d)</string>
+    <string name="google_web_client_id">357423480737-43e3uqp3qoq20l5dv7fsfmmtiigl0h6d.apps.googleusercontent.com</string>
 
     <!-- Dashboard Screen -->
     <string name="btn_logout">Logout</string>
@@ -63,9 +68,25 @@
     <string name="bills_empty_state">No bills to track\nAll your bills will appear here</string>
 
     <!-- General -->
+    <string name="settings_dark_theme">Dark Theme</string>
+    <string name="settings_dark_theme_subtitle">Enable dark colors across the app</string>
     <string name="cd_back">Go back</string>
+    <string name="cd_notifications">Open notifications</string>
     <string name="loading">Loading…</string>
     <string name="error_generic">Something went wrong. Please try again.</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
+
+    <!-- Notifications -->
+    <string name="notifications_title">Notifications</string>
+    <string name="notifications_subtitle">Stay updated with reminders and insights</string>
+    <string name="notifications_empty">No notifications right now</string>
+    <string name="cd_notification_icon">Notification icon</string>
+
+    <!-- Goal progress states -->
+    <string name="goal_status_completed">Completed</string>
+    <string name="goal_status_almost_there">Almost There</string>
+    <string name="goal_status_in_progress">In Progress</string>
+    <string name="goal_progress_percent">%1$d%%</string>
+    <string name="goal_active_count">%1$d active goals</string>
 </resources>
