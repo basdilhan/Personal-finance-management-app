@@ -129,6 +129,41 @@ public class AuthManager {
                 });
     }
 
+    public void updatePassword(String currentPassword, String newPassword, Activity activity, AuthCallback callback) {
+        FirebaseUser user = firebaseAuth.getCurrentUser();
+        if (user == null) {
+            callback.onError("User not authenticated. Please login again.");
+            return;
+        }
+
+        String userEmail = user.getEmail();
+        if (userEmail == null) {
+            callback.onError("Unable to retrieve user email. Please login again.");
+            return;
+        }
+
+        // Re-authenticate the user with current password before updating
+        AuthCredential credential = com.google.firebase.auth.EmailAuthProvider.getCredential(userEmail, currentPassword);
+
+        user.reauthenticate(credential)
+                .addOnCompleteListener(activity, reauthTask -> {
+                    if (!reauthTask.isSuccessful()) {
+                        callback.onError("Current password is incorrect");
+                        return;
+                    }
+
+                    // Now update the password
+                    user.updatePassword(newPassword)
+                            .addOnCompleteListener(activity, updateTask -> {
+                                if (updateTask.isSuccessful()) {
+                                    callback.onSuccess();
+                                    return;
+                                }
+                                callback.onError(resolveError(updateTask.getException()));
+                            });
+                });
+    }
+
     private void upsertUserProfile(@NonNull FirebaseUser user, String fallbackName) {
         String resolvedName = !TextUtils.isEmpty(user.getDisplayName()) ? user.getDisplayName() : fallbackName;
         String photo = user.getPhotoUrl() == null ? "" : user.getPhotoUrl().toString();

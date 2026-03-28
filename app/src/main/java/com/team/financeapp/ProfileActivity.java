@@ -197,7 +197,7 @@ public class ProfileActivity extends AppCompatActivity {
      * Navigate to Change Password activity
      */
     private void navigateToChangePassword() {
-        Intent intent = new Intent(ProfileActivity.this, ForgotPasswordActivity.class);
+        Intent intent = new Intent(ProfileActivity.this, ChangePasswordActivity.class);
         startActivity(intent);
     }
 

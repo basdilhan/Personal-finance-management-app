@@ -1,0 +1,257 @@
+# DreamSaver Project Completion Master Plan
+
+Date: March 28, 2026  
+Branch reviewed: sam
+
+This is the single source of truth for delivery to Apr 5: complete backend first, then optional features.
+
+## 1. Current Status (Verified)
+
+Completed now:
+- Auth is integrated (email/password, Google sign in, reset password, change password, user profile upsert).
+- Room + Firestore + WorkManager dependencies are added.
+- Room local DB schema exists (bill, expense, goal, income entities and DAOs).
+- Bills, Expenses, and Income have repository-based local-first loading and cloud sync.
+- BillsActivity, ExpensesActivity, IncomeHistoryActivity load from repositories.
+- AddBillActivity, AddExpenseActivity, AddIncomeActivity save through repositories.
+- Firestore rules baseline exists with user ownership and sync-state checks.
+- Pending sync worker scheduling exists at app startup.
+- Change Password activity implemented (ChangePasswordActivity with proper re-authentication and password update).
+
+Still incomplete:
+- Goals backend integration is incomplete.
+- Pending sync worker has scaffold only (no real retry logic).
+- Notifications screen still uses mock data.
+- Dashboard summary architecture is not finalized.
+- Cloud Functions layer not yet added in repo.
+- Tests are still template-level only.
+
+## 2. Target Project Structure (Final)
+
+```text
+Personal-finance-management-app/
+├── app/
+│   └── src/main/java/com/team/financeapp/
+│       ├── auth/
+│       ├── data/
+│       │   ├── local/
+│       │   │   ├── AppDatabase.java
+│       │   │   ├── dao/
+│       │   │   │   ├── BillDao.java
+│       │   │   │   ├── ExpenseDao.java
+│       │   │   │   ├── GoalDao.java
+│       │   │   │   ├── IncomeDao.java
+│       │   │   │   ├── NotificationDao.java (new)
+│       │   │   │   ├── WalletDao.java (new)
+│       │   │   │   └── PaymentMethodDao.java (new)
+│       │   │   └── entity/
+│       │   │       ├── BillEntity.java
+│       │   │       ├── ExpenseEntity.java
+│       │   │       ├── GoalEntity.java
+│       │   │       ├── IncomeEntity.java
+│       │   │       ├── NotificationEntity.java (new)
+│       │   │       ├── WalletEntity.java (new)
+│       │   │       └── PaymentMethodEntity.java (new)
+│       │   ├── repository/
+│       │   │   ├── BillRepository.java
+│       │   │   ├── ExpenseRepository.java
+│       │   │   ├── GoalRepository.java (new)
+│       │   │   ├── IncomeRepository.java
+│       │   │   ├── NotificationRepository.java (new)
+│       │   │   ├── WalletRepository.java (new)
+│       │   │   └── PaymentMethodRepository.java (new)
+│       │   ├── remote/
+│       │   │   └── BankLinkSandboxService.java (new)
+│       │   └── sync/
+│       │       ├── PendingSyncWorker.java
+│       │       └── SyncCoordinator.java (new)
+│       ├── wallet/ (new package)
+│       └── ...existing activities
+├── functions/ (new)
+│   └── src/
+│       ├── reminders.ts
+│       ├── summaries.ts
+│       ├── notifications.ts
+│       └── bankSandbox.ts
+└── docs/ (new)
+	├── backend/
+	├── features/
+	└── qa/
+```
+
+## 3. Backend-First Plan (Do This First)
+
+Do not start wallet/card/bank tasks until backend core is complete.
+
+## Phase A: Contract Lock (Mar 28)
+
+Tasks:
+- Finalize schema contracts for users, bills, expenses, goals, incomes, notifications, summaries.
+- Freeze sync-state model and required fields.
+- Agree naming and ownership rules across app and functions.
+
+Exit criteria:
+- Team-approved data contracts.
+
+## Phase B: Core Backend Completion (Mar 29 -> Apr 1)
+
+Tasks:
+- Implement GoalRepository and integrate AddGoalActivity, GoalsActivity, GoalDetailsActivity.
+- Implement real PendingSyncWorker retry flow for PENDING/FAILED states.
+- Implement NotificationRepository and replace NotificationsActivity mock list.
+- Complete create/update/delete sync paths for all finance modules.
+- Add summaries pipeline and wire dashboard to summary docs.
+
+Exit criteria:
+- No backend TODO placeholders remain.
+- Bills/Expenses/Incomes/Goals all persist and sync.
+- Notifications read from backend.
+
+## Phase C: Security and QA Hardening (Apr 2 -> Apr 3)
+
+Tasks:
+- Add Firestore rules tests in emulator.
+- Add repository unit tests and integration tests for offline/online recovery.
+- Run end-to-end flow checks for auth, CRUD, sync, relaunch.
+
+Exit criteria:
+- Rules tests pass.
+- Regression passes with no critical blockers.
+
+## 4. Optional Features (Only After Backend)
+
+## Feature 1: Wallet
+
+Implement:
+- Wallet list and balances.
+- Add/edit wallet records per user.
+
+## Feature 2: Card Option
+
+Implement:
+- Add card with masked fields only: nickname, brand, last4, expiry month/year.
+
+Do not store:
+- Full card number, CVV, PIN.
+
+## Feature 3: Bank Account Details (Sandbox)
+
+Implement:
+- Sandbox-only account linking.
+- Read-only balances and transaction history.
+
+Do not implement by Apr 5:
+- Production real-bank rollout, payment charging, money transfer.
+
+## 5. Team Split (3 People)
+
+## Person 1: Data and Sync Owner
+
+Owns:
+- GoalRepository and goals integration.
+- PendingSyncWorker full retry engine.
+- Update/delete sync handling across modules.
+
+## Person 2: Cloud and Notifications Owner
+
+Owns:
+- Firebase Functions setup.
+- Reminder + summary + notification cloud logic.
+- Notifications backend integration.
+- Bank sandbox integration.
+
+## Person 3: App Integration, Security, QA Owner
+
+Owns:
+- Dashboard summary consumption.
+- Firestore rules hardening and tests.
+- Wallet/card UI integration.
+- End-to-end QA and release checklist.
+
+## 6. Day-by-Day Timeline (Mar 28 -> Apr 5)
+
+Mar 28:
+- Lock contracts and task ownership.
+
+Mar 29:
+- Start GoalRepository + Functions bootstrap + rules test setup.
+
+Mar 30:
+- Integrate goals flows + notification backend write path + summary model.
+
+Mar 31:
+- Complete sync worker retry logic + reminder function + rules test expansion.
+
+Apr 1:
+- Complete summaries and dashboard summary reads + backend bug fixes.
+
+Apr 2:
+- Backend regression and offline/online recovery testing.
+
+Apr 3:
+- Start optional wallet/card + bank sandbox integration.
+
+Apr 4:
+- Polish optional features and prepare fallback demo mode.
+
+Apr 5:
+- Final QA sweep, build freeze, and submission/demo prep.
+
+## 7. Definition of Done
+
+Backend done when:
+- Goals are fully persisted and synced like other modules.
+- Pending sync worker retries pending/failed records successfully.
+- Notifications are backend-driven.
+- Dashboard reads summary documents.
+- Security rules tests pass.
+- Core backend tests pass.
+
+Auth complete when:
+- ✅ Email sign-in/register
+- ✅ Google sign-in
+- ✅ Forgot password (reset via email link)
+- ✅ Change password (for logged-in users with re-authentication)
+- ✅ User profile persistence in Firestore
+- ✅ Session management and logout
+
+Optional features done when:
+- Wallet and masked card flows are stable.
+- Bank account details work in sandbox mode.
+- No optional feature breaks core backend flows.
+
+## 8. Immediate Start Checklist
+
+1. ✅ **[DONE - Mar 28]** Implement ChangePasswordActivity with proper re-authentication.
+2. Implement GoalRepository and remove AddGoalActivity TODO save path.
+3. Replace GoalsActivity sample data with repository data.
+4. Implement PendingSyncWorker real sync/retry loop.
+5. Replace NotificationsActivity mock data with backend data source.
+6. Add Firestore emulator rules tests.
+7. Begin wallet/card/bank sandbox only after checklist items 2 to 6 are merged into dev.
+
+---
+
+## Recent Completions (Mar 28)
+
+**Change Password Feature - IMPLEMENTED & TESTED**
+- ✅ Created `ChangePasswordActivity.java` with three password input fields
+- ✅ Created `activity_change_password.xml` layout with Material Design
+- ✅ Added `updatePassword()` method to `AuthManager` with Firebase re-authentication
+- ✅ Updated `ProfileActivity` to navigate to new `ChangePasswordActivity` instead of `ForgotPasswordActivity`
+- ✅ Registered activity in `AndroidManifest.xml`
+- ✅ Built and deployed to device successfully
+- ✅ App running on device: `R94XB0FWFJX`
+
+**How it works:**
+- User enters current password (verified against Firebase)
+- Enters new password (6+ characters minimum)
+- Confirms new password matches
+- Firebase securely updates password after re-authentication
+- Success message shown to user
+
+**Next immediate tasks:**
+- Implement GoalRepository (Person 1 - Data and Sync Owner)
+- Replace Goals hardcoded mock data with repository
+- Implement PendingSyncWorker retry logic
+
