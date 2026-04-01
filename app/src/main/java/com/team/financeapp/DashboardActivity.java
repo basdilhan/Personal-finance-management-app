@@ -141,7 +141,7 @@ public class DashboardActivity extends AppCompatActivity {
         buttonViewAllGoals = findViewById(R.id.btn_view_all_goals);
         pieChartExpenses = findViewById(R.id.pie_chart_expenses);
         pieChartIncome = findViewById(R.id.pie_chart_income);
-        pieChartBills = findViewById(R.id.pie_chart_bills);
+        pieChartBills = null;
         dashboardWelcome = findViewById(R.id.dashboard_welcome);
         textTotalBalance = findViewById(R.id.text_total_balance);
         textIncomeAmount = findViewById(R.id.text_income_amount);
@@ -464,6 +464,10 @@ public class DashboardActivity extends AppCompatActivity {
         if (pieChartIncome == null) {
             return;
         }
+
+        pieChartIncome.setDrawEntryLabels(true);
+        pieChartIncome.setEntryLabelColor(getColorCompat(R.color.text_primary));
+        pieChartIncome.setEntryLabelTextSize(12f);
 
         Map<String, Double> grouped = new HashMap<>();
         for (IncomeEntry entry : latestIncomes) {

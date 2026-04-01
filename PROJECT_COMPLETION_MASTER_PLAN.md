@@ -14,10 +14,15 @@ Completed now:
 - Bills, Expenses, and Income have repository-based local-first loading and cloud sync.
 - BillsActivity, ExpensesActivity, IncomeHistoryActivity load from repositories.
 - AddBillActivity, AddExpenseActivity, AddIncomeActivity save through repositories.
+- Edit and delete flows are implemented for Bills, Expenses, and IncomeHistory (long-press action sheet + repository update/delete sync).
 - Firestore rules baseline exists with user ownership and sync-state checks.
 - Pending sync worker scheduling exists at app startup.
 - Change Password activity implemented (ChangePasswordActivity with proper re-authentication and password update).
 - **[NEW - Mar 31]** PendingSyncWorker real retry engine fully implemented with backoff, error logging, and state transitions.
+- **[NEW - Apr 1]** Dashboard income card now uses IncomeRepository (local-first + remote refresh) for more consistent totals.
+- **[NEW - Apr 1]** IncomeHistory stability fixes: source filter matching improved, edit intent keys standardized, and "Total This Month" calculation corrected.
+- **[NEW - Apr 1]** Dashboard cleanup: Bills Breakdown section removed as requested; Income Breakdown now shows category labels more clearly.
+- **[NEW - Apr 1]** IncomeHistory top summary card now shows total income across loaded entries (no longer stuck at LKR 0.00).
 
 Still incomplete:
 - Goals backend integration is incomplete.
