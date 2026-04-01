@@ -308,10 +308,12 @@ public class DashboardActivity extends AppCompatActivity {
                                 getString(document, "name", "Savings Goal"),
                                 getDouble(document, "targetAmount", 0.0d),
                                 getDouble(document, "currentAmount", 0.0d),
-                                getLong(document, "targetDate", 0L)
+                                 getLong(document, "targetDate", 0L),
+                                getLong(document, "updatedAt", 0L) // Get updatedAt timestamp
                         ));
                     }
-                    goals.sort(Comparator.comparingLong(goal -> goal.targetDate));
+                    // Sort by latest updated first (descending order)
+                    goals.sort((goal1, goal2) -> Long.compare(goal2.updatedAt, goal1.updatedAt));
                     latestGoals = goals;
                     updateGoalCard();
                     updateDashboardTotalsAndInsight();
@@ -626,12 +628,14 @@ public class DashboardActivity extends AppCompatActivity {
         final double targetAmount;
         final double currentAmount;
         final long targetDate;
+        final long updatedAt;
 
-        GoalSummary(String name, double targetAmount, double currentAmount, long targetDate) {
+        GoalSummary(String name, double targetAmount, double currentAmount, long targetDate, long updatedAt) {
             this.name = name;
             this.targetAmount = targetAmount;
             this.currentAmount = currentAmount;
             this.targetDate = targetDate;
+            this.updatedAt = updatedAt;
         }
     }
 

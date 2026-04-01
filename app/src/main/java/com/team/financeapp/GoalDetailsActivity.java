@@ -15,6 +15,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.button.MaterialButton;
+import com.team.financeapp.auth.AuthManager;
+import com.team.financeapp.data.repository.GoalRepository;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -61,11 +63,16 @@ public class GoalDetailsActivity extends AppCompatActivity {
     private String category;
     private int goalIcon;
     private boolean savingsUpdated;
+    private GoalRepository goalRepository;
+    private AuthManager authManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_goal_details);
+
+        goalRepository = new GoalRepository(this);
+        authManager = new AuthManager();
 
         extractIntentData();
         initializeViews();
@@ -238,16 +245,46 @@ public class GoalDetailsActivity extends AppCompatActivity {
             return;
         }
 
+        // Update current amount
         currentAmount += amountToAdd;
         savingsUpdated = true;
-        populateData();
-        sendUpdatedGoalResultIfNeeded();
 
-        String successMessage = String.format(Locale.getDefault(), "LKR %.0f added to %s", amountToAdd, goalName);
-        Toast.makeText(this, successMessage, Toast.LENGTH_SHORT).show();
+        // Create Goal object with updated amount
+        Goal updatedGoal = new Goal(
+                goalId,
+                goalName,
+                goalDescription,
+                targetAmount,
+                currentAmount,  // Updated amount
+                targetDate,
+                category,
+                goalIcon,
+                R.drawable.circle_primary_light
+        );
 
-        if (currentAmount >= targetAmount && targetAmount > 0) {
-            Toast.makeText(this, "Congratulations! Goal reached.", Toast.LENGTH_LONG).show();
+        // Save to database
+        String userId = authManager.getCurrentUserId();
+        if (userId != null) {
+            goalRepository.updateGoal(userId, updatedGoal, new GoalRepository.UpdateGoalCallback() {
+                @Override
+                public void onSuccess() {
+                    String successMessage = String.format(Locale.getDefault(), "LKR %.0f added to %s", amountToAdd, goalName);
+                    Toast.makeText(GoalDetailsActivity.this, successMessage, Toast.LENGTH_SHORT).show();
+
+                    if (currentAmount >= targetAmount && targetAmount > 0) {
+                        Toast.makeText(GoalDetailsActivity.this, "Congratulations! Goal reached.", Toast.LENGTH_LONG).show();
+                    }
+
+                    populateData();
+                }
+
+                @Override
+                public void onError(String message) {
+                    Toast.makeText(GoalDetailsActivity.this, "Error: " + message, Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            Toast.makeText(this, "User not authenticated", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -275,17 +312,32 @@ public class GoalDetailsActivity extends AppCompatActivity {
     }
 
     /**
-     * Delete the goal
+     * Delete the goal from database
      */
     private void deleteGoal() {
-        // In a real app, this would delete from database
-        Toast.makeText(this, "Goal deleted successfully", Toast.LENGTH_SHORT).show();
+        String userId = authManager.getCurrentUserId();
+        if (userId == null) {
+            Toast.makeText(this, "User not authenticated", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-        // Set result to indicate deletion and go back
-        Intent resultIntent = new Intent();
-        resultIntent.putExtra(EXTRA_DELETED_GOAL_ID, goalId);
-        setResult(RESULT_OK, resultIntent);
-        finish();
+        goalRepository.deleteGoal(userId, goalId, new GoalRepository.DeleteGoalCallback() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(GoalDetailsActivity.this, "Goal deleted successfully", Toast.LENGTH_SHORT).show();
+
+                // Set result to indicate deletion and go back
+                Intent resultIntent = new Intent();
+                resultIntent.putExtra(EXTRA_DELETED_GOAL_ID, goalId);
+                setResult(RESULT_OK, resultIntent);
+                finish();
+            }
+
+            @Override
+            public void onError(String message) {
+                Toast.makeText(GoalDetailsActivity.this, "Error deleting goal: " + message, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
 }

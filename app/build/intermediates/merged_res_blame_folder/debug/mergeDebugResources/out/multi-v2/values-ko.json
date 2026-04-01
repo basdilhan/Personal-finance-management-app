@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.team.financeapp-mergeDebugResources-3:/values-ko/values-ko.xml",
+            "outputFile": "com.team.financeapp-mergeDebugResources-47:/values-ko/values-ko.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\samudu\\.gradle\\caches\\9.1.0\\transforms\\a4a80d7ce457c6312d78783dcf02ed72\\workspace\\transformed\\core-1.9.0\\res\\values-ko\\values-ko.xml",
+                    "source": "C:\\Users\\Nethma\\.gradle\\caches\\9.1.0\\transforms\\a4a80d7ce457c6312d78783dcf02ed72\\workspace\\transformed\\core-1.9.0\\res\\values-ko\\values-ko.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",
@@ -21,41 +21,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\samudu\\.gradle\\caches\\9.1.0\\transforms\\9a67e89fd2461b8b08f633d87f65898c\\workspace\\transformed\\credentials-1.2.0-rc01\\res\\values-ko\\values-ko.xml",
-                    "from": {
-                        "startLines": "2,3",
-                        "startColumns": "4,4",
-                        "startOffsets": "55,163",
-                        "endColumns": "107,109",
-                        "endOffsets": "158,268"
-                    },
-                    "to": {
-                        "startLines": "33,34",
-                        "startColumns": "4,4",
-                        "startOffsets": "2879,2987",
-                        "endColumns": "107,109",
-                        "endOffsets": "2982,3092"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\samudu\\.gradle\\caches\\9.1.0\\transforms\\affef99e92b41010fbf0fa6f8a977c76\\workspace\\transformed\\play-services-base-18.3.0\\res\\values-ko\\values.xml",
-                    "from": {
-                        "startLines": "4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20",
-                        "startColumns": "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0",
-                        "startOffsets": "193,293,428,540,638,749,862,965,1056,1197,1296,1428,1542,1656,1771,1826,1880",
-                        "endColumns": "99,134,111,97,110,112,102,90,140,98,131,113,113,114,54,53,70",
-                        "endOffsets": "292,427,539,637,748,861,964,1055,1196,1295,1427,1541,1655,1770,1825,1879,1950"
-                    },
-                    "to": {
-                        "startLines": "43,44,45,46,47,48,49,50,52,53,54,55,56,57,58,59,60",
-                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
-                        "startOffsets": "3712,3816,3955,4071,4173,4288,4405,4512,4728,4873,4976,5112,5230,5348,5467,5526,5584",
-                        "endColumns": "103,138,115,101,114,116,106,94,144,102,135,117,117,118,58,57,74",
-                        "endOffsets": "3811,3950,4066,4168,4283,4400,4507,4602,4868,4971,5107,5225,5343,5462,5521,5579,5654"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\samudu\\.gradle\\caches\\9.1.0\\transforms\\33ee4db2042135c738cc04fbc1eeb66e\\workspace\\transformed\\browser-1.4.0\\res\\values-ko\\values-ko.xml",
+                    "source": "C:\\Users\\Nethma\\.gradle\\caches\\9.1.0\\transforms\\33ee4db2042135c738cc04fbc1eeb66e\\workspace\\transformed\\browser-1.4.0\\res\\values-ko\\values-ko.xml",
                     "from": {
                         "startLines": "2,3,4,5",
                         "startColumns": "4,4,4,4",
@@ -72,7 +38,41 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\samudu\\.gradle\\caches\\9.1.0\\transforms\\8fa91f03ca4b878263ee59f78a358451\\workspace\\transformed\\material-1.10.0\\res\\values-ko\\values-ko.xml",
+                    "source": "C:\\Users\\Nethma\\.gradle\\caches\\9.1.0\\transforms\\affef99e92b41010fbf0fa6f8a977c76\\workspace\\transformed\\play-services-base-18.3.0\\res\\values-ko\\values.xml",
+                    "from": {
+                        "startLines": "4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20",
+                        "startColumns": "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0",
+                        "startOffsets": "193,293,428,540,638,749,862,965,1056,1197,1296,1428,1542,1656,1771,1826,1880",
+                        "endColumns": "99,134,111,97,110,112,102,90,140,98,131,113,113,114,54,53,70",
+                        "endOffsets": "292,427,539,637,748,861,964,1055,1196,1295,1427,1541,1655,1770,1825,1879,1950"
+                    },
+                    "to": {
+                        "startLines": "43,44,45,46,47,48,49,50,52,53,54,55,56,57,58,59,60",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "3712,3816,3955,4071,4173,4288,4405,4512,4728,4873,4976,5112,5230,5348,5467,5526,5584",
+                        "endColumns": "103,138,115,101,114,116,106,94,144,102,135,117,117,118,58,57,74",
+                        "endOffsets": "3811,3950,4066,4168,4283,4400,4507,4602,4868,4971,5107,5225,5343,5462,5521,5579,5654"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\Nethma\\.gradle\\caches\\9.1.0\\transforms\\9a67e89fd2461b8b08f633d87f65898c\\workspace\\transformed\\credentials-1.2.0-rc01\\res\\values-ko\\values-ko.xml",
+                    "from": {
+                        "startLines": "2,3",
+                        "startColumns": "4,4",
+                        "startOffsets": "55,163",
+                        "endColumns": "107,109",
+                        "endOffsets": "158,268"
+                    },
+                    "to": {
+                        "startLines": "33,34",
+                        "startColumns": "4,4",
+                        "startOffsets": "2879,2987",
+                        "endColumns": "107,109",
+                        "endOffsets": "2982,3092"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\Nethma\\.gradle\\caches\\9.1.0\\transforms\\8fa91f03ca4b878263ee59f78a358451\\workspace\\transformed\\material-1.10.0\\res\\values-ko\\values-ko.xml",
                     "from": {
                         "startLines": "2,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -91,7 +91,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\samudu\\.gradle\\caches\\9.1.0\\transforms\\0bd4251e75d9ea8b3c6440b6c874380c\\workspace\\transformed\\play-services-basement-18.4.0\\res\\values-ko\\values.xml",
+                    "source": "C:\\Users\\Nethma\\.gradle\\caches\\9.1.0\\transforms\\0bd4251e75d9ea8b3c6440b6c874380c\\workspace\\transformed\\play-services-basement-18.4.0\\res\\values-ko\\values.xml",
                     "from": {
                         "startLines": "4",
                         "startColumns": "0",
@@ -108,7 +108,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\samudu\\.gradle\\caches\\9.1.0\\transforms\\ed2ecdb05fc107f100743c0666bbd2ac\\workspace\\transformed\\appcompat-1.6.1\\res\\values-ko\\values-ko.xml",
+                    "source": "C:\\Users\\Nethma\\.gradle\\caches\\9.1.0\\transforms\\ed2ecdb05fc107f100743c0666bbd2ac\\workspace\\transformed\\appcompat-1.6.1\\res\\values-ko\\values-ko.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",

@@ -76,6 +76,7 @@ drawable circle_urgent
 drawable circle_warning
 drawable circle_white
 drawable circle_yellow_light
+drawable divider_background
 drawable divider_gradient
 drawable gradient_header
 drawable ic_add
@@ -86,6 +87,7 @@ drawable ic_bills
 drawable ic_calendar
 drawable ic_car
 drawable ic_chevron_right
+drawable ic_delete
 drawable ic_edit
 drawable ic_electricity
 drawable ic_expenses
@@ -161,6 +163,9 @@ id card_bill_internet
 id card_bill_water
 id card_expense_chart
 id card_goal
+id change_password_icon
+id change_password_subtitle
+id change_password_title
 id chip_all
 id chip_business
 id chip_completed
@@ -205,6 +210,7 @@ id image_bill_2_icon
 id image_bill_3_icon
 id info_email
 id input_confirm_password
+id input_current_password
 id input_email
 id input_full_name
 id input_new_password
@@ -217,6 +223,7 @@ id iv_goal_icon_bg
 id iv_income_icon
 id iv_notification_icon
 id layout_confirm_password
+id layout_current_password
 id layout_email
 id layout_full_name
 id layout_new_password
@@ -306,6 +313,8 @@ id tv_current_label
 id tv_date_label
 id tv_description
 id tv_due_date
+id tv_empty_subtitle
+id tv_empty_title
 id tv_goal_category
 id tv_goal_name
 id tv_income_amount
@@ -344,6 +353,7 @@ layout activity_add_expense
 layout activity_add_goal
 layout activity_add_income
 layout activity_bills
+layout activity_change_password
 layout activity_dashboard
 layout activity_edit_profile
 layout activity_expenses

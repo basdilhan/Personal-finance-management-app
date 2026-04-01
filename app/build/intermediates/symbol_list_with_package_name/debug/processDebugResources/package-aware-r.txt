@@ -3072,6 +3072,7 @@ drawable design_ic_visibility
 drawable design_ic_visibility_off
 drawable design_password_eye
 drawable design_snackbar_background
+drawable divider_background
 drawable divider_gradient
 drawable googleg_disabled_color_18
 drawable googleg_standard_color_18
@@ -3087,6 +3088,7 @@ drawable ic_car
 drawable ic_chevron_right
 drawable ic_clear_black_24
 drawable ic_clock_black_24dp
+drawable ic_delete
 drawable ic_edit
 drawable ic_electricity
 drawable ic_expenses
@@ -3367,6 +3369,9 @@ id center_vertical
 id chain
 id chain2
 id chains
+id change_password_icon
+id change_password_subtitle
+id change_password_title
 id checkbox
 id checked
 id chip_all
@@ -3524,6 +3529,7 @@ id indeterminate
 id info
 id info_email
 id input_confirm_password
+id input_current_password
 id input_email
 id input_full_name
 id input_new_password
@@ -3544,6 +3550,7 @@ id jumpToStart
 id labeled
 id layout
 id layout_confirm_password
+id layout_current_password
 id layout_email
 id layout_full_name
 id layout_new_password
@@ -3875,6 +3882,8 @@ id tv_current_label
 id tv_date_label
 id tv_description
 id tv_due_date
+id tv_empty_subtitle
+id tv_empty_title
 id tv_goal_category
 id tv_goal_name
 id tv_income_amount
@@ -4052,6 +4061,7 @@ layout activity_add_expense
 layout activity_add_goal
 layout activity_add_income
 layout activity_bills
+layout activity_change_password
 layout activity_dashboard
 layout activity_edit_profile
 layout activity_expenses

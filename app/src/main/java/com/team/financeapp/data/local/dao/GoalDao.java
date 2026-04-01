@@ -30,4 +30,13 @@ public interface GoalDao {
 
     @Query("DELETE FROM goals WHERE localId = :localId")
     void deleteByLocalId(long localId);
+
+    @Query("SELECT * FROM goals WHERE localId = :localId")
+    GoalEntity getById(long localId);
+
+    @Query("SELECT * FROM goals WHERE remoteId = :remoteId LIMIT 1")
+    GoalEntity getByRemoteId(String remoteId);
+
+    @Query("DELETE FROM goals WHERE userId = :userId")
+    void deleteAllForUser(String userId);
 }

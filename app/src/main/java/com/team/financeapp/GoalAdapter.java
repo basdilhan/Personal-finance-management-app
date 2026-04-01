@@ -10,6 +10,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.button.MaterialButton;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -94,7 +96,7 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalViewHolder
         holder.tvRemainingAmount.setText(String.format(Locale.getDefault(), "LKR %.0f", goal.getRemainingAmount()));
         holder.tvRemainingLabel.setText("To Go");
 
-        // Set click listeners on the card
+        // Set click listeners on the card - navigate to goal details
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

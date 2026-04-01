@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.team.financeapp-mergeDebugResources-3:/values-ldrtl-v17/values-ldrtl-v17.xml",
+            "outputFile": "com.team.financeapp-mergeDebugResources-47:/values-ldrtl-v17/values-ldrtl-v17.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\samudu\\.gradle\\caches\\9.1.0\\transforms\\8fa91f03ca4b878263ee59f78a358451\\workspace\\transformed\\material-1.10.0\\res\\values-ldrtl-v17\\values-ldrtl-v17.xml",
+                    "source": "C:\\Users\\Nethma\\.gradle\\caches\\9.1.0\\transforms\\8fa91f03ca4b878263ee59f78a358451\\workspace\\transformed\\material-1.10.0\\res\\values-ldrtl-v17\\values-ldrtl-v17.xml",
                     "from": {
                         "startLines": "2,3",
                         "startColumns": "4,4",
