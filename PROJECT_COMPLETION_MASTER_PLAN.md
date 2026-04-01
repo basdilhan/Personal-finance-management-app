@@ -1,6 +1,6 @@
 # DreamSaver Project Completion Master Plan
 
-Date: March 28, 2026  
+Date: April 1, 2026  
 Branch reviewed: sam
 
 This is the single source of truth for delivery to Apr 5: complete backend first, then optional features.
@@ -11,20 +11,28 @@ Completed now:
 - Auth is integrated (email/password, Google sign in, reset password, change password, user profile upsert).
 - Room + Firestore + WorkManager dependencies are added.
 - Room local DB schema exists (bill, expense, goal, income entities and DAOs).
-- Bills, Expenses, and Income have repository-based local-first loading and cloud sync.
-- BillsActivity, ExpensesActivity, IncomeHistoryActivity load from repositories.
-- AddBillActivity, AddExpenseActivity, AddIncomeActivity save through repositories.
+- Bills, Expenses, Income, and Goals have repository-based local-first loading and cloud sync.
+- BillsActivity, ExpensesActivity, IncomeHistoryActivity, and GoalsActivity load from repositories.
+- AddBillActivity, AddExpenseActivity, AddIncomeActivity, and AddGoalActivity save through repositories.
 - Firestore rules baseline exists with user ownership and sync-state checks.
 - Pending sync worker scheduling exists at app startup.
 - Change Password activity implemented (ChangePasswordActivity with proper re-authentication and password update).
-- **[NEW - Mar 31]** PendingSyncWorker real retry engine fully implemented with backoff, error logging, and state transitions.
+- PendingSyncWorker real retry engine is implemented with backoff, error logging, and state transitions.
+- Expense/Income/Bill edit and delete flows are restored end-to-end (adapter long-press actions, edit forms, repository update/delete).
+- Goals long-press delete now persists through GoalRepository (no UI-only delete).
+- Date picker visibility for Add Bill/Add Expense/Add Income dialogs was fixed (calendar date text contrast issue resolved).
+- Build and unit test command passes: `./gradlew clean assembleDebug testDebugUnitTest`.
 
 Still incomplete:
-- Goals backend integration is incomplete.
 - Notifications screen still uses mock data.
-- Dashboard summary architecture is not finalized.
-- Cloud Functions layer not yet added in repo.
-- Tests are still template-level only.
+- Dashboard summary pipeline is not finalized (no cloud summary-doc pipeline; dashboard calculates mainly from loaded records).
+- Cloud Functions layer is still not in repo (`functions/` folder not present).
+- Automated tests are still minimal/template-level (no repository/offline-sync regression suite).
+
+Audit notes (Apr 1):
+- The app currently builds and installs successfully on device.
+- IDE "not on classpath" diagnostics were observed in Problems panel for some Java files, but Gradle compile/test succeeds.
+- `local.properties` points to a teammate SDK path (`C:/Users/Nethma/...`), causing non-blocking SDK location warnings on other machines.
 
 ## 2. Target Project Structure (Final)
 

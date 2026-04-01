@@ -19,6 +19,9 @@ public interface ExpenseDao {
     @Query("SELECT * FROM expenses WHERE userId = :userId AND syncState != 'SYNCED'")
     List<ExpenseEntity> getPendingSync(String userId);
 
+    @Query("SELECT * FROM expenses WHERE localId = :localId LIMIT 1")
+    ExpenseEntity getByLocalId(long localId);
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     long insert(ExpenseEntity entity);
 

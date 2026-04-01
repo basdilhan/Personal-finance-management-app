@@ -191,7 +191,17 @@ public class BillsActivity extends AppCompatActivity {
     private void setupRecyclerView() {
         billsList = new ArrayList<>();
         allBillsList = new ArrayList<>();
-        billAdapter = new BillAdapter(billsList);
+        billAdapter = new BillAdapter(billsList, new BillAdapter.OnBillItemClickListener() {
+            @Override
+            public void onBillClick(Bill bill) {
+                // Keep single tap as no-op.
+            }
+
+            @Override
+            public void onBillLongClick(Bill bill) {
+                showBillActions(bill);
+            }
+        });
 
         rvBills.setLayoutManager(new LinearLayoutManager(this));
         rvBills.setAdapter(billAdapter);
@@ -250,5 +260,60 @@ public class BillsActivity extends AppCompatActivity {
     public void refreshBills() {
         loadBills();
         calculateTotalDue();
+    }
+
+    private void showBillActions(Bill bill) {
+        String[] actions = {"Edit", "Delete"};
+        new AlertDialog.Builder(this)
+                .setTitle("Bill Options")
+                .setItems(actions, (dialog, which) -> {
+                    if (which == 0) {
+                        openEditBill(bill);
+                    } else if (which == 1) {
+                        confirmDeleteBill(bill);
+                    }
+                })
+                .show();
+    }
+
+    private void openEditBill(Bill bill) {
+        Intent intent = new Intent(this, AddBillActivity.class);
+        intent.putExtra(AddBillActivity.EXTRA_BILL_ID, bill.getId());
+        intent.putExtra(AddBillActivity.EXTRA_BILL_NAME, bill.getName());
+        intent.putExtra(AddBillActivity.EXTRA_BILL_DESCRIPTION, bill.getDescription());
+        intent.putExtra(AddBillActivity.EXTRA_BILL_AMOUNT, bill.getAmount());
+        intent.putExtra(AddBillActivity.EXTRA_BILL_DUE_DATE, bill.getDueDate());
+        intent.putExtra(AddBillActivity.EXTRA_BILL_TYPE, bill.getCategory());
+        startActivity(intent);
+    }
+
+    private void confirmDeleteBill(Bill bill) {
+        new AlertDialog.Builder(this)
+                .setTitle("Delete Bill")
+                .setMessage("Delete this bill entry?")
+                .setPositiveButton("Delete", (dialog, which) -> deleteBill(bill))
+                .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
+                .show();
+    }
+
+    private void deleteBill(Bill bill) {
+        String userId = authManager.getCurrentUserId();
+        if (userId == null || userId.isEmpty()) {
+            Toast.makeText(this, "Please login again", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        billRepository.deleteBill(userId, bill.getId(), new BillRepository.ModifyBillCallback() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(BillsActivity.this, "Bill deleted", Toast.LENGTH_SHORT).show();
+                loadBills();
+            }
+
+            @Override
+            public void onError(String message) {
+                Toast.makeText(BillsActivity.this, message, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

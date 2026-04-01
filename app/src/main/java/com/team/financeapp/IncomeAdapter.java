@@ -26,10 +26,26 @@ public class IncomeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     private final List<Object> items = new ArrayList<>();
     private List<IncomeEntry> incomes;
+    private OnIncomeItemClickListener listener;
+
+    public interface OnIncomeItemClickListener {
+        void onIncomeClick(IncomeEntry income);
+
+        void onIncomeLongClick(IncomeEntry income);
+    }
 
     public IncomeAdapter(List<IncomeEntry> incomes) {
         this.incomes = incomes;
         groupByDate();
+    }
+
+    public IncomeAdapter(List<IncomeEntry> incomes, OnIncomeItemClickListener listener) {
+        this(incomes);
+        this.listener = listener;
+    }
+
+    public void setOnIncomeItemClickListener(OnIncomeItemClickListener listener) {
+        this.listener = listener;
     }
 
     private void groupByDate() {
@@ -96,7 +112,7 @@ public class IncomeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             ((DateHeaderViewHolder) holder).bind((String) items.get(position));
             return;
         }
-        ((IncomeViewHolder) holder).bind((IncomeEntry) items.get(position));
+        ((IncomeViewHolder) holder).bind((IncomeEntry) items.get(position), listener);
     }
 
     @Override
@@ -139,12 +155,25 @@ public class IncomeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             tvIncomeAmount = itemView.findViewById(R.id.tv_income_amount);
         }
 
-        void bind(IncomeEntry income) {
+        void bind(IncomeEntry income, OnIncomeItemClickListener listener) {
             ivIncomeIcon.setImageResource(income.getSourceIcon());
             tvSourceName.setText(income.getSource());
             tvIncomeNote.setText(income.getNote());
             tvIncomeTime.setText(income.getTime());
             tvIncomeAmount.setText(String.format(Locale.getDefault(), "+LKR %,.2f", income.getAmount()));
+
+            itemView.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onIncomeClick(income);
+                }
+            });
+            itemView.setOnLongClickListener(v -> {
+                if (listener != null) {
+                    listener.onIncomeLongClick(income);
+                    return true;
+                }
+                return false;
+            });
         }
     }
 }

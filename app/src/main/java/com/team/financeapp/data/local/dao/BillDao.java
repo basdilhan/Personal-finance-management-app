@@ -19,6 +19,9 @@ public interface BillDao {
     @Query("SELECT * FROM bills WHERE userId = :userId AND syncState != 'SYNCED'")
     List<BillEntity> getPendingSync(String userId);
 
+    @Query("SELECT * FROM bills WHERE localId = :localId LIMIT 1")
+    BillEntity getByLocalId(long localId);
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     long insert(BillEntity entity);
 

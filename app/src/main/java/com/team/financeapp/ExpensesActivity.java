@@ -209,7 +209,17 @@ public class ExpensesActivity extends AppCompatActivity {
     private void setupRecyclerView() {
         expensesList = new ArrayList<>();
         allExpensesList = new ArrayList<>();
-        expenseAdapter = new ExpenseAdapter(expensesList);
+        expenseAdapter = new ExpenseAdapter(expensesList, new ExpenseAdapter.OnExpenseItemClickListener() {
+            @Override
+            public void onExpenseClick(Expense expense) {
+                // Keep single tap as no-op.
+            }
+
+            @Override
+            public void onExpenseLongClick(Expense expense) {
+                showExpenseActions(expense);
+            }
+        });
 
         rvExpenses.setLayoutManager(new LinearLayoutManager(this));
         rvExpenses.setAdapter(expenseAdapter);
@@ -278,5 +288,61 @@ public class ExpensesActivity extends AppCompatActivity {
     public void refreshExpenses() {
         loadExpenses();
         calculateTotalAmount();
+    }
+
+    private void showExpenseActions(Expense expense) {
+        String[] actions = {"Edit", "Delete"};
+        new AlertDialog.Builder(this)
+                .setTitle("Expense Options")
+                .setItems(actions, (dialog, which) -> {
+                    if (which == 0) {
+                        openEditExpense(expense);
+                    } else if (which == 1) {
+                        confirmDeleteExpense(expense);
+                    }
+                })
+                .show();
+    }
+
+    private void openEditExpense(Expense expense) {
+        Intent intent = new Intent(this, AddExpenseActivity.class);
+        intent.putExtra(AddExpenseActivity.EXTRA_EXPENSE_ID, expense.getId());
+        intent.putExtra(AddExpenseActivity.EXTRA_EXPENSE_CATEGORY, expense.getCategory());
+        intent.putExtra(AddExpenseActivity.EXTRA_EXPENSE_AMOUNT, expense.getAmount());
+        intent.putExtra(AddExpenseActivity.EXTRA_EXPENSE_DESCRIPTION, expense.getDescription());
+        intent.putExtra(AddExpenseActivity.EXTRA_EXPENSE_DATE, expense.getDate());
+        intent.putExtra(AddExpenseActivity.EXTRA_EXPENSE_TIME, expense.getTime());
+        intent.putExtra(AddExpenseActivity.EXTRA_EXPENSE_ICON, expense.getCategoryIcon());
+        startActivity(intent);
+    }
+
+    private void confirmDeleteExpense(Expense expense) {
+        new AlertDialog.Builder(this)
+                .setTitle("Delete Expense")
+                .setMessage("Delete this expense entry?")
+                .setPositiveButton("Delete", (dialog, which) -> deleteExpense(expense))
+                .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
+                .show();
+    }
+
+    private void deleteExpense(Expense expense) {
+        String userId = authManager.getCurrentUserId();
+        if (userId == null || userId.isEmpty()) {
+            Toast.makeText(this, "Please login again", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        expenseRepository.deleteExpense(userId, expense.getId(), new ExpenseRepository.ModifyExpenseCallback() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(ExpensesActivity.this, "Expense deleted", Toast.LENGTH_SHORT).show();
+                loadExpenses();
+            }
+
+            @Override
+            public void onError(String message) {
+                Toast.makeText(ExpensesActivity.this, message, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

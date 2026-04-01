@@ -163,6 +163,7 @@ id card_bill_internet
 id card_bill_water
 id card_expense_chart
 id card_goal
+id card_income_chart
 id change_password_icon
 id change_password_subtitle
 id change_password_title
@@ -251,6 +252,7 @@ id password_description
 id password_requirements
 id password_title
 id pie_chart_expenses
+id pie_chart_income
 id profile_avatar
 id profile_icon
 id progress_bar
@@ -278,6 +280,8 @@ id step_password_container
 id switch_dark_theme
 id text_alert_message
 id text_app_title
+id text_balance_trend
+id text_balance_trend_caption
 id text_bill_1_amount
 id text_bill_1_due
 id text_bill_1_name
@@ -296,6 +300,11 @@ id text_goal_name
 id text_goal_percentage
 id text_goal_target
 id text_income_amount
+id text_legend_entertainment_percent
+id text_legend_food_percent
+id text_legend_housing_percent
+id text_legend_other_percent
+id text_legend_transport_percent
 id text_login
 id text_password_hint
 id text_register

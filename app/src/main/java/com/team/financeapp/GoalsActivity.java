@@ -299,11 +299,27 @@ public class GoalsActivity extends AppCompatActivity implements GoalAdapter.OnGo
                 .setTitle("Delete Goal")
                 .setMessage("Are you sure you want to delete \"" + goal.getName() + "\"?")
                 .setPositiveButton("Delete", (dialog, which) -> {
-                    goalAdapter.removeGoal(goal.getId());
-                    allGoalsList.removeIf(g -> g.getId() == goal.getId());
-                    calculateTotalSaved();
-                    updateEmptyState();
-                    Toast.makeText(this, "Goal deleted", Toast.LENGTH_SHORT).show();
+                    String userId = authManager.getCurrentUserId();
+                    if (userId == null || userId.isEmpty()) {
+                        Toast.makeText(this, "User not authenticated", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    goalRepository.deleteGoal(userId, goal.getId(), new GoalRepository.DeleteGoalCallback() {
+                        @Override
+                        public void onSuccess() {
+                            goalAdapter.removeGoal(goal.getId());
+                            allGoalsList.removeIf(g -> g.getId() == goal.getId());
+                            calculateTotalSaved();
+                            updateEmptyState();
+                            Toast.makeText(GoalsActivity.this, "Goal deleted", Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onError(String message) {
+                            Toast.makeText(GoalsActivity.this, "Error deleting goal: " + message, Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 })
                 .setNegativeButton("Cancel", null)
                 .show();

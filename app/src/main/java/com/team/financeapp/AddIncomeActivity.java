@@ -24,6 +24,14 @@ import java.util.Locale;
  */
 public class AddIncomeActivity extends AppCompatActivity {
 
+    public static final String EXTRA_INCOME_ID = "extra_income_id";
+    public static final String EXTRA_INCOME_SOURCE = "extra_income_source";
+    public static final String EXTRA_INCOME_AMOUNT = "extra_income_amount";
+    public static final String EXTRA_INCOME_NOTE = "extra_income_note";
+    public static final String EXTRA_INCOME_DATE = "extra_income_date";
+    public static final String EXTRA_INCOME_TIME = "extra_income_time";
+    public static final String EXTRA_INCOME_ICON = "extra_income_icon";
+
     private TextInputEditText etAmount, etDescription, etDate;
     private AutoCompleteTextView spinnerSource;
     private MaterialButton btnSave, btnCancel;
@@ -32,6 +40,8 @@ public class AddIncomeActivity extends AppCompatActivity {
     private SimpleDateFormat timeFormat;
     private AuthManager authManager;
     private IncomeRepository incomeRepository;
+    private boolean isEditMode;
+    private int editingIncomeId;
 
     // Sri Lankan income sources
     private String[] incomeSources = {
@@ -51,10 +61,13 @@ public class AddIncomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_income);
 
+        isEditMode = getIntent().hasExtra(EXTRA_INCOME_ID);
+        editingIncomeId = getIntent().getIntExtra(EXTRA_INCOME_ID, -1);
+
         // Enable back button
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle("Add Income");
+            getSupportActionBar().setTitle(isEditMode ? "Edit Income" : "Add Income");
         }
 
         initializeViews();
@@ -62,6 +75,7 @@ public class AddIncomeActivity extends AppCompatActivity {
         incomeRepository = new IncomeRepository(this);
         setupSourceDropdown();
         setupClickListeners();
+        populateIfEditing();
     }
 
     private void initializeViews() {
@@ -125,7 +139,7 @@ public class AddIncomeActivity extends AppCompatActivity {
 
         DatePickerDialog datePickerDialog = new DatePickerDialog(
                 AddIncomeActivity.this,
-                android.R.style.Theme_Material_Light_Dialog_Alert,
+                android.R.style.Theme_DeviceDefault_Light_Dialog,
                 new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int selectedYear, int selectedMonth, int selectedDay) {
@@ -186,6 +200,7 @@ public class AddIncomeActivity extends AppCompatActivity {
         }
 
         IncomeEntry incomeEntry = new IncomeEntry(
+                isEditMode ? editingIncomeId : 0,
                 source,
                 amountValue,
                 description,
@@ -193,6 +208,22 @@ public class AddIncomeActivity extends AppCompatActivity {
                 timeFormat.format(calendar.getTime()),
                 resolveSourceIcon(source)
         );
+
+        if (isEditMode) {
+            incomeRepository.updateIncome(userId, incomeEntry, new IncomeRepository.ModifyIncomeCallback() {
+                @Override
+                public void onSuccess() {
+                    Toast.makeText(AddIncomeActivity.this, "Income updated", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+
+                @Override
+                public void onError(String message) {
+                    Toast.makeText(AddIncomeActivity.this, message, Toast.LENGTH_SHORT).show();
+                }
+            });
+            return;
+        }
 
         incomeRepository.saveIncome(userId, incomeEntry, new IncomeRepository.SaveIncomeCallback() {
             @Override
@@ -206,6 +237,20 @@ public class AddIncomeActivity extends AppCompatActivity {
                 Toast.makeText(AddIncomeActivity.this, message, Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void populateIfEditing() {
+        if (!isEditMode) {
+            return;
+        }
+
+        spinnerSource.setText(getIntent().getStringExtra(EXTRA_INCOME_SOURCE), false);
+        etAmount.setText(String.valueOf(getIntent().getDoubleExtra(EXTRA_INCOME_AMOUNT, 0.0d)));
+        etDescription.setText(getIntent().getStringExtra(EXTRA_INCOME_NOTE));
+
+        long incomeDate = getIntent().getLongExtra(EXTRA_INCOME_DATE, System.currentTimeMillis());
+        calendar.setTimeInMillis(incomeDate);
+        etDate.setText(dateFormat.format(calendar.getTime()));
     }
 
     private int resolveSourceIcon(String source) {

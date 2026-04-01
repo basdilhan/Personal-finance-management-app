@@ -38,6 +38,12 @@ public class BillRepository {
         void onError(String message);
     }
 
+    public interface ModifyBillCallback {
+        void onSuccess();
+
+        void onError(String message);
+    }
+
     private static final ExecutorService IO = Executors.newSingleThreadExecutor();
 
     private final BillDao billDao;
@@ -75,6 +81,49 @@ public class BillRepository {
         });
     }
 
+    public void updateBill(@NonNull String userId, @NonNull Bill bill, @NonNull ModifyBillCallback callback) {
+        IO.execute(() -> {
+            BillEntity existing = billDao.getByLocalId(bill.getId());
+            if (existing == null || !userId.equals(existing.userId)) {
+                mainHandler.post(() -> callback.onError("Bill not found"));
+                return;
+            }
+
+            existing.name = bill.getName();
+            existing.description = bill.getDescription();
+            existing.amount = bill.getAmount();
+            existing.dueDate = bill.getDueDate();
+            existing.category = bill.getCategory();
+            existing.categoryIcon = bill.getCategoryIcon();
+            existing.status = bill.getStatus();
+            existing.indicatorColor = bill.getIndicatorColor();
+            existing.deleted = false;
+            existing.syncState = SyncState.PENDING;
+            existing.updatedAt = System.currentTimeMillis();
+
+            billDao.update(existing);
+            mainHandler.post(callback::onSuccess);
+            pushBillToRemote(existing, callback);
+        });
+    }
+
+    public void deleteBill(@NonNull String userId, int billId, @NonNull ModifyBillCallback callback) {
+        IO.execute(() -> {
+            BillEntity existing = billDao.getByLocalId(billId);
+            if (existing == null || !userId.equals(existing.userId)) {
+                mainHandler.post(() -> callback.onError("Bill not found"));
+                return;
+            }
+
+            existing.deleted = true;
+            existing.syncState = SyncState.PENDING;
+            existing.updatedAt = System.currentTimeMillis();
+            billDao.update(existing);
+            mainHandler.post(callback::onSuccess);
+            pushBillToRemote(existing, callback);
+        });
+    }
+
     private void refreshFromRemote(@NonNull String userId, @NonNull LoadBillsCallback callback) {
         firestore.collection("bills")
                 .whereEqualTo("userId", userId)
@@ -96,6 +145,40 @@ public class BillRepository {
     }
 
     private void pushBillToRemote(@NonNull BillEntity entity, @NonNull SaveBillCallback callback) {
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("userId", entity.userId);
+        payload.put("name", entity.name);
+        payload.put("description", entity.description);
+        payload.put("amount", entity.amount);
+        payload.put("dueDate", entity.dueDate);
+        payload.put("category", entity.category);
+        payload.put("categoryIcon", entity.categoryIcon);
+        payload.put("status", entity.status);
+        payload.put("indicatorColor", entity.indicatorColor);
+        payload.put("deleted", entity.deleted);
+        payload.put("syncState", SyncState.SYNCED);
+        payload.put("createdAt", entity.createdAt);
+        payload.put("updatedAt", System.currentTimeMillis());
+
+        firestore.collection("bills")
+                .document(entity.remoteId)
+                .set(payload)
+                .addOnSuccessListener(unused -> IO.execute(() -> {
+                    entity.syncState = SyncState.SYNCED;
+                    entity.updatedAt = System.currentTimeMillis();
+                    billDao.update(entity);
+                }))
+                .addOnFailureListener(e -> IO.execute(() -> {
+                    entity.syncState = SyncState.FAILED;
+                    entity.updatedAt = System.currentTimeMillis();
+                    billDao.update(entity);
+                    mainHandler.post(() -> callback.onError(
+                            e.getMessage() == null ? "Saved locally but cloud sync failed" : e.getMessage()
+                    ));
+                }));
+    }
+
+    private void pushBillToRemote(@NonNull BillEntity entity, @NonNull ModifyBillCallback callback) {
         Map<String, Object> payload = new HashMap<>();
         payload.put("userId", entity.userId);
         payload.put("name", entity.name);

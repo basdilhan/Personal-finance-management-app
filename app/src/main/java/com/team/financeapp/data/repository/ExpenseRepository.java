@@ -38,6 +38,12 @@ public class ExpenseRepository {
         void onError(String message);
     }
 
+    public interface ModifyExpenseCallback {
+        void onSuccess();
+
+        void onError(String message);
+    }
+
     private static final ExecutorService IO = Executors.newSingleThreadExecutor();
 
     private final ExpenseDao expenseDao;
@@ -75,6 +81,47 @@ public class ExpenseRepository {
         });
     }
 
+    public void updateExpense(@NonNull String userId, @NonNull Expense expense, @NonNull ModifyExpenseCallback callback) {
+        IO.execute(() -> {
+            ExpenseEntity existing = expenseDao.getByLocalId(expense.getId());
+            if (existing == null || !userId.equals(existing.userId)) {
+                mainHandler.post(() -> callback.onError("Expense not found"));
+                return;
+            }
+
+            existing.category = expense.getCategory();
+            existing.amount = expense.getAmount();
+            existing.description = expense.getDescription();
+            existing.date = expense.getDate();
+            existing.time = expense.getTime();
+            existing.categoryIcon = expense.getCategoryIcon();
+            existing.deleted = false;
+            existing.syncState = SyncState.PENDING;
+            existing.updatedAt = System.currentTimeMillis();
+
+            expenseDao.update(existing);
+            mainHandler.post(callback::onSuccess);
+            pushExpenseToRemote(existing, callback);
+        });
+    }
+
+    public void deleteExpense(@NonNull String userId, int expenseId, @NonNull ModifyExpenseCallback callback) {
+        IO.execute(() -> {
+            ExpenseEntity existing = expenseDao.getByLocalId(expenseId);
+            if (existing == null || !userId.equals(existing.userId)) {
+                mainHandler.post(() -> callback.onError("Expense not found"));
+                return;
+            }
+
+            existing.deleted = true;
+            existing.syncState = SyncState.PENDING;
+            existing.updatedAt = System.currentTimeMillis();
+            expenseDao.update(existing);
+            mainHandler.post(callback::onSuccess);
+            pushExpenseToRemote(existing, callback);
+        });
+    }
+
     private void refreshFromRemote(@NonNull String userId, @NonNull LoadExpensesCallback callback) {
         firestore.collection("expenses")
                 .whereEqualTo("userId", userId)
@@ -96,6 +143,38 @@ public class ExpenseRepository {
     }
 
     private void pushExpenseToRemote(@NonNull ExpenseEntity entity, @NonNull SaveExpenseCallback callback) {
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("userId", entity.userId);
+        payload.put("category", entity.category);
+        payload.put("amount", entity.amount);
+        payload.put("description", entity.description);
+        payload.put("date", entity.date);
+        payload.put("time", entity.time);
+        payload.put("categoryIcon", entity.categoryIcon);
+        payload.put("deleted", entity.deleted);
+        payload.put("syncState", SyncState.SYNCED);
+        payload.put("createdAt", entity.createdAt);
+        payload.put("updatedAt", System.currentTimeMillis());
+
+        firestore.collection("expenses")
+                .document(entity.remoteId)
+                .set(payload)
+                .addOnSuccessListener(unused -> IO.execute(() -> {
+                    entity.syncState = SyncState.SYNCED;
+                    entity.updatedAt = System.currentTimeMillis();
+                    expenseDao.update(entity);
+                }))
+                .addOnFailureListener(e -> IO.execute(() -> {
+                    entity.syncState = SyncState.FAILED;
+                    entity.updatedAt = System.currentTimeMillis();
+                    expenseDao.update(entity);
+                    mainHandler.post(() -> callback.onError(
+                            e.getMessage() == null ? "Saved locally but cloud sync failed" : e.getMessage()
+                    ));
+                }));
+    }
+
+    private void pushExpenseToRemote(@NonNull ExpenseEntity entity, @NonNull ModifyExpenseCallback callback) {
         Map<String, Object> payload = new HashMap<>();
         payload.put("userId", entity.userId);
         payload.put("category", entity.category);

@@ -38,6 +38,12 @@ public class IncomeRepository {
         void onError(String message);
     }
 
+    public interface ModifyIncomeCallback {
+        void onSuccess();
+
+        void onError(String message);
+    }
+
     private static final ExecutorService IO = Executors.newSingleThreadExecutor();
 
     private final IncomeDao incomeDao;
@@ -71,6 +77,47 @@ public class IncomeRepository {
             entity.localId = localId;
             mainHandler.post(callback::onSuccess);
             pushIncomeToRemote(entity, callback);
+        });
+    }
+
+    public void updateIncome(@NonNull String userId, @NonNull IncomeEntry income, @NonNull ModifyIncomeCallback callback) {
+        IO.execute(() -> {
+            IncomeEntity existing = incomeDao.getByLocalId(income.getId());
+            if (existing == null || !userId.equals(existing.userId)) {
+                mainHandler.post(() -> callback.onError("Income entry not found"));
+                return;
+            }
+
+            existing.source = income.getSource();
+            existing.amount = income.getAmount();
+            existing.note = income.getNote();
+            existing.date = income.getDate();
+            existing.time = income.getTime();
+            existing.sourceIcon = income.getSourceIcon();
+            existing.deleted = false;
+            existing.syncState = SyncState.PENDING;
+            existing.updatedAt = System.currentTimeMillis();
+
+            incomeDao.update(existing);
+            mainHandler.post(callback::onSuccess);
+            pushIncomeToRemote(existing, callback);
+        });
+    }
+
+    public void deleteIncome(@NonNull String userId, int incomeId, @NonNull ModifyIncomeCallback callback) {
+        IO.execute(() -> {
+            IncomeEntity existing = incomeDao.getByLocalId(incomeId);
+            if (existing == null || !userId.equals(existing.userId)) {
+                mainHandler.post(() -> callback.onError("Income entry not found"));
+                return;
+            }
+
+            existing.deleted = true;
+            existing.syncState = SyncState.PENDING;
+            existing.updatedAt = System.currentTimeMillis();
+            incomeDao.update(existing);
+            mainHandler.post(callback::onSuccess);
+            pushIncomeToRemote(existing, callback);
         });
     }
 
@@ -125,6 +172,38 @@ public class IncomeRepository {
                 }));
     }
 
+    private void pushIncomeToRemote(@NonNull IncomeEntity entity, @NonNull ModifyIncomeCallback callback) {
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("userId", entity.userId);
+        payload.put("source", entity.source);
+        payload.put("amount", entity.amount);
+        payload.put("note", entity.note);
+        payload.put("date", entity.date);
+        payload.put("time", entity.time);
+        payload.put("sourceIcon", entity.sourceIcon);
+        payload.put("deleted", entity.deleted);
+        payload.put("syncState", SyncState.SYNCED);
+        payload.put("createdAt", entity.createdAt);
+        payload.put("updatedAt", System.currentTimeMillis());
+
+        firestore.collection("incomes")
+                .document(entity.remoteId)
+                .set(payload)
+                .addOnSuccessListener(unused -> IO.execute(() -> {
+                    entity.syncState = SyncState.SYNCED;
+                    entity.updatedAt = System.currentTimeMillis();
+                    incomeDao.update(entity);
+                }))
+                .addOnFailureListener(e -> IO.execute(() -> {
+                    entity.syncState = SyncState.FAILED;
+                    entity.updatedAt = System.currentTimeMillis();
+                    incomeDao.update(entity);
+                    mainHandler.post(() -> callback.onError(
+                            e.getMessage() == null ? "Saved locally but cloud sync failed" : e.getMessage()
+                    ));
+                }));
+    }
+
     private IncomeEntity fromIncome(String userId, IncomeEntry income) {
         IncomeEntity entity = new IncomeEntity();
         entity.userId = userId;
@@ -142,6 +221,7 @@ public class IncomeRepository {
         List<IncomeEntry> entries = new ArrayList<>();
         for (IncomeEntity entity : entities) {
             entries.add(new IncomeEntry(
+                    (int) entity.localId,
                     entity.source,
                     entity.amount,
                     entity.note,

@@ -284,49 +284,58 @@ public class IncomeHistoryActivity extends AppCompatActivity implements IncomeAd
 
     @Override
     public void onIncomeLongClick(IncomeEntry income) {
+        String[] actions = {"Edit", "Delete"};
         new AlertDialog.Builder(this)
-                .setTitle(income.getSource())
-                .setItems(new String[]{"Edit", "Delete"}, (dialog, which) -> {
+                .setTitle("Income Options")
+                .setItems(actions, (dialog, which) -> {
                     if (which == 0) {
-                        Intent intent = new Intent(this, AddIncomeActivity.class);
-                        intent.putExtra(AddIncomeActivity.EXTRA_EDIT_MODE, true);
-                        intent.putExtra(AddIncomeActivity.EXTRA_INCOME_ID, income.getId());
-                        intent.putExtra(AddIncomeActivity.EXTRA_INCOME_SOURCE, income.getSource());
-                        intent.putExtra(AddIncomeActivity.EXTRA_INCOME_AMOUNT, income.getAmount());
-                        intent.putExtra(AddIncomeActivity.EXTRA_INCOME_NOTE, income.getNote());
-                        intent.putExtra(AddIncomeActivity.EXTRA_INCOME_DATE, income.getDate());
-                        startActivity(intent);
-                        return;
+                        openEditIncome(income);
+                    } else if (which == 1) {
+                        confirmDeleteIncome(income);
                     }
-                    showDeleteIncomeConfirmation(income);
                 })
                 .show();
     }
 
-    private void showDeleteIncomeConfirmation(IncomeEntry income) {
+    private void openEditIncome(IncomeEntry income) {
+        Intent intent = new Intent(this, AddIncomeActivity.class);
+        intent.putExtra(AddIncomeActivity.EXTRA_INCOME_ID, income.getId());
+        intent.putExtra(AddIncomeActivity.EXTRA_INCOME_SOURCE, income.getSource());
+        intent.putExtra(AddIncomeActivity.EXTRA_INCOME_AMOUNT, income.getAmount());
+        intent.putExtra(AddIncomeActivity.EXTRA_INCOME_NOTE, income.getNote());
+        intent.putExtra(AddIncomeActivity.EXTRA_INCOME_DATE, income.getDate());
+        intent.putExtra(AddIncomeActivity.EXTRA_INCOME_TIME, income.getTime());
+        intent.putExtra(AddIncomeActivity.EXTRA_INCOME_ICON, income.getSourceIcon());
+        startActivity(intent);
+    }
+
+    private void confirmDeleteIncome(IncomeEntry income) {
         new AlertDialog.Builder(this)
                 .setTitle("Delete Income")
                 .setMessage("Delete this income entry?")
-                .setPositiveButton("Delete", (dialog, which) -> {
-                    String userId = authManager.getCurrentUserId();
-                    if (userId == null || userId.isEmpty()) {
-                        Toast.makeText(this, "Please login again", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                    incomeRepository.deleteIncome(userId, income.getId(), new IncomeRepository.ModifyIncomeCallback() {
-                        @Override
-                        public void onSuccess() {
-                            loadIncomeHistory();
-                            Toast.makeText(IncomeHistoryActivity.this, "Income deleted", Toast.LENGTH_SHORT).show();
-                        }
-
-                        @Override
-                        public void onError(String message) {
-                            Toast.makeText(IncomeHistoryActivity.this, message, Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                })
-                .setNegativeButton("Cancel", null)
+                .setPositiveButton("Delete", (dialog, which) -> deleteIncome(income))
+                .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
                 .show();
+    }
+
+    private void deleteIncome(IncomeEntry income) {
+        String userId = authManager.getCurrentUserId();
+        if (userId == null || userId.isEmpty()) {
+            Toast.makeText(this, "Please login again", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        incomeRepository.deleteIncome(userId, income.getId(), new IncomeRepository.ModifyIncomeCallback() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(IncomeHistoryActivity.this, "Income deleted", Toast.LENGTH_SHORT).show();
+                loadIncomeHistory();
+            }
+
+            @Override
+            public void onError(String message) {
+                Toast.makeText(IncomeHistoryActivity.this, message, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

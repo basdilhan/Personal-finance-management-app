@@ -19,6 +19,9 @@ public interface IncomeDao {
     @Query("SELECT * FROM incomes WHERE userId = :userId AND syncState != 'SYNCED'")
     List<IncomeEntity> getPendingSync(String userId);
 
+    @Query("SELECT * FROM incomes WHERE localId = :localId LIMIT 1")
+    IncomeEntity getByLocalId(long localId);
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     long insert(IncomeEntity entity);
 

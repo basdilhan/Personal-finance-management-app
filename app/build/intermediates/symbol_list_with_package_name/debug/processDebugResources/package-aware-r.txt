@@ -3360,6 +3360,7 @@ id card_bill_internet
 id card_bill_water
 id card_expense_chart
 id card_goal
+id card_income_chart
 id carryVelocity
 id center
 id centerCrop
@@ -3696,6 +3697,7 @@ id pathRelative
 id peekHeight
 id percent
 id pie_chart_expenses
+id pie_chart_income
 id pin
 id position
 id postLayout
@@ -3822,6 +3824,8 @@ id textStart
 id textTop
 id text_alert_message
 id text_app_title
+id text_balance_trend
+id text_balance_trend_caption
 id text_bill_1_amount
 id text_bill_1_due
 id text_bill_1_name
@@ -3843,6 +3847,11 @@ id text_income_amount
 id text_input_end_icon
 id text_input_error_icon
 id text_input_start_icon
+id text_legend_entertainment_percent
+id text_legend_food_percent
+id text_legend_housing_percent
+id text_legend_other_percent
+id text_legend_transport_percent
 id text_login
 id text_password_hint
 id text_register
