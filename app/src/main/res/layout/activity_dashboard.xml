@@ -218,6 +218,7 @@
                                             app:tint="@color/success" />
 
                                         <TextView
+                                            android:id="@+id/text_balance_trend"
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
                                             android:text="+12.5%"
@@ -228,6 +229,7 @@
                                     </LinearLayout>
 
                                     <TextView
+                                        android:id="@+id/text_balance_trend_caption"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="vs last month"
@@ -656,6 +658,7 @@
                                         android:textStyle="bold" />
 
                                     <TextView
+                                        android:id="@+id/text_legend_housing_percent"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="45%"
@@ -692,6 +695,7 @@
                                         android:textStyle="bold" />
 
                                     <TextView
+                                        android:id="@+id/text_legend_food_percent"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="25%"
@@ -728,6 +732,7 @@
                                         android:textStyle="bold" />
 
                                     <TextView
+                                        android:id="@+id/text_legend_transport_percent"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="15%"
@@ -773,6 +778,7 @@
                                         android:textStyle="bold" />
 
                                     <TextView
+                                        android:id="@+id/text_legend_entertainment_percent"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="10%"
@@ -809,6 +815,7 @@
                                         android:textStyle="bold" />
 
                                     <TextView
+                                        android:id="@+id/text_legend_other_percent"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="5%"
@@ -823,6 +830,70 @@
                                 android:layout_height="1dp"
                                 android:layout_weight="1" />
                         </LinearLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:text="Income Breakdown"
+                    android:textColor="@color/text_primary"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif-medium" />
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_income_chart"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="2dp"
+                    app:cardBackgroundColor="@color/card_background">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="20dp">
+
+                        <com.github.mikephil.charting.charts.PieChart
+                            android:id="@+id/pie_chart_income"
+                            android:layout_width="match_parent"
+                            android:layout_height="220dp" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:text="Bills Breakdown"
+                    android:textColor="@color/text_primary"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif-medium" />
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_bills_chart"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="2dp"
+                    app:cardBackgroundColor="@color/card_background">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="20dp">
+
+                        <com.github.mikephil.charting.charts.PieChart
+                            android:id="@+id/pie_chart_bills"
+                            android:layout_width="match_parent"
+                            android:layout_height="220dp" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 

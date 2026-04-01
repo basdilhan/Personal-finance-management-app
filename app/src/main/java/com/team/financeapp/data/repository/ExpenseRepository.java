@@ -6,6 +6,7 @@ import android.os.Looper;
 
 import androidx.annotation.NonNull;
 
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.team.financeapp.Expense;
@@ -162,13 +163,13 @@ public class ExpenseRepository {
         entity.category = getString(document, "category", "Other");
         entity.amount = getDouble(document, "amount", 0.0d);
         entity.description = getString(document, "description", "");
-        entity.date = getLong(document, "date", 0L);
+        entity.date = getEpochMillis(document, "date", 0L);
         entity.time = getString(document, "time", "00:00");
         entity.categoryIcon = (int) getLong(document, "categoryIcon", R.drawable.ic_receipt);
         entity.deleted = document.getBoolean("deleted") != null && Boolean.TRUE.equals(document.getBoolean("deleted"));
         entity.syncState = SyncState.SYNCED;
-        entity.createdAt = getLong(document, "createdAt", System.currentTimeMillis());
-        entity.updatedAt = getLong(document, "updatedAt", System.currentTimeMillis());
+        entity.createdAt = getEpochMillis(document, "createdAt", System.currentTimeMillis());
+        entity.updatedAt = getEpochMillis(document, "updatedAt", System.currentTimeMillis());
         return entity;
     }
 
@@ -182,8 +183,46 @@ public class ExpenseRepository {
         return value == null ? fallback : value;
     }
 
+    private static long getEpochMillis(DocumentSnapshot doc, String key, long fallback) {
+        Object value = doc.get(key);
+        if (value == null) {
+            return fallback;
+        }
+        if (value instanceof Timestamp) {
+            return ((Timestamp) value).toDate().getTime();
+        }
+        if (value instanceof Number) {
+            return normalizeEpochMillis(((Number) value).longValue());
+        }
+        if (value instanceof String) {
+            try {
+                return normalizeEpochMillis(Long.parseLong((String) value));
+            } catch (NumberFormatException ignored) {
+                return fallback;
+            }
+        }
+        return fallback;
+    }
+
+    private static long normalizeEpochMillis(long raw) {
+        if (raw <= 0L) {
+            return raw;
+        }
+        return raw < 1_000_000_000_000L ? raw * 1000L : raw;
+    }
+
     private static double getDouble(DocumentSnapshot doc, String key, double fallback) {
-        Double value = doc.getDouble(key);
-        return value == null ? fallback : value;
+        Object value = doc.get(key);
+        if (value instanceof Number) {
+            return ((Number) value).doubleValue();
+        }
+        if (value instanceof String) {
+            try {
+                return Double.parseDouble((String) value);
+            } catch (NumberFormatException ignored) {
+                return fallback;
+            }
+        }
+        return fallback;
     }
 }
