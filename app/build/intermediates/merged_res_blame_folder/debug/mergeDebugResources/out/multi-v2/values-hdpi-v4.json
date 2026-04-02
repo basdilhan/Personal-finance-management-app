@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.team.financeapp-mergeDebugResources-28:/values-hdpi-v4/values-hdpi-v4.xml",
+            "outputFile": "com.team.financeapp-mergeDebugResources-3:/values-hdpi-v4/values-hdpi-v4.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\ASUS\\.gradle\\caches\\9.2.1\\transforms\\2fba7b151fcca111383a2f5a16a26f82\\workspace\\transformed\\appcompat-1.6.1\\res\\values-hdpi-v4\\values-hdpi-v4.xml",
+                    "source": "C:\\Users\\samudu\\.gradle\\caches\\9.1.0\\transforms\\ed2ecdb05fc107f100743c0666bbd2ac\\workspace\\transformed\\appcompat-1.6.1\\res\\values-hdpi-v4\\values-hdpi-v4.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",

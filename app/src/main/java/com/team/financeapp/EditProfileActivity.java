@@ -1,14 +1,21 @@
 package com.team.financeapp;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Edit Profile Activity
@@ -21,18 +28,14 @@ public class EditProfileActivity extends AppCompatActivity {
     private TextInputEditText etUserPhone;
     private MaterialButton btnSave;
     private MaterialButton btnCancel;
-    private SharedPreferences sharedPreferences;
-    private static final String PREF_NAME = "profile_pref";
-    private static final String KEY_USER_NAME = "user_name";
-    private static final String KEY_USER_EMAIL = "user_email";
-    private static final String KEY_USER_PHONE = "user_phone";
+    private FirebaseFirestore firestore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_profile);
 
-        sharedPreferences = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+        firestore = FirebaseFirestore.getInstance();
 
         initializeViews();
         loadProfileData();
@@ -51,16 +54,42 @@ public class EditProfileActivity extends AppCompatActivity {
     }
 
     /**
-     * Load existing profile data from SharedPreferences
+     * Load existing profile data from FirebaseAuth and Firestore
      */
     private void loadProfileData() {
-        String savedName = sharedPreferences.getString(KEY_USER_NAME, "John Doe");
-        String savedEmail = sharedPreferences.getString(KEY_USER_EMAIL, "john.doe@example.com");
-        String savedPhone = sharedPreferences.getString(KEY_USER_PHONE, "+94 76 123 4567");
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) {
+            Toast.makeText(this, "Please login again", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
 
-        etUserName.setText(savedName);
-        etUserEmail.setText(savedEmail);
-        etUserPhone.setText(savedPhone);
+        String fallbackName = user.getDisplayName() == null || user.getDisplayName().trim().isEmpty()
+                ? "User"
+                : user.getDisplayName().trim();
+        String email = user.getEmail() == null ? "" : user.getEmail();
+
+        etUserName.setText(fallbackName);
+        etUserEmail.setText(email);
+
+        firestore.collection("users")
+                .document(user.getUid())
+                .get()
+                .addOnSuccessListener(snapshot -> {
+                    String firestoreName = snapshot.getString("name");
+                    String firestoreEmail = snapshot.getString("email");
+                    String phone = snapshot.getString("phone");
+
+                    if (firestoreName != null && !firestoreName.trim().isEmpty()) {
+                        etUserName.setText(firestoreName.trim());
+                    }
+                    if (firestoreEmail != null && !firestoreEmail.trim().isEmpty()) {
+                        etUserEmail.setText(firestoreEmail.trim());
+                    }
+                    if (phone != null && !phone.trim().isEmpty()) {
+                        etUserPhone.setText(phone.trim());
+                    }
+                });
     }
 
     /**
@@ -83,7 +112,7 @@ public class EditProfileActivity extends AppCompatActivity {
     }
 
     /**
-     * Save profile data to SharedPreferences
+     * Save profile data to FirebaseAuth and Firestore
      */
     private void saveProfileData() {
         String name = etUserName.getText().toString().trim();
@@ -109,20 +138,53 @@ public class EditProfileActivity extends AppCompatActivity {
             return;
         }
 
-        if (phone.isEmpty()) {
-            Toast.makeText(this, "Please enter your phone number", Toast.LENGTH_SHORT).show();
-            etUserPhone.requestFocus();
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) {
+            Toast.makeText(this, "Please login again", Toast.LENGTH_SHORT).show();
+            finish();
             return;
         }
 
-        // Save to SharedPreferences
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(KEY_USER_NAME, name);
-        editor.putString(KEY_USER_EMAIL, email);
-        editor.putString(KEY_USER_PHONE, phone);
-        editor.apply();
+        btnSave.setEnabled(false);
 
-        Toast.makeText(this, "Profile updated successfully", Toast.LENGTH_SHORT).show();
-        finish();
+        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                .setDisplayName(name)
+                .build();
+
+        user.updateProfile(profileUpdates)
+                .addOnCompleteListener(profileTask -> {
+                    Map<String, Object> userDoc = new HashMap<>();
+                    userDoc.put("uid", user.getUid());
+                    userDoc.put("name", name);
+                    userDoc.put("email", email);
+                    userDoc.put("phone", phone);
+                    userDoc.put("photoUrl", user.getPhotoUrl() == null ? "" : user.getPhotoUrl().toString());
+                    userDoc.put("updatedAt", System.currentTimeMillis());
+
+                    firestore.collection("users")
+                            .document(user.getUid())
+                            .set(userDoc, SetOptions.merge())
+                            .addOnSuccessListener(unused -> {
+                                if (user.getEmail() != null && !user.getEmail().equalsIgnoreCase(email)) {
+                                    user.verifyBeforeUpdateEmail(email)
+                                            .addOnSuccessListener(v -> {
+                                                Toast.makeText(this, "Profile saved. Verify new email from your inbox to complete email update.", Toast.LENGTH_LONG).show();
+                                                finish();
+                                            })
+                                            .addOnFailureListener(e -> {
+                                                btnSave.setEnabled(true);
+                                                Toast.makeText(this, "Profile saved, but email update failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                                            });
+                                    return;
+                                }
+
+                                Toast.makeText(this, "Profile updated successfully", Toast.LENGTH_SHORT).show();
+                                finish();
+                            })
+                            .addOnFailureListener(e -> {
+                                btnSave.setEnabled(true);
+                                Toast.makeText(this, "Failed to save profile: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            });
+                });
     }
 }

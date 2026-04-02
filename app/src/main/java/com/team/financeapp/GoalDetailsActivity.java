@@ -2,16 +2,21 @@ package com.team.financeapp;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.button.MaterialButton;
+import com.team.financeapp.auth.AuthManager;
+import com.team.financeapp.data.repository.GoalRepository;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -30,6 +35,9 @@ public class GoalDetailsActivity extends AppCompatActivity {
     public static final String EXTRA_GOAL_TARGET_DATE = "goal_target_date";
     public static final String EXTRA_GOAL_CATEGORY = "goal_category";
     public static final String EXTRA_GOAL_ICON = "goal_icon";
+    public static final String EXTRA_UPDATED_GOAL_ID = "updated_goal_id";
+    public static final String EXTRA_UPDATED_CURRENT_AMOUNT = "updated_current_amount";
+    public static final String EXTRA_DELETED_GOAL_ID = "deleted_goal_id";
 
     private MaterialButton btnBack;
     private ImageView ivGoalIcon;
@@ -54,16 +62,23 @@ public class GoalDetailsActivity extends AppCompatActivity {
     private long targetDate;
     private String category;
     private int goalIcon;
+    private boolean savingsUpdated;
+    private GoalRepository goalRepository;
+    private AuthManager authManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_goal_details);
 
+        goalRepository = new GoalRepository(this);
+        authManager = new AuthManager();
+
         extractIntentData();
         initializeViews();
         populateData();
         setupClickListeners();
+        setupBackHandler();
     }
 
     /**
@@ -117,14 +132,15 @@ public class GoalDetailsActivity extends AppCompatActivity {
         if (targetAmount > 0) {
             progress = (int) ((currentAmount / targetAmount) * 100);
         }
-        tvProgressPercentage.setText(progress + "%");
+        progress = Math.min(progress, 100);
+        tvProgressPercentage.setText(getString(R.string.goal_progress_percent, progress));
         progressBar.setProgress(progress);
 
         // Set amounts
-        tvCurrentAmount.setText(String.format("LKR %.0f", currentAmount));
-        tvTargetAmount.setText(String.format("LKR %.0f", targetAmount));
+        tvCurrentAmount.setText(String.format(Locale.getDefault(), "LKR %.0f", currentAmount));
+        tvTargetAmount.setText(String.format(Locale.getDefault(), "LKR %.0f", targetAmount));
         double remaining = Math.max(0, targetAmount - currentAmount);
-        tvRemainingAmount.setText(String.format("LKR %.0f", remaining));
+        tvRemainingAmount.setText(String.format(Locale.getDefault(), "LKR %.0f", remaining));
 
         // Set description
         tvDescription.setText(goalDescription != null && !goalDescription.isEmpty()
@@ -135,8 +151,18 @@ public class GoalDetailsActivity extends AppCompatActivity {
             SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault());
             tvTargetDate.setText(dateFormat.format(new Date(targetDate)));
         } else {
-            tvTargetDate.setText("Not set");
+            tvTargetDate.setText("-");
         }
+    }
+
+    private void setupBackHandler() {
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                sendUpdatedGoalResultIfNeeded();
+                finish();
+            }
+        });
     }
 
     /**
@@ -146,6 +172,7 @@ public class GoalDetailsActivity extends AppCompatActivity {
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                sendUpdatedGoalResultIfNeeded();
                 finish();
             }
         });
@@ -186,8 +213,90 @@ public class GoalDetailsActivity extends AppCompatActivity {
      * Show dialog to add savings to this goal
      */
     private void showAddSavingsDialog() {
-        // Simple dialog to add savings - in a real app, this would be a more sophisticated input
-        Toast.makeText(this, "Add savings feature coming soon!", Toast.LENGTH_SHORT).show();
+        EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        input.setHint("Enter amount in LKR");
+
+        new AlertDialog.Builder(this)
+                .setTitle("Add Savings")
+                .setMessage("How much do you want to add to this goal?")
+                .setView(input)
+                .setPositiveButton("Add", (dialog, which) -> applySavings(input.getText().toString().trim()))
+                .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
+                .show();
+    }
+
+    private void applySavings(String amountText) {
+        if (amountText.isEmpty()) {
+            Toast.makeText(this, "Please enter an amount", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        double amountToAdd;
+        try {
+            amountToAdd = Double.parseDouble(amountText);
+        } catch (NumberFormatException ex) {
+            Toast.makeText(this, "Invalid amount", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (amountToAdd <= 0) {
+            Toast.makeText(this, "Amount should be greater than zero", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Update current amount
+        currentAmount += amountToAdd;
+        savingsUpdated = true;
+
+        // Create Goal object with updated amount
+        Goal updatedGoal = new Goal(
+                goalId,
+                goalName,
+                goalDescription,
+                targetAmount,
+                currentAmount,  // Updated amount
+                targetDate,
+                category,
+                goalIcon,
+                R.drawable.circle_primary_light
+        );
+
+        // Save to database
+        String userId = authManager.getCurrentUserId();
+        if (userId != null) {
+            goalRepository.updateGoal(userId, updatedGoal, new GoalRepository.UpdateGoalCallback() {
+                @Override
+                public void onSuccess() {
+                    String successMessage = String.format(Locale.getDefault(), "LKR %.0f added to %s", amountToAdd, goalName);
+                    Toast.makeText(GoalDetailsActivity.this, successMessage, Toast.LENGTH_SHORT).show();
+
+                    if (currentAmount >= targetAmount && targetAmount > 0) {
+                        Toast.makeText(GoalDetailsActivity.this, "Congratulations! Goal reached.", Toast.LENGTH_LONG).show();
+                    }
+
+                    populateData();
+                }
+
+                @Override
+                public void onError(String message) {
+                    Toast.makeText(GoalDetailsActivity.this, "Error: " + message, Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            Toast.makeText(this, "User not authenticated", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void sendUpdatedGoalResultIfNeeded() {
+        if (!savingsUpdated) {
+            return;
+        }
+
+        Intent resultIntent = new Intent();
+        resultIntent.putExtra(EXTRA_UPDATED_GOAL_ID, goalId);
+        resultIntent.putExtra(EXTRA_UPDATED_CURRENT_AMOUNT, currentAmount);
+        setResult(RESULT_OK, resultIntent);
     }
 
     /**
@@ -203,18 +312,34 @@ public class GoalDetailsActivity extends AppCompatActivity {
     }
 
     /**
-     * Delete the goal
+     * Delete the goal from database
      */
     private void deleteGoal() {
-        // In a real app, this would delete from database
-        Toast.makeText(this, "Goal deleted successfully", Toast.LENGTH_SHORT).show();
+        String userId = authManager.getCurrentUserId();
+        if (userId == null) {
+            Toast.makeText(this, "User not authenticated", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-        // Set result to indicate deletion and go back
-        Intent resultIntent = new Intent();
-        resultIntent.putExtra("deleted_goal_id", goalId);
-        setResult(RESULT_OK, resultIntent);
-        finish();
+        goalRepository.deleteGoal(userId, goalId, new GoalRepository.DeleteGoalCallback() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(GoalDetailsActivity.this, "Goal deleted successfully", Toast.LENGTH_SHORT).show();
+
+                // Set result to indicate deletion and go back
+                Intent resultIntent = new Intent();
+                resultIntent.putExtra(EXTRA_DELETED_GOAL_ID, goalId);
+                setResult(RESULT_OK, resultIntent);
+                finish();
+            }
+
+            @Override
+            public void onError(String message) {
+                Toast.makeText(GoalDetailsActivity.this, "Error deleting goal: " + message, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
+
 }
 
 

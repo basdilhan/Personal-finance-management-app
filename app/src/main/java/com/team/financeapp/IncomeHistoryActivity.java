@@ -2,6 +2,7 @@ package com.team.financeapp;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -15,6 +16,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.team.financeapp.auth.AuthManager;
+import com.team.financeapp.data.repository.IncomeRepository;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -25,7 +28,9 @@ import java.util.stream.Collectors;
 /**
  * Activity for displaying income history with date grouping and source filters.
  */
-public class IncomeHistoryActivity extends AppCompatActivity {
+public class IncomeHistoryActivity extends AppCompatActivity implements IncomeAdapter.OnIncomeItemClickListener {
+
+    private static final String TAG = "IncomeHistoryActivity";
 
     private TextView tvTotalIncome;
     private LinearLayout emptyStateContainer;
@@ -39,18 +44,22 @@ public class IncomeHistoryActivity extends AppCompatActivity {
     private IncomeAdapter incomeAdapter;
     private List<IncomeEntry> incomeList;
     private List<IncomeEntry> allIncomeList;
+    private AuthManager authManager;
+    private IncomeRepository incomeRepository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_income_history);
 
+        authManager = new AuthManager();
+        incomeRepository = new IncomeRepository(this);
         initializeViews();
         setupRecyclerView();
         setupBottomNavigation();
         setupFilterChips();
         loadIncomeHistory();
-        calculateTotalIncome();
+        calculateHeaderTotalIncome();
     }
 
     @Override
@@ -59,6 +68,7 @@ public class IncomeHistoryActivity extends AppCompatActivity {
         if (bottomNavigationView != null) {
             bottomNavigationView.setSelectedItemId(R.id.nav_income_history);
         }
+        loadIncomeHistory();
     }
 
     private void initializeViews() {
@@ -88,7 +98,7 @@ public class IncomeHistoryActivity extends AppCompatActivity {
     private void setupRecyclerView() {
         incomeList = new ArrayList<>();
         allIncomeList = new ArrayList<>();
-        incomeAdapter = new IncomeAdapter(incomeList);
+        incomeAdapter = new IncomeAdapter(incomeList, this);
 
         rvIncomeHistory.setLayoutManager(new LinearLayoutManager(this));
         rvIncomeHistory.setAdapter(incomeAdapter);
@@ -150,26 +160,26 @@ public class IncomeHistoryActivity extends AppCompatActivity {
             filtered = allIncomeList.stream()
                     .filter(i -> {
                         Calendar cal = Calendar.getInstance();
-                        cal.setTimeInMillis(i.getDate());
+                        cal.setTimeInMillis(normalizeEpochMillis(i.getDate()));
                         return cal.get(Calendar.MONTH) == currentMonth && cal.get(Calendar.YEAR) == currentYear;
                     })
                     .collect(Collectors.toList());
         } else if (chipId == R.id.chip_last_7_days) {
             long sevenDaysAgo = now.getTimeInMillis() - (7L * 24 * 60 * 60 * 1000);
             filtered = allIncomeList.stream()
-                    .filter(i -> i.getDate() >= sevenDaysAgo)
+                    .filter(i -> normalizeEpochMillis(i.getDate()) >= sevenDaysAgo)
                     .collect(Collectors.toList());
         } else if (chipId == R.id.chip_salary) {
             filtered = allIncomeList.stream()
-                    .filter(i -> "Salary".equalsIgnoreCase(i.getSource()))
+                    .filter(i -> i.getSource() != null && i.getSource().toLowerCase(Locale.ROOT).contains("salary"))
                     .collect(Collectors.toList());
         } else if (chipId == R.id.chip_freelance) {
             filtered = allIncomeList.stream()
-                    .filter(i -> "Freelance".equalsIgnoreCase(i.getSource()))
+                    .filter(i -> i.getSource() != null && i.getSource().toLowerCase(Locale.ROOT).contains("freelance"))
                     .collect(Collectors.toList());
         } else if (chipId == R.id.chip_business) {
             filtered = allIncomeList.stream()
-                    .filter(i -> "Business".equalsIgnoreCase(i.getSource()))
+                    .filter(i -> i.getSource() != null && i.getSource().toLowerCase(Locale.ROOT).contains("business"))
                     .collect(Collectors.toList());
         } else {
             filtered = new ArrayList<>(allIncomeList);
@@ -179,6 +189,15 @@ public class IncomeHistoryActivity extends AppCompatActivity {
         incomeList.addAll(filtered);
         incomeAdapter.updateIncomes(incomeList);
         updateEmptyState();
+        calculateHeaderTotalIncome();
+    }
+
+    private void applyCurrentFilter() {
+        int checkedChipId = chipGroupFilter == null ? android.view.View.NO_ID : chipGroupFilter.getCheckedChipId();
+        if (checkedChipId == android.view.View.NO_ID) {
+            checkedChipId = R.id.chip_all;
+        }
+        filterIncomes(checkedChipId);
     }
 
     private void updateEmptyState() {
@@ -196,77 +215,48 @@ public class IncomeHistoryActivity extends AppCompatActivity {
     }
 
     private void loadIncomeHistory() {
-        incomeList.clear();
-        allIncomeList.clear();
-
-        Calendar calendar = Calendar.getInstance();
-
-        calendar.set(Calendar.HOUR_OF_DAY, 9);
-        calendar.set(Calendar.MINUTE, 45);
-        allIncomeList.add(new IncomeEntry(
-                "Salary",
-                120000,
-                "Monthly salary credit",
-                calendar.getTimeInMillis(),
-                "9:45 AM",
-                R.drawable.ic_wallet
-        ));
-
-        calendar.set(Calendar.HOUR_OF_DAY, 20);
-        calendar.set(Calendar.MINUTE, 10);
-        allIncomeList.add(new IncomeEntry(
-                "Freelance",
-                18500,
-                "Website design project",
-                calendar.getTimeInMillis(),
-                "8:10 PM",
-                R.drawable.ic_laptop
-        ));
-
-        calendar.add(Calendar.DAY_OF_YEAR, -3);
-        calendar.set(Calendar.HOUR_OF_DAY, 14);
-        calendar.set(Calendar.MINUTE, 20);
-        allIncomeList.add(new IncomeEntry(
-                "Business",
-                42000,
-                "Shop daily collection",
-                calendar.getTimeInMillis(),
-                "2:20 PM",
-                R.drawable.ic_savings
-        ));
-
-        calendar.add(Calendar.DAY_OF_YEAR, -2);
-        calendar.set(Calendar.HOUR_OF_DAY, 10);
-        calendar.set(Calendar.MINUTE, 5);
-        allIncomeList.add(new IncomeEntry(
-                "Salary",
-                120000,
-                "Allowance adjustment",
-                calendar.getTimeInMillis(),
-                "10:05 AM",
-                R.drawable.ic_wallet
-        ));
-
-        incomeList.addAll(allIncomeList);
-        incomeAdapter.updateIncomes(incomeList);
-        updateEmptyState();
-    }
-
-    private void calculateTotalIncome() {
-        double total = 0;
-        Calendar current = Calendar.getInstance();
-        int month = current.get(Calendar.MONTH);
-        int year = current.get(Calendar.YEAR);
-
-        for (IncomeEntry entry : allIncomeList) {
-            Calendar cal = Calendar.getInstance();
-            cal.setTimeInMillis(entry.getDate());
-            if (cal.get(Calendar.MONTH) == month && cal.get(Calendar.YEAR) == year) {
-                total += entry.getAmount();
-            }
+        String userId = authManager.getCurrentUserId();
+        if (userId == null || userId.isEmpty()) {
+            incomeList.clear();
+            allIncomeList.clear();
+            incomeAdapter.updateIncomes(incomeList);
+            updateEmptyState();
+            calculateHeaderTotalIncome();
+            return;
         }
 
+        incomeRepository.loadIncome(userId, new IncomeRepository.LoadIncomeCallback() {
+            @Override
+            public void onIncomeLoaded(List<IncomeEntry> incomes) {
+                allIncomeList.clear();
+                allIncomeList.addAll(incomes);
+                allIncomeList.sort((i1, i2) -> Long.compare(i2.getDate(), i1.getDate()));
+                applyCurrentFilter();
+            }
+
+            @Override
+            public void onError(String message) {
+                Log.w(TAG, "Income remote refresh failed: " + message);
+                if (allIncomeList.isEmpty()) {
+                    Toast.makeText(IncomeHistoryActivity.this, message, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    private void calculateHeaderTotalIncome() {
+        double total = 0;
+        for (IncomeEntry entry : allIncomeList) {
+            total += entry.getAmount();
+        }
         tvTotalIncome.setText(String.format(Locale.getDefault(), "LKR %,.2f", total));
+    }
+
+    private long normalizeEpochMillis(long raw) {
+        if (raw <= 0L) {
+            return raw;
+        }
+        return raw < 1_000_000_000_000L ? raw * 1000L : raw;
     }
 
     private void showLogoutConfirmation() {
@@ -279,10 +269,73 @@ public class IncomeHistoryActivity extends AppCompatActivity {
     }
 
     private void handleLogout() {
+        authManager.signOut(this);
         Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(IncomeHistoryActivity.this, LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
+    }
+
+    @Override
+    public void onIncomeClick(IncomeEntry income) {
+        // Keep single tap as a no-op.
+    }
+
+    @Override
+    public void onIncomeLongClick(IncomeEntry income) {
+        String[] actions = {"Edit", "Delete"};
+        new AlertDialog.Builder(this)
+                .setTitle("Income Options")
+                .setItems(actions, (dialog, which) -> {
+                    if (which == 0) {
+                        openEditIncome(income);
+                    } else if (which == 1) {
+                        confirmDeleteIncome(income);
+                    }
+                })
+                .show();
+    }
+
+    private void openEditIncome(IncomeEntry income) {
+        Intent intent = new Intent(this, AddIncomeActivity.class);
+        intent.putExtra(AddIncomeActivity.EXTRA_INCOME_ID, income.getId());
+        intent.putExtra(AddIncomeActivity.EXTRA_INCOME_SOURCE, income.getSource());
+        intent.putExtra(AddIncomeActivity.EXTRA_INCOME_AMOUNT, income.getAmount());
+        intent.putExtra(AddIncomeActivity.EXTRA_INCOME_NOTE, income.getNote());
+        intent.putExtra(AddIncomeActivity.EXTRA_INCOME_DATE, income.getDate());
+        intent.putExtra(AddIncomeActivity.EXTRA_INCOME_TIME, income.getTime());
+        intent.putExtra(AddIncomeActivity.EXTRA_INCOME_ICON, income.getSourceIcon());
+        startActivity(intent);
+    }
+
+    private void confirmDeleteIncome(IncomeEntry income) {
+        new AlertDialog.Builder(this)
+                .setTitle("Delete Income")
+                .setMessage("Delete this income entry?")
+                .setPositiveButton("Delete", (dialog, which) -> deleteIncome(income))
+                .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
+                .show();
+    }
+
+    private void deleteIncome(IncomeEntry income) {
+        String userId = authManager.getCurrentUserId();
+        if (userId == null || userId.isEmpty()) {
+            Toast.makeText(this, "Please login again", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        incomeRepository.deleteIncome(userId, income.getId(), new IncomeRepository.ModifyIncomeCallback() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(IncomeHistoryActivity.this, "Income deleted", Toast.LENGTH_SHORT).show();
+                loadIncomeHistory();
+            }
+
+            @Override
+            public void onError(String message) {
+                Toast.makeText(IncomeHistoryActivity.this, message, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

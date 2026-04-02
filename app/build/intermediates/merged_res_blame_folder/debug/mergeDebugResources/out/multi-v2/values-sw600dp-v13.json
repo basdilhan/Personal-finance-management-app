@@ -1,10 +1,20 @@
 {
     "logs": [
         {
-            "outputFile": "com.team.financeapp-mergeDebugResources-28:/values-sw600dp-v13/values-sw600dp-v13.xml",
+            "outputFile": "com.team.financeapp-mergeDebugResources-3:/values-sw600dp-v13/values-sw600dp-v13.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\ASUS\\.gradle\\caches\\9.2.1\\transforms\\2eda2e79076d7256c6d3d7ae5e519f7b\\workspace\\transformed\\material-1.10.0\\res\\values-sw600dp-v13\\values-sw600dp-v13.xml",
+                    "source": "C:\\Users\\samudu\\.gradle\\caches\\9.1.0\\transforms\\ed2ecdb05fc107f100743c0666bbd2ac\\workspace\\transformed\\appcompat-1.6.1\\res\\values-sw600dp-v13\\values-sw600dp-v13.xml",
+                    "from": {
+                        "startLines": "2,3,4,5,6,7,8,9",
+                        "startColumns": "4,4,4,4,4,4,4,4",
+                        "startOffsets": "55,124,193,263,337,413,472,543",
+                        "endColumns": "68,68,69,73,75,58,70,67",
+                        "endOffsets": "119,188,258,332,408,467,538,606"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\samudu\\.gradle\\caches\\9.1.0\\transforms\\8fa91f03ca4b878263ee59f78a358451\\workspace\\transformed\\material-1.10.0\\res\\values-sw600dp-v13\\values-sw600dp-v13.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,10,11,12,13,14",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4",

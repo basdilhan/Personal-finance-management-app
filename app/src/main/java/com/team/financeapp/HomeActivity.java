@@ -7,6 +7,7 @@ import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.button.MaterialButton;
+import com.team.financeapp.auth.AuthManager;
 
 /**
  * Home activity - Landing screen displaying app features and welcome message.
@@ -15,14 +16,26 @@ import com.google.android.material.button.MaterialButton;
 public class HomeActivity extends AppCompatActivity {
 
     private MaterialButton btnGetStarted;
+    private AuthManager authManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+        authManager = new AuthManager();
         initializeViews();
         setupClickListeners();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (authManager.isUserLoggedIn()) {
+            Intent intent = new Intent(HomeActivity.this, DashboardActivity.class);
+            startActivity(intent);
+            finish();
+        }
     }
 
     /**

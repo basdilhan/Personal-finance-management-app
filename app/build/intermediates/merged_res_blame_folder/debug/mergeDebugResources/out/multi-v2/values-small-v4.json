@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.team.financeapp-mergeDebugResources-28:/values-small-v4/values-small-v4.xml",
+            "outputFile": "com.team.financeapp-mergeDebugResources-3:/values-small-v4/values-small-v4.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\ASUS\\.gradle\\caches\\9.2.1\\transforms\\2eda2e79076d7256c6d3d7ae5e519f7b\\workspace\\transformed\\material-1.10.0\\res\\values-small-v4\\values-small-v4.xml",
+                    "source": "C:\\Users\\samudu\\.gradle\\caches\\9.1.0\\transforms\\8fa91f03ca4b878263ee59f78a358451\\workspace\\transformed\\material-1.10.0\\res\\values-small-v4\\values-small-v4.xml",
                     "from": {
                         "startLines": "2,3,4,5",
                         "startColumns": "4,4,4,4",

@@ -52,4 +52,14 @@
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
+
+    <!-- Dashboard-specific semantic colors -->
+    <color name="dashboard_header_subtitle">#E0E7FF</color>
+    <color name="dashboard_insight_bg">#FFF7ED</color>
+    <color name="dashboard_insight_stroke">#FFEDD5</color>
+    <color name="dashboard_insight_title">#92400E</color>
+    <color name="dashboard_insight_body">#B45309</color>
+    <color name="dashboard_chart_center">#1E293B</color>
+    <color name="dashboard_chart_hole">#FFFFFF</color>
+    <color name="dashboard_chart_other">#94A3B8</color>
 </resources>

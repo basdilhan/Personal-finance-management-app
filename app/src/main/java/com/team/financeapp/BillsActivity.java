@@ -15,9 +15,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.team.financeapp.auth.AuthManager;
+import com.team.financeapp.data.repository.BillRepository;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,12 +39,16 @@ public class BillsActivity extends AppCompatActivity {
     private ChipGroup chipGroupFilter;
     private List<Bill> billsList;
     private List<Bill> allBillsList;
+    private AuthManager authManager;
+    private BillRepository billRepository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bills);
 
+        authManager = new AuthManager();
+    billRepository = new BillRepository(this);
         initializeViews();
         setupRecyclerView();
         BottomNavigationFragment.attach(this, R.id.bottom_navigation_container, R.id.nav_bills);
@@ -56,6 +61,7 @@ public class BillsActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         BottomNavigationFragment.attach(this, R.id.bottom_navigation_container, R.id.nav_bills);
+        loadBills();
     }
 
     /**
@@ -171,6 +177,7 @@ public class BillsActivity extends AppCompatActivity {
      * Handle logout action
      */
     private void handleLogout() {
+        authManager.signOut(this);
         Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(BillsActivity.this, LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -184,7 +191,17 @@ public class BillsActivity extends AppCompatActivity {
     private void setupRecyclerView() {
         billsList = new ArrayList<>();
         allBillsList = new ArrayList<>();
-        billAdapter = new BillAdapter(billsList);
+        billAdapter = new BillAdapter(billsList, new BillAdapter.OnBillItemClickListener() {
+            @Override
+            public void onBillClick(Bill bill) {
+                // Keep single tap as no-op.
+            }
+
+            @Override
+            public void onBillLongClick(Bill bill) {
+                showBillActions(bill);
+            }
+        });
 
         rvBills.setLayoutManager(new LinearLayoutManager(this));
         rvBills.setAdapter(billAdapter);
@@ -194,78 +211,34 @@ public class BillsActivity extends AppCompatActivity {
      * Load bills from database or local storage
      */
     private void loadBills() {
-        billsList.clear();
-        allBillsList.clear();
+        String userId = authManager.getCurrentUserId();
+        if (userId == null || userId.isEmpty()) {
+            billsList.clear();
+            allBillsList.clear();
+            billAdapter.updateBills(billsList);
+            updateEmptyState();
+            return;
+        }
 
-        // Create sample bills for testing
-        Calendar calendar = Calendar.getInstance();
+        billRepository.loadBills(userId, new BillRepository.LoadBillsCallback() {
+            @Override
+            public void onBillsLoaded(List<Bill> bills) {
+                allBillsList.clear();
+                allBillsList.addAll(bills);
+                allBillsList.sort((b1, b2) -> Long.compare(b1.getDueDate(), b2.getDueDate()));
 
-        // Electricity Bill - Urgent (due in 2 days)
-        calendar.add(Calendar.DAY_OF_YEAR, 2);
-        Bill electricityBill = new Bill(
-                1,
-                "Electricity Bill",
-                "Monthly electricity bill",
-                4500,
-                calendar.getTimeInMillis(),
-                "Electricity",
-                R.drawable.ic_electricity,
-                "urgent",
-                R.drawable.circle_urgent
-        );
-        allBillsList.add(electricityBill);
+                billsList.clear();
+                billsList.addAll(allBillsList);
+                billAdapter.updateBills(billsList);
+                updateEmptyState();
+                calculateTotalDue();
+            }
 
-        // Water Bill - Due Soon (due in 8 days)
-        calendar.add(Calendar.DAY_OF_YEAR, 6);
-        Bill waterBill = new Bill(
-                2,
-                "Water Bill",
-                "Monthly water supply bill",
-                2500,
-                calendar.getTimeInMillis(),
-                "Water",
-                R.drawable.ic_water,
-                "due_soon",
-                R.drawable.circle_warning
-        );
-        allBillsList.add(waterBill);
-
-        // Internet Bill - Pending (due in 12 days)
-        calendar.add(Calendar.DAY_OF_YEAR, 4);
-        Bill internetBill = new Bill(
-                3,
-                "Internet Bill",
-                "Monthly internet bill",
-                6990,
-                calendar.getTimeInMillis(),
-                "Internet",
-                R.drawable.ic_wifi,
-                "pending",
-                R.drawable.circle_blue_light
-        );
-        allBillsList.add(internetBill);
-
-        // Mobile Bill - Pending (due in 20 days)
-        calendar.add(Calendar.DAY_OF_YEAR, 8);
-        Bill mobileBill = new Bill(
-                4,
-                "Mobile Bill",
-                "Mobile phone plan",
-                1200,
-                calendar.getTimeInMillis(),
-                "Mobile",
-                R.drawable.ic_notification,
-                "pending",
-                R.drawable.circle_blue_light
-        );
-        allBillsList.add(mobileBill);
-
-        // Sort bills by due date (nearest first)
-        allBillsList.sort((b1, b2) -> Long.compare(b1.getDueDate(), b2.getDueDate()));
-
-        billsList.addAll(allBillsList);
-        billAdapter.updateBills(billsList);
-        updateEmptyState();
+            @Override
+            public void onError(String message) {
+                Toast.makeText(BillsActivity.this, message, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     /**
@@ -287,5 +260,60 @@ public class BillsActivity extends AppCompatActivity {
     public void refreshBills() {
         loadBills();
         calculateTotalDue();
+    }
+
+    private void showBillActions(Bill bill) {
+        String[] actions = {"Edit", "Delete"};
+        new AlertDialog.Builder(this)
+                .setTitle("Bill Options")
+                .setItems(actions, (dialog, which) -> {
+                    if (which == 0) {
+                        openEditBill(bill);
+                    } else if (which == 1) {
+                        confirmDeleteBill(bill);
+                    }
+                })
+                .show();
+    }
+
+    private void openEditBill(Bill bill) {
+        Intent intent = new Intent(this, AddBillActivity.class);
+        intent.putExtra(AddBillActivity.EXTRA_BILL_ID, bill.getId());
+        intent.putExtra(AddBillActivity.EXTRA_BILL_NAME, bill.getName());
+        intent.putExtra(AddBillActivity.EXTRA_BILL_DESCRIPTION, bill.getDescription());
+        intent.putExtra(AddBillActivity.EXTRA_BILL_AMOUNT, bill.getAmount());
+        intent.putExtra(AddBillActivity.EXTRA_BILL_DUE_DATE, bill.getDueDate());
+        intent.putExtra(AddBillActivity.EXTRA_BILL_TYPE, bill.getCategory());
+        startActivity(intent);
+    }
+
+    private void confirmDeleteBill(Bill bill) {
+        new AlertDialog.Builder(this)
+                .setTitle("Delete Bill")
+                .setMessage("Delete this bill entry?")
+                .setPositiveButton("Delete", (dialog, which) -> deleteBill(bill))
+                .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
+                .show();
+    }
+
+    private void deleteBill(Bill bill) {
+        String userId = authManager.getCurrentUserId();
+        if (userId == null || userId.isEmpty()) {
+            Toast.makeText(this, "Please login again", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        billRepository.deleteBill(userId, bill.getId(), new BillRepository.ModifyBillCallback() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(BillsActivity.this, "Bill deleted", Toast.LENGTH_SHORT).show();
+                loadBills();
+            }
+
+            @Override
+            public void onError(String message) {
+                Toast.makeText(BillsActivity.this, message, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

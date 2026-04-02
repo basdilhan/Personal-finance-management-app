@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Primary Colors - Dark Theme -->
+    <color name="primary">#8B8DFF</color>
+    <color name="primary_dark">#6366F1</color>
+    <color name="primary_light">#A5B4FC</color>
+    <color name="accent">#FBBF24</color>
+    <color name="accent_dark">#F59E0B</color>
+
+    <!-- Background Colors - Dark Theme -->
+    <color name="background">#0F172A</color>
+    <color name="background_light">#111827</color>
+    <color name="surface">#1E293B</color>
+    <color name="surface_elevated">#334155</color>
+    <color name="card_background">#1E293B</color>
+    <color name="card_background_light">#273449</color>
+
+    <!-- Text Colors -->
+    <color name="text_primary">#F8FAFC</color>
+    <color name="text_secondary">#CBD5E1</color>
+    <color name="text_hint">#94A3B8</color>
+    <color name="text_on_primary">#FFFFFF</color>
+    <color name="text_on_card">#E2E8F0</color>
+
+    <!-- Status Colors -->
+    <color name="success">#34D399</color>
+    <color name="success_dark">#10B981</color>
+    <color name="warning">#FB923C</color>
+    <color name="error">#F87171</color>
+    <color name="info">#60A5FA</color>
+
+    <!-- Basic Colors -->
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="grey_light">#334155</color>
+    <color name="grey_medium">#64748B</color>
+    <color name="grey_dark">#CBD5E1</color>
+    <color name="divider">#334155</color>
+
+    <!-- Gradient Colors -->
+    <color name="gradient_start">#3730A3</color>
+    <color name="gradient_mid">#4F46E5</color>
+    <color name="gradient_end">#6366F1</color>
+
+    <!-- Accent Variations -->
+    <color name="accent_overlay">#3A2A05</color>
+    <color name="primary_overlay">#1E1B4B</color>
+
+    <!-- Material Design default colors (for compatibility) -->
+    <color name="teal_200">#FF80CBC4</color>
+    <color name="teal_700">#FF00897B</color>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+
+    <!-- Dashboard-specific semantic colors -->
+    <color name="dashboard_header_subtitle">#C7D2FE</color>
+    <color name="dashboard_insight_bg">#2A2110</color>
+    <color name="dashboard_insight_stroke">#4A3413</color>
+    <color name="dashboard_insight_title">#FDE68A</color>
+    <color name="dashboard_insight_body">#FCD34D</color>
+    <color name="dashboard_chart_center">#E2E8F0</color>
+    <color name="dashboard_chart_hole">#1E293B</color>
+    <color name="dashboard_chart_other">#64748B</color>
+</resources>

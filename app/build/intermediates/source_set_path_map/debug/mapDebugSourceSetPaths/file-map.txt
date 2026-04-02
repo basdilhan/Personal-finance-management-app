@@ -1,0 +1,53 @@
+com.team.financeapp-pngs-0 C:\HND note & projcts\Mobile\cw1\Personal-finance-management-app\app\build\generated\res\pngs\debug
+com.team.financeapp-res-1 C:\HND note & projcts\Mobile\cw1\Personal-finance-management-app\app\build\generated\res\processDebugGoogleServices
+com.team.financeapp-resValues-2 C:\HND note & projcts\Mobile\cw1\Personal-finance-management-app\app\build\generated\res\resValues\debug
+com.team.financeapp-updated_navigation_xml-3 C:\HND note & projcts\Mobile\cw1\Personal-finance-management-app\app\build\generated\updated_navigation_xml\debug
+com.team.financeapp-packageDebugResources-4 C:\HND note & projcts\Mobile\cw1\Personal-finance-management-app\app\build\intermediates\incremental\debug\packageDebugResources\merged.dir
+com.team.financeapp-packageDebugResources-5 C:\HND note & projcts\Mobile\cw1\Personal-finance-management-app\app\build\intermediates\incremental\debug\packageDebugResources\stripped.dir
+com.team.financeapp-debug-6 C:\HND note & projcts\Mobile\cw1\Personal-finance-management-app\app\build\intermediates\merged_res\debug\mergeDebugResources
+com.team.financeapp-debug-7 C:\HND note & projcts\Mobile\cw1\Personal-finance-management-app\app\src\debug\res
+com.team.financeapp-main-8 C:\HND note & projcts\Mobile\cw1\Personal-finance-management-app\app\src\main\res
+com.team.financeapp-datastore-release-9 C:\Users\samudu\.gradle\caches\9.1.0\transforms\022a9c1a65d6a17282a2a92a38c5c6a5\workspace\transformed\datastore-release\res
+com.team.financeapp-room-ktx-2.6.1-10 C:\Users\samudu\.gradle\caches\9.1.0\transforms\062a7dcc9b3e64957855ac7b9f1d654a\workspace\transformed\room-ktx-2.6.1\res
+com.team.financeapp-play-services-basement-18.4.0-11 C:\Users\samudu\.gradle\caches\9.1.0\transforms\0bd4251e75d9ea8b3c6440b6c874380c\workspace\transformed\play-services-basement-18.4.0\res
+com.team.financeapp-transition-1.2.0-12 C:\Users\samudu\.gradle\caches\9.1.0\transforms\133b5c5c18070d78fd43b8f3dff46b70\workspace\transformed\transition-1.2.0\res
+com.team.financeapp-coordinatorlayout-1.1.0-13 C:\Users\samudu\.gradle\caches\9.1.0\transforms\1506907b002a94dd6485b7a9314eddb0\workspace\transformed\coordinatorlayout-1.1.0\res
+com.team.financeapp-work-runtime-2.9.1-14 C:\Users\samudu\.gradle\caches\9.1.0\transforms\188128139ed4d8211b32366a165bf662\workspace\transformed\work-runtime-2.9.1\res
+com.team.financeapp-credentials-play-services-auth-1.2.0-rc01-15 C:\Users\samudu\.gradle\caches\9.1.0\transforms\1a7577cc74bbef8c0fafe016a7d01689\workspace\transformed\credentials-play-services-auth-1.2.0-rc01\res
+com.team.financeapp-viewpager2-1.0.0-16 C:\Users\samudu\.gradle\caches\9.1.0\transforms\1ca2a772ef87594d2e3c8d1b3d61ad1f\workspace\transformed\viewpager2-1.0.0\res
+com.team.financeapp-core-ktx-1.9.0-17 C:\Users\samudu\.gradle\caches\9.1.0\transforms\298388704eafd872316c9555661e3612\workspace\transformed\core-ktx-1.9.0\res
+com.team.financeapp-browser-1.4.0-18 C:\Users\samudu\.gradle\caches\9.1.0\transforms\33ee4db2042135c738cc04fbc1eeb66e\workspace\transformed\browser-1.4.0\res
+com.team.financeapp-core-runtime-2.2.0-19 C:\Users\samudu\.gradle\caches\9.1.0\transforms\365980bebbcbe5c8f13deee55db6717e\workspace\transformed\core-runtime-2.2.0\res
+com.team.financeapp-savedstate-1.2.1-20 C:\Users\samudu\.gradle\caches\9.1.0\transforms\383f89e96c313fea5833432dd59b48b2\workspace\transformed\savedstate-1.2.1\res
+com.team.financeapp-lifecycle-runtime-2.6.1-21 C:\Users\samudu\.gradle\caches\9.1.0\transforms\4c84adbf9828083968a54515d7e1c417\workspace\transformed\lifecycle-runtime-2.6.1\res
+com.team.financeapp-lifecycle-livedata-2.6.1-22 C:\Users\samudu\.gradle\caches\9.1.0\transforms\5348911143780fb9378b3f6bf0612b44\workspace\transformed\lifecycle-livedata-2.6.1\res
+com.team.financeapp-firebase-common-22.0.0-23 C:\Users\samudu\.gradle\caches\9.1.0\transforms\59f0ee3fb908a87c91eeb1c1b50c3fcb\workspace\transformed\firebase-common-22.0.0\res
+com.team.financeapp-activity-1.8.0-24 C:\Users\samudu\.gradle\caches\9.1.0\transforms\5adf9772808db2bcc30fc7749d8cb372\workspace\transformed\activity-1.8.0\res
+com.team.financeapp-sqlite-2.4.0-25 C:\Users\samudu\.gradle\caches\9.1.0\transforms\64a71e071a910af500c528b1f9fb14ab\workspace\transformed\sqlite-2.4.0\res
+com.team.financeapp-annotation-experimental-1.3.0-26 C:\Users\samudu\.gradle\caches\9.1.0\transforms\6b9320c7b051e5410e27ece9cc0fd49d\workspace\transformed\annotation-experimental-1.3.0\res
+com.team.financeapp-datastore-core-release-27 C:\Users\samudu\.gradle\caches\9.1.0\transforms\6e055c608e4f10796e54ee5a9ad28eac\workspace\transformed\datastore-core-release\res
+com.team.financeapp-room-runtime-2.6.1-28 C:\Users\samudu\.gradle\caches\9.1.0\transforms\726ffab2f870ab14e650083ee1a8a28f\workspace\transformed\room-runtime-2.6.1\res
+com.team.financeapp-play-services-auth-21.2.0-29 C:\Users\samudu\.gradle\caches\9.1.0\transforms\799214c2c6c52dbd6bf862ff4c9fa5a9\workspace\transformed\play-services-auth-21.2.0\res
+com.team.financeapp-emoji2-1.2.0-30 C:\Users\samudu\.gradle\caches\9.1.0\transforms\83f5d09b1940099d9fecaf55cc4b0da5\workspace\transformed\emoji2-1.2.0\res
+com.team.financeapp-startup-runtime-1.1.1-31 C:\Users\samudu\.gradle\caches\9.1.0\transforms\87121802bbfd51f6019ae17c19d45a9d\workspace\transformed\startup-runtime-1.1.1\res
+com.team.financeapp-profileinstaller-1.3.0-32 C:\Users\samudu\.gradle\caches\9.1.0\transforms\88cd36d3badaccdc6aeab0f9db23913f\workspace\transformed\profileinstaller-1.3.0\res
+com.team.financeapp-fragment-1.5.7-33 C:\Users\samudu\.gradle\caches\9.1.0\transforms\8d7ac3c77d0fb505fc260a8e5678cbd5\workspace\transformed\fragment-1.5.7\res
+com.team.financeapp-material-1.10.0-34 C:\Users\samudu\.gradle\caches\9.1.0\transforms\8fa91f03ca4b878263ee59f78a358451\workspace\transformed\material-1.10.0\res
+com.team.financeapp-drawerlayout-1.1.1-35 C:\Users\samudu\.gradle\caches\9.1.0\transforms\91d05c2e7ce362a9a99c8d375dcdb516\workspace\transformed\drawerlayout-1.1.1\res
+com.team.financeapp-lifecycle-service-2.6.1-36 C:\Users\samudu\.gradle\caches\9.1.0\transforms\9498c4f6f3c52228579b4c69b1e15772\workspace\transformed\lifecycle-service-2.6.1\res
+com.team.financeapp-lifecycle-process-2.6.1-37 C:\Users\samudu\.gradle\caches\9.1.0\transforms\9710a76d15d3fea0084bfd03a3bff3a5\workspace\transformed\lifecycle-process-2.6.1\res
+com.team.financeapp-credentials-1.2.0-rc01-38 C:\Users\samudu\.gradle\caches\9.1.0\transforms\9a67e89fd2461b8b08f633d87f65898c\workspace\transformed\credentials-1.2.0-rc01\res
+com.team.financeapp-lifecycle-viewmodel-2.6.1-39 C:\Users\samudu\.gradle\caches\9.1.0\transforms\9edc97b784faaf3781f6d9dfb64c04c2\workspace\transformed\lifecycle-viewmodel-2.6.1\res
+com.team.financeapp-datastore-preferences-release-40 C:\Users\samudu\.gradle\caches\9.1.0\transforms\a448de15fc45b46df92ed3f3163aa83d\workspace\transformed\datastore-preferences-release\res
+com.team.financeapp-core-1.9.0-41 C:\Users\samudu\.gradle\caches\9.1.0\transforms\a4a80d7ce457c6312d78783dcf02ed72\workspace\transformed\core-1.9.0\res
+com.team.financeapp-recyclerview-1.1.0-42 C:\Users\samudu\.gradle\caches\9.1.0\transforms\ab37fcc280688d860442e6d85157287c\workspace\transformed\recyclerview-1.1.0\res
+com.team.financeapp-constraintlayout-2.1.4-43 C:\Users\samudu\.gradle\caches\9.1.0\transforms\ab6c58429105e20cfe5bf62e89149f3f\workspace\transformed\constraintlayout-2.1.4\res
+com.team.financeapp-play-services-base-18.3.0-44 C:\Users\samudu\.gradle\caches\9.1.0\transforms\affef99e92b41010fbf0fa6f8a977c76\workspace\transformed\play-services-base-18.3.0\res
+com.team.financeapp-core-common-2.0.3-45 C:\Users\samudu\.gradle\caches\9.1.0\transforms\bb291d0ff1615fc31de1bcb7eaefe9c0\workspace\transformed\core-common-2.0.3\res
+com.team.financeapp-sqlite-framework-2.4.0-46 C:\Users\samudu\.gradle\caches\9.1.0\transforms\bdf131f23d7d97c128a971feee05bcbb\workspace\transformed\sqlite-framework-2.4.0\res
+com.team.financeapp-emoji2-views-helper-1.2.0-47 C:\Users\samudu\.gradle\caches\9.1.0\transforms\c6f8fa21a285222c2f72d1aac9d00fc4\workspace\transformed\emoji2-views-helper-1.2.0\res
+com.team.financeapp-lifecycle-livedata-core-2.6.1-48 C:\Users\samudu\.gradle\caches\9.1.0\transforms\c8d378f10ba5392b4e14824ade0b0b07\workspace\transformed\lifecycle-livedata-core-2.6.1\res
+com.team.financeapp-cardview-1.0.0-49 C:\Users\samudu\.gradle\caches\9.1.0\transforms\d709b7c3cb7bd8f620dfdc4382d7415e\workspace\transformed\cardview-1.0.0\res
+com.team.financeapp-lifecycle-viewmodel-savedstate-2.6.1-50 C:\Users\samudu\.gradle\caches\9.1.0\transforms\e0f1b52634430ef2e39dabd4669e071a\workspace\transformed\lifecycle-viewmodel-savedstate-2.6.1\res
+com.team.financeapp-appcompat-1.6.1-51 C:\Users\samudu\.gradle\caches\9.1.0\transforms\ed2ecdb05fc107f100743c0666bbd2ac\workspace\transformed\appcompat-1.6.1\res
+com.team.financeapp-appcompat-resources-1.6.1-52 C:\Users\samudu\.gradle\caches\9.1.0\transforms\fc499ed19f13edaf3905cee8bee4dee3\workspace\transformed\appcompat-resources-1.6.1\res

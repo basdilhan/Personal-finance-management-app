@@ -15,10 +15,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.team.financeapp.auth.AuthManager;
+import com.team.financeapp.data.repository.GoalRepository;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 /**
@@ -26,6 +29,8 @@ import java.util.stream.Collectors;
  * Shows goals with progress tracking and target dates
  */
 public class GoalsActivity extends AppCompatActivity implements GoalAdapter.OnGoalClickListener {
+
+    private static final int REQUEST_GOAL_DETAILS = 101;
 
     private TextView tvTotalSaved;
     private TextView tvActiveGoalsCount;
@@ -39,12 +44,17 @@ public class GoalsActivity extends AppCompatActivity implements GoalAdapter.OnGo
     private ChipGroup chipGroupFilter;
     private List<Goal> goalsList;
     private List<Goal> allGoalsList; // Keep original list for filtering
+    private AuthManager authManager;
+    private GoalRepository goalRepository;
+    private int currentFilterId = R.id.chip_all; // Track current filter
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_goals);
 
+        authManager = new AuthManager();
+        goalRepository = new GoalRepository(this);
         initializeViews();
         setupRecyclerView();
         BottomNavigationFragment.attach(this, R.id.bottom_navigation_container, R.id.nav_goals);
@@ -57,6 +67,9 @@ public class GoalsActivity extends AppCompatActivity implements GoalAdapter.OnGo
     protected void onResume() {
         super.onResume();
         BottomNavigationFragment.attach(this, R.id.bottom_navigation_container, R.id.nav_goals);
+        // Refresh goals when returning to this activity
+        loadGoals();
+        calculateTotalSaved();
     }
 
     /**
@@ -118,6 +131,7 @@ public class GoalsActivity extends AppCompatActivity implements GoalAdapter.OnGo
      * Filter goals based on selected chip
      */
     private void filterGoals(int chipId) {
+        currentFilterId = chipId; // Store current filter
         if (allGoalsList == null) return;
 
         List<Goal> filteredList;
@@ -162,6 +176,7 @@ public class GoalsActivity extends AppCompatActivity implements GoalAdapter.OnGo
      * Handle logout action
      */
     private void handleLogout() {
+        authManager.signOut(this);
         Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(GoalsActivity.this, LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -195,7 +210,53 @@ public class GoalsActivity extends AppCompatActivity implements GoalAdapter.OnGo
         intent.putExtra(GoalDetailsActivity.EXTRA_GOAL_TARGET_DATE, goal.getTargetDate());
         intent.putExtra(GoalDetailsActivity.EXTRA_GOAL_CATEGORY, goal.getCategory());
         intent.putExtra(GoalDetailsActivity.EXTRA_GOAL_ICON, goal.getCategoryIcon());
-        startActivity(intent);
+        startActivityForResult(intent, REQUEST_GOAL_DETAILS);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode != REQUEST_GOAL_DETAILS || resultCode != RESULT_OK || data == null) {
+            return;
+        }
+
+        int deletedGoalId = data.getIntExtra(GoalDetailsActivity.EXTRA_DELETED_GOAL_ID, -1);
+        if (deletedGoalId != -1) {
+            goalAdapter.removeGoal(deletedGoalId);
+            allGoalsList.removeIf(g -> g.getId() == deletedGoalId);
+            calculateTotalSaved();
+            updateEmptyState();
+            return;
+        }
+
+        int updatedGoalId = data.getIntExtra(GoalDetailsActivity.EXTRA_UPDATED_GOAL_ID, -1);
+        if (updatedGoalId != -1) {
+            double updatedCurrentAmount = data.getDoubleExtra(GoalDetailsActivity.EXTRA_UPDATED_CURRENT_AMOUNT, -1);
+            if (updatedCurrentAmount >= 0) {
+                updateGoalSavings(updatedGoalId, updatedCurrentAmount);
+            }
+        }
+    }
+
+    private void updateGoalSavings(int goalId, double updatedCurrentAmount) {
+        for (Goal goal : allGoalsList) {
+            if (goal.getId() == goalId) {
+                goal.setCurrentAmount(updatedCurrentAmount);
+                break;
+            }
+        }
+
+        for (Goal goal : goalsList) {
+            if (goal.getId() == goalId) {
+                goal.setCurrentAmount(updatedCurrentAmount);
+                break;
+            }
+        }
+
+        goalAdapter.notifyDataSetChanged();
+        calculateTotalSaved();
+        updateEmptyState();
     }
 
     /**
@@ -238,27 +299,55 @@ public class GoalsActivity extends AppCompatActivity implements GoalAdapter.OnGo
                 .setTitle("Delete Goal")
                 .setMessage("Are you sure you want to delete \"" + goal.getName() + "\"?")
                 .setPositiveButton("Delete", (dialog, which) -> {
-                    goalAdapter.removeGoal(goal.getId());
-                    allGoalsList.removeIf(g -> g.getId() == goal.getId());
-                    calculateTotalSaved();
-                    updateEmptyState();
-                    Toast.makeText(this, "Goal deleted", Toast.LENGTH_SHORT).show();
+                    String userId = authManager.getCurrentUserId();
+                    if (userId == null || userId.isEmpty()) {
+                        Toast.makeText(this, "User not authenticated", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    goalRepository.deleteGoal(userId, goal.getId(), new GoalRepository.DeleteGoalCallback() {
+                        @Override
+                        public void onSuccess() {
+                            goalAdapter.removeGoal(goal.getId());
+                            allGoalsList.removeIf(g -> g.getId() == goal.getId());
+                            calculateTotalSaved();
+                            updateEmptyState();
+                            Toast.makeText(GoalsActivity.this, "Goal deleted", Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onError(String message) {
+                            Toast.makeText(GoalsActivity.this, "Error deleting goal: " + message, Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 })
                 .setNegativeButton("Cancel", null)
                 .show();
     }
 
     /**
-     * Update empty state visibility
+     * Update empty state visibility and message based on filter
      */
     private void updateEmptyState() {
         if (goalsList.isEmpty()) {
+            // No goals in current filter
             if (emptyStateContainer != null) {
+                // Check if total goals exist
+                if (allGoalsList == null || allGoalsList.isEmpty()) {
+                    // No goals at all - show "No saving goals yet" card
+                    updateEmptyStateMessage("No Savings Goals Yet",
+                        "Start your savings journey today!\nSet goals and track your progress.", true);
+                } else {
+                    // Goals exist but filtered - show filter-specific message
+                    updateEmptyStateMessage(getEmptyFilterMessage(),
+                        getEmptyFilterSubtitle(), false);
+                }
                 emptyStateContainer.setVisibility(View.VISIBLE);
             }
             tvNoGoals.setVisibility(View.GONE);
             rvGoals.setVisibility(View.GONE);
         } else {
+            // Goals exist - hide empty state
             if (emptyStateContainer != null) {
                 emptyStateContainer.setVisibility(View.GONE);
             }
@@ -268,10 +357,93 @@ public class GoalsActivity extends AppCompatActivity implements GoalAdapter.OnGo
     }
 
     /**
+     * Get empty state message based on current filter
+     */
+    private String getEmptyFilterMessage() {
+        if (currentFilterId == R.id.chip_completed) {
+            return "No Completed Goals Yet";
+        } else if (currentFilterId == R.id.chip_in_progress) {
+            return "No In Progress Goals";
+        } else if (currentFilterId == R.id.chip_near_target) {
+            return "No Goals Near Target";
+        }
+        return "No Savings Goals Yet";
+    }
+
+    /**
+     * Get empty state subtitle based on current filter
+     */
+    private String getEmptyFilterSubtitle() {
+        if (currentFilterId == R.id.chip_completed) {
+            return "Complete your goals to see them here!";
+        } else if (currentFilterId == R.id.chip_in_progress) {
+            return "You don't have any in-progress goals yet.";
+        } else if (currentFilterId == R.id.chip_near_target) {
+            return "Keep saving! Your goals are almost complete.";
+        }
+        return "Start your savings journey today!\nSet goals and track your progress.";
+    }
+
+    /**
+     * Update empty state text views
+     */
+    private void updateEmptyStateMessage(String title, String subtitle, boolean showButton) {
+        if (emptyStateContainer != null) {
+            TextView tvTitle = emptyStateContainer.findViewById(R.id.tv_empty_title);
+            TextView tvSubtitle = emptyStateContainer.findViewById(R.id.tv_empty_subtitle);
+            MaterialButton btnCreateGoal = emptyStateContainer.findViewById(R.id.btn_create_first_goal);
+
+            if (tvTitle != null) {
+                tvTitle.setText(title);
+            }
+            if (tvSubtitle != null) {
+                tvSubtitle.setText(subtitle);
+            }
+            if (btnCreateGoal != null) {
+                btnCreateGoal.setVisibility(showButton ? View.VISIBLE : View.GONE);
+            }
+        }
+    }
+
+    /**
      * Load goals from database or local storage
-     * TODO: Replace with actual database/API calls
+     * Uses GoalRepository to fetch from local database and sync with Firebase
      */
     private void loadGoals() {
+        // Get current user ID
+        String userId = authManager.getCurrentUserId();
+        if (userId == null) {
+            Toast.makeText(this, "User not authenticated", Toast.LENGTH_SHORT).show();
+            // Show sample goals for testing if not authenticated
+            loadSampleGoals();
+            return;
+        }
+
+        // Load goals from repository
+        goalRepository.loadGoals(userId, new GoalRepository.LoadGoalsCallback() {
+            @Override
+            public void onGoalsLoaded(List<Goal> goals) {
+                goalsList.clear();
+                allGoalsList.clear();
+                allGoalsList.addAll(goals);
+                goalsList.addAll(goals);
+                goalAdapter.updateGoals(goalsList);
+                updateEmptyState();
+            }
+
+            @Override
+            public void onError(String message) {
+                Toast.makeText(GoalsActivity.this, "Error loading goals: " + message, Toast.LENGTH_SHORT).show();
+                // Fall back to sample goals
+                loadSampleGoals();
+            }
+        });
+    }
+
+    /**
+     * Load sample goals for testing (fallback when database is empty)
+     */
+    private void loadSampleGoals() {
         goalsList.clear();
         allGoalsList.clear();
 
@@ -361,8 +533,8 @@ public class GoalsActivity extends AppCompatActivity implements GoalAdapter.OnGo
             totalSaved += goal.getCurrentAmount();
         }
 
-        tvTotalSaved.setText(String.format("LKR %.0f", totalSaved));
-        tvActiveGoalsCount.setText(allGoalsList.size() + " active goals");
+        tvTotalSaved.setText(String.format(Locale.getDefault(), "LKR %.0f", totalSaved));
+        tvActiveGoalsCount.setText(getString(R.string.goal_active_count, allGoalsList.size()));
     }
 
     /**
