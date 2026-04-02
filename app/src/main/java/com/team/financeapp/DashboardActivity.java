@@ -691,7 +691,7 @@ public class DashboardActivity extends AppCompatActivity {
         dueView.setText(formatDueLabel(bill.getDueDate()));
         amountView.setText(formatMoney(bill.getAmount()));
         if (iconView != null) {
-            iconView.setImageResource(resolveBillIcon(bill));
+            DrawableUtils.safeSetImageResource(iconView, resolveBillIcon(bill), R.drawable.ic_receipt);
         }
     }
 

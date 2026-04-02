@@ -67,8 +67,8 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalViewHolder
         holder.tvTargetDate.setText(targetDateStr);
         
         // Set category icon
-        holder.ivCategoryIcon.setImageResource(goal.getCategoryIcon());
-        holder.ivCategoryIcon.setBackgroundResource(goal.getProgressCircleBackground());
+        DrawableUtils.safeSetImageResource(holder.ivCategoryIcon, goal.getCategoryIcon(), R.drawable.ic_wallet);
+        DrawableUtils.safeSetBackgroundResource(holder.ivCategoryIcon, goal.getProgressCircleBackground(), R.drawable.circle_blue_light);
         
         // Set progress percentage
         int progress = Math.min(goal.getProgressPercentage(), 100);

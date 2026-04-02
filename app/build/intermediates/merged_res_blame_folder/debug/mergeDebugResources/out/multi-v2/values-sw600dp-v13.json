@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.team.financeapp-mergeDebugResources-3:/values-sw600dp-v13/values-sw600dp-v13.xml",
+            "outputFile": "com.team.financeapp-mergeDebugResources-47:/values-sw600dp-v13/values-sw600dp-v13.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\samudu\\.gradle\\caches\\9.1.0\\transforms\\ed2ecdb05fc107f100743c0666bbd2ac\\workspace\\transformed\\appcompat-1.6.1\\res\\values-sw600dp-v13\\values-sw600dp-v13.xml",
+                    "source": "C:\\Users\\ASUS\\.gradle\\caches\\9.2.1\\transforms\\0ecce84873fbde75f65776919b19d274\\workspace\\transformed\\appcompat-1.6.1\\res\\values-sw600dp-v13\\values-sw600dp-v13.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9",
                         "startColumns": "4,4,4,4,4,4,4,4",
@@ -14,7 +14,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\samudu\\.gradle\\caches\\9.1.0\\transforms\\8fa91f03ca4b878263ee59f78a358451\\workspace\\transformed\\material-1.10.0\\res\\values-sw600dp-v13\\values-sw600dp-v13.xml",
+                    "source": "C:\\Users\\ASUS\\.gradle\\caches\\9.2.1\\transforms\\ade5a52c2cecb4fd276c33dd5c0392da\\workspace\\transformed\\material-1.10.0\\res\\values-sw600dp-v13\\values-sw600dp-v13.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,10,11,12,13,14",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4",
@@ -30,16 +30,6 @@
                         "endLines": "10,11,12,13,14,15,17,18,19,20,21,25",
                         "endColumns": "59,69,70,71,57,57,10,63,55,58,62,10",
                         "endOffsets": "666,736,807,879,937,995,1104,1168,1224,1283,1346,1518"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\ASUS\\.gradle\\caches\\9.2.1\\transforms\\2fba7b151fcca111383a2f5a16a26f82\\workspace\\transformed\\appcompat-1.6.1\\res\\values-sw600dp-v13\\values-sw600dp-v13.xml",
-                    "from": {
-                        "startLines": "2,3,4,5,6,7,8,9",
-                        "startColumns": "4,4,4,4,4,4,4,4",
-                        "startOffsets": "55,124,193,263,337,413,472,543",
-                        "endColumns": "68,68,69,73,75,58,70,67",
-                        "endOffsets": "119,188,258,332,408,467,538,606"
                     }
                 }
             ]

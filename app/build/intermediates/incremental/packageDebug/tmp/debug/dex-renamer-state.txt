@@ -1,13 +1,13 @@
-#Wed Apr 01 18:48:11 IST 2026
-base.0=C\:\\HND note & projcts\\Mobile\\cw1\\Personal-finance-management-app\\app\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes.dex
-base.1=C\:\\HND note & projcts\\Mobile\\cw1\\Personal-finance-management-app\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\0\\classes.dex
-base.2=C\:\\HND note & projcts\\Mobile\\cw1\\Personal-finance-management-app\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\13\\classes.dex
-base.3=C\:\\HND note & projcts\\Mobile\\cw1\\Personal-finance-management-app\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\14\\classes.dex
-base.4=C\:\\HND note & projcts\\Mobile\\cw1\\Personal-finance-management-app\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\2\\classes.dex
-base.5=C\:\\HND note & projcts\\Mobile\\cw1\\Personal-finance-management-app\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\3\\classes.dex
-base.6=C\:\\HND note & projcts\\Mobile\\cw1\\Personal-finance-management-app\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\8\\classes.dex
-base.7=C\:\\HND note & projcts\\Mobile\\cw1\\Personal-finance-management-app\\app\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes2.dex
-base.8=C\:\\HND note & projcts\\Mobile\\cw1\\Personal-finance-management-app\\app\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes3.dex
+#Thu Apr 02 21:16:34 IST 2026
+base.0=D\:\\HDSE\\MAD\\App\\Personal-finance-management-app-dev\\Personal-finance-management-app-dev\\app\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes.dex
+base.1=D\:\\HDSE\\MAD\\App\\Personal-finance-management-app-dev\\Personal-finance-management-app-dev\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\0\\classes.dex
+base.2=D\:\\HDSE\\MAD\\App\\Personal-finance-management-app-dev\\Personal-finance-management-app-dev\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\13\\classes.dex
+base.3=D\:\\HDSE\\MAD\\App\\Personal-finance-management-app-dev\\Personal-finance-management-app-dev\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\14\\classes.dex
+base.4=D\:\\HDSE\\MAD\\App\\Personal-finance-management-app-dev\\Personal-finance-management-app-dev\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\2\\classes.dex
+base.5=D\:\\HDSE\\MAD\\App\\Personal-finance-management-app-dev\\Personal-finance-management-app-dev\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\3\\classes.dex
+base.6=D\:\\HDSE\\MAD\\App\\Personal-finance-management-app-dev\\Personal-finance-management-app-dev\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\8\\classes.dex
+base.7=D\:\\HDSE\\MAD\\App\\Personal-finance-management-app-dev\\Personal-finance-management-app-dev\\app\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes2.dex
+base.8=D\:\\HDSE\\MAD\\App\\Personal-finance-management-app-dev\\Personal-finance-management-app-dev\\app\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes3.dex
 path.0=classes.dex
 path.1=0/classes.dex
 path.2=13/classes.dex

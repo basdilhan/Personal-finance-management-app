@@ -1,530 +1,538 @@
 [
     {
-        "merged": "com.team.financeapp-debug-5:/menu_menu_navigation.xml.flat",
-        "source": "com.team.financeapp-main-7:/menu/menu_navigation.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_ic_launcher_foreground.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/ic_launcher_foreground.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_card_elevated.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/card_elevated.xml"
+        "merged": "com.team.financeapp-debug-49:/layout_activity_dashboard.xml.flat",
+        "source": "com.team.financeapp-main-51:/layout/activity_dashboard.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_circle_yellow_light.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/circle_yellow_light.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_divider_gradient.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/divider_gradient.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_ic_wallet.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/ic_wallet.xml"
+        "merged": "com.team.financeapp-debug-49:/layout_activity_main.xml.flat",
+        "source": "com.team.financeapp-main-51:/layout/activity_main.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_ic_chevron_right.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/ic_chevron_right.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_circle_border_white.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/circle_border_white.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/xml_backup_rules.xml.flat",
-        "source": "com.team.financeapp-main-7:/xml/backup_rules.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_ic_arrow_down.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/ic_arrow_down.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/mipmap-xxxhdpi_ic_launcher_round.webp.flat",
-        "source": "com.team.financeapp-main-7:/mipmap-xxxhdpi/ic_launcher_round.webp"
+        "merged": "com.team.financeapp-debug-49:/drawable_ic_water.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/ic_water.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable-night_card_rounded_white.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable-night/card_rounded_white.xml"
+        "merged": "com.team.financeapp-debug-49:/layout_income_item.xml.flat",
+        "source": "com.team.financeapp-main-51:/layout/income_item.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_ic_electricity.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/ic_electricity.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_ic_goals.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/ic_goals.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable-night_progress_track.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable-night/progress_track.xml"
+        "merged": "com.team.financeapp-debug-49:/layout_activity_add_bill.xml.flat",
+        "source": "com.team.financeapp-main-51:/layout/activity_add_bill.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/layout_activity_add_goal.xml.flat",
-        "source": "com.team.financeapp-main-7:/layout/activity_add_goal.xml"
+        "merged": "com.team.financeapp-debug-49:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "com.team.financeapp-main-51:/mipmap-anydpi-v26/ic_launcher_round.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_circle_translucent.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/circle_translucent.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_ic_add.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/ic_add.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_rounded_background.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/rounded_background.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_action_button_bill.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/action_button_bill.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_ic_laptop.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/ic_laptop.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_rounded_background.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/rounded_background.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/layout_activity_bills.xml.flat",
-        "source": "com.team.financeapp-main-7:/layout/activity_bills.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_ic_arrow_up.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/ic_arrow_up.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/mipmap-xxxhdpi_ic_launcher.webp.flat",
-        "source": "com.team.financeapp-main-7:/mipmap-xxxhdpi/ic_launcher.webp"
+        "merged": "com.team.financeapp-debug-49:/drawable_circle_translucent.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/circle_translucent.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/layout_activity_login.xml.flat",
-        "source": "com.team.financeapp-main-7:/layout/activity_login.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable-night_popup_menu_background.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable-night/popup_menu_background.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_circle_danger_light.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/circle_danger_light.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable-night_badge_success.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable-night/badge_success.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_circle_primary.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/circle_primary.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_ic_delete.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/ic_delete.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/layout_income_item.xml.flat",
-        "source": "com.team.financeapp-main-7:/layout/income_item.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_ic_laptop.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/ic_laptop.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/menu_menu_logout.xml.flat",
-        "source": "com.team.financeapp-main-7:/menu/menu_logout.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_ic_edit.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/ic_edit.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_divider_gradient.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/divider_gradient.xml"
+        "merged": "com.team.financeapp-debug-49:/mipmap-xxxhdpi_ic_launcher.webp.flat",
+        "source": "com.team.financeapp-main-51:/mipmap-xxxhdpi/ic_launcher.webp"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_action_button_bill.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/action_button_bill.xml"
+        "merged": "com.team.financeapp-debug-49:/anim_slide_in_right.xml.flat",
+        "source": "com.team.financeapp-main-51:/anim/slide_in_right.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable-night_circle_blue_light.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable-night/circle_blue_light.xml"
+        "merged": "com.team.financeapp-debug-49:/layout_activity_login.xml.flat",
+        "source": "com.team.financeapp-main-51:/layout/activity_login.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/mipmap-hdpi_ic_launcher.webp.flat",
-        "source": "com.team.financeapp-main-7:/mipmap-hdpi/ic_launcher.webp"
+        "merged": "com.team.financeapp-debug-49:/drawable_ic_car.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/ic_car.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_badge_primary.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/badge_primary.xml"
+        "merged": "com.team.financeapp-debug-49:/layout_activity_profile.xml.flat",
+        "source": "com.team.financeapp-main-51:/layout/activity_profile.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/layout_activity_add_expense.xml.flat",
-        "source": "com.team.financeapp-main-7:/layout/activity_add_expense.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable-night_circle_warning.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable-night/circle_warning.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_ic_trending_up.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/ic_trending_up.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_badge_success.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/badge_success.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/layout_activity_home.xml.flat",
-        "source": "com.team.financeapp-main-7:/layout/activity_home.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_circle_background.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/circle_background.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/layout_activity_notifications.xml.flat",
-        "source": "com.team.financeapp-main-7:/layout/activity_notifications.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_progress_track.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/progress_track.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_card_background.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/card_background.xml"
+        "merged": "com.team.financeapp-debug-49:/layout_item_date_header.xml.flat",
+        "source": "com.team.financeapp-main-51:/layout/item_date_header.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_ic_edit.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/ic_edit.xml"
+        "merged": "com.team.financeapp-debug-49:/anim_slide_in_left.xml.flat",
+        "source": "com.team.financeapp-main-51:/anim/slide_in_left.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_ic_savings.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/ic_savings.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_circle_primary_light.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/circle_primary_light.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_circle_blue_light.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/circle_blue_light.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_circle_yellow_light.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/circle_yellow_light.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/layout_fragment_bottom_navigation.xml.flat",
-        "source": "com.team.financeapp-main-7:/layout/fragment_bottom_navigation.xml"
+        "merged": "com.team.financeapp-debug-49:/layout_activity_add_expense.xml.flat",
+        "source": "com.team.financeapp-main-51:/layout/activity_add_expense.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/mipmap-xxhdpi_ic_launcher.webp.flat",
-        "source": "com.team.financeapp-main-7:/mipmap-xxhdpi/ic_launcher.webp"
+        "merged": "com.team.financeapp-debug-49:/drawable_ic_wifi.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/ic_wifi.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/layout_activity_dashboard.xml.flat",
-        "source": "com.team.financeapp-main-7:/layout/activity_dashboard.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_ic_trending_up.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/ic_trending_up.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable-night_circle_danger_light.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable-night/circle_danger_light.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable-night_circle_danger_light.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable-night/circle_danger_light.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_ic_arrow_up.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/ic_arrow_up.xml"
+        "merged": "com.team.financeapp-debug-49:/layout_bill_item.xml.flat",
+        "source": "com.team.financeapp-main-51:/layout/bill_item.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_ic_profile.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/ic_profile.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_card_rounded_white.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/card_rounded_white.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_circle_success_light.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/circle_success_light.xml"
+        "merged": "com.team.financeapp-debug-49:/layout_activity_edit_profile.xml.flat",
+        "source": "com.team.financeapp-main-51:/layout/activity_edit_profile.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_ic_wifi.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/ic_wifi.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_ic_profile.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/ic_profile.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_ic_logout.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/ic_logout.xml"
+        "merged": "com.team.financeapp-debug-49:/menu_menu_navigation.xml.flat",
+        "source": "com.team.financeapp-main-51:/menu/menu_navigation.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_alert_background.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/alert_background.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable-night_circle_primary_light.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable-night/circle_primary_light.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/anim_slide_in_right.xml.flat",
-        "source": "com.team.financeapp-main-7:/anim/slide_in_right.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_divider_background.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/divider_background.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/layout_item_notification.xml.flat",
-        "source": "com.team.financeapp-main-7:/layout/item_notification.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_ic_logout.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/ic_logout.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/layout_activity_income_history.xml.flat",
-        "source": "com.team.financeapp-main-7:/layout/activity_income_history.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_ic_electricity.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/ic_electricity.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable-night_circle_purple_light.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable-night/circle_purple_light.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_ic_chevron_right.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/ic_chevron_right.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/anim_slide_in_left.xml.flat",
-        "source": "com.team.financeapp-main-7:/anim/slide_in_left.xml"
+        "merged": "com.team.financeapp-debug-49:/mipmap-xhdpi_ic_launcher_round.webp.flat",
+        "source": "com.team.financeapp-main-51:/mipmap-xhdpi/ic_launcher_round.webp"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_circle_warning.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/circle_warning.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_ic_menu.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/ic_menu.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/layout_activity_goal_details.xml.flat",
-        "source": "com.team.financeapp-main-7:/layout/activity_goal_details.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_circle_red.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/circle_red.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_ic_launcher_background.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/ic_launcher_background.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_circle_urgent.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/circle_urgent.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/layout_item_date_header.xml.flat",
-        "source": "com.team.financeapp-main-7:/layout/item_date_header.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_action_button_goal.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/action_button_goal.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_ic_delete.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/ic_delete.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_ic_receipt.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/ic_receipt.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_ic_expenses.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/ic_expenses.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_action_button_expense.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/action_button_expense.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_circle_border_white.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/circle_border_white.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_card_background.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/card_background.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_circle_purple_light.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/circle_purple_light.xml"
+        "merged": "com.team.financeapp-debug-49:/mipmap-xxhdpi_ic_launcher_round.webp.flat",
+        "source": "com.team.financeapp-main-51:/mipmap-xxhdpi/ic_launcher_round.webp"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/layout_expense_item.xml.flat",
-        "source": "com.team.financeapp-main-7:/layout/expense_item.xml"
+        "merged": "com.team.financeapp-debug-49:/layout_activity_forgot_password.xml.flat",
+        "source": "com.team.financeapp-main-51:/layout/activity_forgot_password.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/color-night_bottom_nav_color.xml.flat",
-        "source": "com.team.financeapp-main-7:/color-night/bottom_nav_color.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_circle_danger_light.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/circle_danger_light.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_circle_white.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/circle_white.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_ic_target.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/ic_target.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_ic_receipt.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/ic_receipt.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable-night_alert_background.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable-night/alert_background.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/layout_bill_item.xml.flat",
-        "source": "com.team.financeapp-main-7:/layout/bill_item.xml"
+        "merged": "com.team.financeapp-debug-49:/mipmap-xxhdpi_ic_launcher.webp.flat",
+        "source": "com.team.financeapp-main-51:/mipmap-xxhdpi/ic_launcher.webp"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_ic_water.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/ic_water.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_ic_person.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/ic_person.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable-night_circle_primary_light.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable-night/circle_primary_light.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_progress_bar.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/progress_bar.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/layout_activity_main.xml.flat",
-        "source": "com.team.financeapp-main-7:/layout/activity_main.xml"
+        "merged": "com.team.financeapp-debug-49:/layout_fragment_bottom_navigation.xml.flat",
+        "source": "com.team.financeapp-main-51:/layout/fragment_bottom_navigation.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_action_button_income.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/action_button_income.xml"
+        "merged": "com.team.financeapp-debug-49:/anim_slide_out_right.xml.flat",
+        "source": "com.team.financeapp-main-51:/anim/slide_out_right.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_circle_red.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/circle_red.xml"
+        "merged": "com.team.financeapp-debug-49:/mipmap-mdpi_ic_launcher.webp.flat",
+        "source": "com.team.financeapp-main-51:/mipmap-mdpi/ic_launcher.webp"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_circle_background.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/circle_background.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_circle_blue_light.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/circle_blue_light.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable-night_divider_gradient.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable-night/divider_gradient.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_circle_purple_light.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/circle_purple_light.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable-night_circle_yellow_light.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable-night/circle_yellow_light.xml"
+        "merged": "com.team.financeapp-debug-49:/mipmap-xhdpi_ic_launcher.webp.flat",
+        "source": "com.team.financeapp-main-51:/mipmap-xhdpi/ic_launcher.webp"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_ic_person.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/ic_person.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable-night_progress_bar.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable-night/progress_bar.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_circle_urgent.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/circle_urgent.xml"
+        "merged": "com.team.financeapp-debug-49:/xml_data_extraction_rules.xml.flat",
+        "source": "com.team.financeapp-main-51:/xml/data_extraction_rules.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/mipmap-hdpi_ic_launcher_round.webp.flat",
-        "source": "com.team.financeapp-main-7:/mipmap-hdpi/ic_launcher_round.webp"
+        "merged": "com.team.financeapp-debug-49:/drawable-night_card_rounded_white.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable-night/card_rounded_white.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_gradient_header.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/gradient_header.xml"
+        "merged": "com.team.financeapp-debug-49:/layout_expense_item.xml.flat",
+        "source": "com.team.financeapp-main-51:/layout/expense_item.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_popup_menu_background.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/popup_menu_background.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_circle_warning.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/circle_warning.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/mipmap-xhdpi_ic_launcher_round.webp.flat",
-        "source": "com.team.financeapp-main-7:/mipmap-xhdpi/ic_launcher_round.webp"
+        "merged": "com.team.financeapp-debug-49:/drawable-night_divider_gradient.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable-night/divider_gradient.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/layout_activity_goals.xml.flat",
-        "source": "com.team.financeapp-main-7:/layout/activity_goals.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_ic_launcher_background.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/ic_launcher_background.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_ic_menu.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/ic_menu.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_ic_lock_open.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/ic_lock_open.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/layout_activity_register.xml.flat",
-        "source": "com.team.financeapp-main-7:/layout/activity_register.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_ic_lightbulb.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/ic_lightbulb.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/layout_activity_add_income.xml.flat",
-        "source": "com.team.financeapp-main-7:/layout/activity_add_income.xml"
+        "merged": "com.team.financeapp-debug-49:/mipmap-xxxhdpi_ic_launcher_round.webp.flat",
+        "source": "com.team.financeapp-main-51:/mipmap-xxxhdpi/ic_launcher_round.webp"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/xml_data_extraction_rules.xml.flat",
-        "source": "com.team.financeapp-main-7:/xml/data_extraction_rules.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable-night_badge_primary.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable-night/badge_primary.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/layout_activity_change_password.xml.flat",
-        "source": "com.team.financeapp-main-7:/layout/activity_change_password.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_circle_white.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/circle_white.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable-night_progress_bar.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable-night/progress_bar.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_popup_menu_background.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/popup_menu_background.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_ic_arrow_down.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/ic_arrow_down.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_ic_expenses_nav.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/ic_expenses_nav.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_ic_goals.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/ic_goals.xml"
+        "merged": "com.team.financeapp-debug-49:/layout_activity_app_lock_settings.xml.flat",
+        "source": "com.team.financeapp-main-51:/layout/activity_app_lock_settings.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/layout_goal_item.xml.flat",
-        "source": "com.team.financeapp-main-7:/layout/goal_item.xml"
+        "merged": "com.team.financeapp-debug-49:/menu_bottom_nav_menu.xml.flat",
+        "source": "com.team.financeapp-main-51:/menu/bottom_nav_menu.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_ic_lock_open.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/ic_lock_open.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_card_elevated.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/card_elevated.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_progress_indicator.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/progress_indicator.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_ic_bills.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/ic_bills.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable-night_alert_background.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable-night/alert_background.xml"
+        "merged": "com.team.financeapp-debug-49:/layout_activity_change_password.xml.flat",
+        "source": "com.team.financeapp-main-51:/layout/activity_change_password.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/mipmap-anydpi-v26_ic_launcher.xml.flat",
-        "source": "com.team.financeapp-main-7:/mipmap-anydpi-v26/ic_launcher.xml"
+        "merged": "com.team.financeapp-debug-49:/xml_backup_rules.xml.flat",
+        "source": "com.team.financeapp-main-51:/xml/backup_rules.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_progress_track.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/progress_track.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable-night_progress_track.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable-night/progress_track.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_badge_success.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/badge_success.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_progress_indicator.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/progress_indicator.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/anim_slide_out_right.xml.flat",
-        "source": "com.team.financeapp-main-7:/anim/slide_out_right.xml"
+        "merged": "com.team.financeapp-debug-49:/layout_activity_bills.xml.flat",
+        "source": "com.team.financeapp-main-51:/layout/activity_bills.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/layout_activity_forgot_password.xml.flat",
-        "source": "com.team.financeapp-main-7:/layout/activity_forgot_password.xml"
+        "merged": "com.team.financeapp-debug-49:/layout_activity_expenses.xml.flat",
+        "source": "com.team.financeapp-main-51:/layout/activity_expenses.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_ic_calendar.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/ic_calendar.xml"
+        "merged": "com.team.financeapp-debug-49:/menu_menu_logout.xml.flat",
+        "source": "com.team.financeapp-main-51:/menu/menu_logout.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/mipmap-mdpi_ic_launcher_round.webp.flat",
-        "source": "com.team.financeapp-main-7:/mipmap-mdpi/ic_launcher_round.webp"
+        "merged": "com.team.financeapp-debug-49:/mipmap-mdpi_ic_launcher_round.webp.flat",
+        "source": "com.team.financeapp-main-51:/mipmap-mdpi/ic_launcher_round.webp"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/mipmap-xhdpi_ic_launcher.webp.flat",
-        "source": "com.team.financeapp-main-7:/mipmap-xhdpi/ic_launcher.webp"
+        "merged": "com.team.financeapp-debug-49:/drawable_ic_key.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/ic_key.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_ic_add.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/ic_add.xml"
+        "merged": "com.team.financeapp-debug-49:/layout_item_notification.xml.flat",
+        "source": "com.team.financeapp-main-51:/layout/item_notification.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/layout_activity_profile.xml.flat",
-        "source": "com.team.financeapp-main-7:/layout/activity_profile.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_badge_primary.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/badge_primary.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_circle_primary_light.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/circle_primary_light.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_ic_expenses.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/ic_expenses.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_card_rounded_white.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/card_rounded_white.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_circle_success_light.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/circle_success_light.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable-night_badge_primary.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable-night/badge_primary.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_button_gradient.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/button_gradient.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_ic_launcher_foreground.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/ic_launcher_foreground.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_ic_notification.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/ic_notification.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_progress_bar.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/progress_bar.xml"
+        "merged": "com.team.financeapp-debug-49:/layout_goal_item.xml.flat",
+        "source": "com.team.financeapp-main-51:/layout/goal_item.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/menu_bottom_nav_menu.xml.flat",
-        "source": "com.team.financeapp-main-7:/menu/bottom_nav_menu.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_ic_savings.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/ic_savings.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_ic_bills.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/ic_bills.xml"
+        "merged": "com.team.financeapp-debug-49:/color-night_bottom_nav_color.xml.flat",
+        "source": "com.team.financeapp-main-51:/color-night/bottom_nav_color.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_button_accent.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/button_accent.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_gradient_header.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/gradient_header.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_ic_lightbulb.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/ic_lightbulb.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_circle_primary.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/circle_primary.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable-night_badge_success.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable-night/badge_success.xml"
+        "merged": "com.team.financeapp-debug-49:/color_bottom_nav_color.xml.flat",
+        "source": "com.team.financeapp-main-51:/color/bottom_nav_color.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable-night_popup_menu_background.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable-night/popup_menu_background.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_action_button_income.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/action_button_income.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_ic_car.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/ic_car.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable-night_circle_purple_light.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable-night/circle_purple_light.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/layout_activity_add_bill.xml.flat",
-        "source": "com.team.financeapp-main-7:/layout/activity_add_bill.xml"
+        "merged": "com.team.financeapp-debug-49:/layout_activity_register.xml.flat",
+        "source": "com.team.financeapp-main-51:/layout/activity_register.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_action_button_expense.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/action_button_expense.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable-night_circle_blue_light.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable-night/circle_blue_light.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/color_bottom_nav_color.xml.flat",
-        "source": "com.team.financeapp-main-7:/color/bottom_nav_color.xml"
+        "merged": "com.team.financeapp-debug-49:/layout_activity_notifications.xml.flat",
+        "source": "com.team.financeapp-main-51:/layout/activity_notifications.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
-        "source": "com.team.financeapp-main-7:/mipmap-anydpi-v26/ic_launcher_round.xml"
+        "merged": "com.team.financeapp-debug-49:/layout_activity_app_lock.xml.flat",
+        "source": "com.team.financeapp-main-51:/layout/activity_app_lock.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_divider_background.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/divider_background.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable-night_circle_success_light.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable-night/circle_success_light.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/mipmap-mdpi_ic_launcher.webp.flat",
-        "source": "com.team.financeapp-main-7:/mipmap-mdpi/ic_launcher.webp"
+        "merged": "com.team.financeapp-debug-49:/drawable_ic_home.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/ic_home.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_ic_target.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/ic_target.xml"
+        "merged": "com.team.financeapp-debug-49:/layout_activity_goals.xml.flat",
+        "source": "com.team.financeapp-main-51:/layout/activity_goals.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/layout_activity_edit_profile.xml.flat",
-        "source": "com.team.financeapp-main-7:/layout/activity_edit_profile.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_alert_background.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/alert_background.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_button_gradient.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/button_gradient.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_ic_calendar.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/ic_calendar.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_ic_back.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/ic_back.xml"
+        "merged": "com.team.financeapp-debug-49:/mipmap-hdpi_ic_launcher.webp.flat",
+        "source": "com.team.financeapp-main-51:/mipmap-hdpi/ic_launcher.webp"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/anim_slide_out_left.xml.flat",
-        "source": "com.team.financeapp-main-7:/anim/slide_out_left.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable-night_circle_yellow_light.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable-night/circle_yellow_light.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_ic_key.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/ic_key.xml"
+        "merged": "com.team.financeapp-debug-49:/layout_activity_income_history.xml.flat",
+        "source": "com.team.financeapp-main-51:/layout/activity_income_history.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_action_button_goal.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/action_button_goal.xml"
+        "merged": "com.team.financeapp-debug-49:/layout_activity_add_income.xml.flat",
+        "source": "com.team.financeapp-main-51:/layout/activity_add_income.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_ic_notification.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/ic_notification.xml"
+        "merged": "com.team.financeapp-debug-49:/mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "com.team.financeapp-main-51:/mipmap-anydpi-v26/ic_launcher.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_ic_expenses_nav.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/ic_expenses_nav.xml"
+        "merged": "com.team.financeapp-debug-49:/layout_activity_home.xml.flat",
+        "source": "com.team.financeapp-main-51:/layout/activity_home.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/layout_activity_expenses.xml.flat",
-        "source": "com.team.financeapp-main-7:/layout/activity_expenses.xml"
+        "merged": "com.team.financeapp-debug-49:/layout_activity_add_goal.xml.flat",
+        "source": "com.team.financeapp-main-51:/layout/activity_add_goal.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable-night_circle_success_light.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable-night/circle_success_light.xml"
+        "merged": "com.team.financeapp-debug-49:/anim_slide_out_left.xml.flat",
+        "source": "com.team.financeapp-main-51:/anim/slide_out_left.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable-night_circle_warning.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable-night/circle_warning.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_ic_wallet.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/ic_wallet.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/mipmap-xxhdpi_ic_launcher_round.webp.flat",
-        "source": "com.team.financeapp-main-7:/mipmap-xxhdpi/ic_launcher_round.webp"
+        "merged": "com.team.financeapp-debug-49:/drawable_ic_back.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/ic_back.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_ic_finance.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/ic_finance.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_button_accent.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/button_accent.xml"
     },
     {
-        "merged": "com.team.financeapp-debug-5:/drawable_ic_home.xml.flat",
-        "source": "com.team.financeapp-main-7:/drawable/ic_home.xml"
+        "merged": "com.team.financeapp-debug-49:/drawable_ic_finance.xml.flat",
+        "source": "com.team.financeapp-main-51:/drawable/ic_finance.xml"
+    },
+    {
+        "merged": "com.team.financeapp-debug-49:/mipmap-hdpi_ic_launcher_round.webp.flat",
+        "source": "com.team.financeapp-main-51:/mipmap-hdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "com.team.financeapp-debug-49:/layout_activity_goal_details.xml.flat",
+        "source": "com.team.financeapp-main-51:/layout/activity_goal_details.xml"
     }
 ]

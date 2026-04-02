@@ -46,6 +46,7 @@ dependencies {
     implementation(libs.work.runtime)
     implementation(libs.concurrent.futures)
     implementation(libs.guava)
+    implementation(libs.biometric)
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)

@@ -316,8 +316,18 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Change Password"
-            android:layout_marginBottom="32dp"
+            android:layout_marginBottom="12dp"
             app:icon="@drawable/ic_key"
+            app:iconGravity="textStart"
+            style="@style/Widget.Material3.Button.OutlinedButton" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_app_lock"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/settings_app_lock"
+            android:layout_marginBottom="32dp"
+            app:icon="@drawable/ic_lock_open"
             app:iconGravity="textStart"
             style="@style/Widget.Material3.Button.OutlinedButton" />
     </LinearLayout>

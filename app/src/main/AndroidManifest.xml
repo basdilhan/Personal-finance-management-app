@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
 
     <application
         android:name=".FinanceApplication"
@@ -33,6 +34,8 @@
         <activity android:name=".GoalsActivity" android:exported="false" />
         <activity android:name=".ProfileActivity" android:exported="false" />
         <activity android:name=".EditProfileActivity" android:exported="false" />
+        <activity android:name=".AppLockActivity" android:exported="false" />
+        <activity android:name=".AppLockSettingsActivity" android:exported="false" />
         <activity android:name=".AddExpenseActivity" android:exported="false" />
         <activity android:name=".AddIncomeActivity" android:exported="false" />
         <activity android:name=".IncomeHistoryActivity" android:exported="false" />

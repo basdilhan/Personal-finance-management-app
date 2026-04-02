@@ -192,7 +192,7 @@ public class ExpenseAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
 
         public void bind(Expense expense, OnExpenseItemClickListener listener) {
-            ivCategoryIcon.setImageResource(expense.getCategoryIcon());
+            DrawableUtils.safeSetImageResource(ivCategoryIcon, expense.getCategoryIcon(), R.drawable.ic_receipt);
             tvCategoryName.setText(expense.getCategory());
             tvTime.setText(expense.getTime());
             tvAmount.setText(String.format("LKR %.2f", expense.getAmount()));
