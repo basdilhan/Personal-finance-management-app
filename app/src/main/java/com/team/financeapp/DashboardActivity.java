@@ -1,6 +1,7 @@
 package com.team.financeapp;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -48,8 +49,11 @@ import java.util.Map;
 public class DashboardActivity extends AppCompatActivity {
 
     private static final long BACK_PRESS_EXIT_INTERVAL_MS = 2000;
+    private static final String PREF_DASHBOARD = "dashboard_preferences";
+    private static final String KEY_BALANCE_VISIBLE = "balance_visible";
 
     private MaterialButton btnLogout;
+    private MaterialButton buttonToggleBalanceVisibility;
     private View actionAddExpense, actionAddIncome, actionAddBill, actionAddGoal;
     private View btnNotifications;
     private View notificationBadge;
@@ -105,6 +109,9 @@ public class DashboardActivity extends AppCompatActivity {
     private List<GoalSummary> latestGoals = new ArrayList<>();
     private List<IncomeEntry> latestIncomes = new ArrayList<>();
     private double currentMonthIncome = 0.0d;
+    private double currentTotalBalance = 0.0d;
+    private double currentTotalExpenses = 0.0d;
+    private boolean isBalanceVisible = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,6 +124,7 @@ public class DashboardActivity extends AppCompatActivity {
         incomeRepository = new IncomeRepository(this);
         firestore = FirebaseFirestore.getInstance();
         initializeViews();
+        loadPrivacyPreference();
         BottomNavigationFragment.attach(this, R.id.bottom_navigation_container, R.id.nav_home);
         setupClickListeners();
         setupBackPressedCallback();
@@ -127,8 +135,19 @@ public class DashboardActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        // Always start hidden when user returns to the app for better privacy.
+        isBalanceVisible = false;
+        savePrivacyPreference();
         BottomNavigationFragment.attach(this, R.id.bottom_navigation_container, R.id.nav_home);
         loadDashboardData();
+    }
+
+    @Override
+    protected void onPause() {
+        // Hide sensitive wallet figures whenever dashboard leaves foreground.
+        isBalanceVisible = false;
+        savePrivacyPreference();
+        super.onPause();
     }
 
     /**
@@ -146,6 +165,7 @@ public class DashboardActivity extends AppCompatActivity {
         textTotalBalance = findViewById(R.id.text_total_balance);
         textIncomeAmount = findViewById(R.id.text_income_amount);
         textExpensesAmount = findViewById(R.id.text_expenses_amount);
+        buttonToggleBalanceVisibility = findViewById(R.id.button_toggle_balance_visibility);
         textBalanceTrend = findViewById(R.id.text_balance_trend);
         textBalanceTrendCaption = findViewById(R.id.text_balance_trend_caption);
         textAlertMessage = findViewById(R.id.text_alert_message);
@@ -184,6 +204,43 @@ public class DashboardActivity extends AppCompatActivity {
         actionAddGoal = findViewById(R.id.action_add_goal);
         btnNotifications = findViewById(R.id.btn_notifications);
         notificationBadge = findViewById(R.id.notification_badge);
+    }
+
+    private void loadPrivacyPreference() {
+        SharedPreferences preferences = getSharedPreferences(PREF_DASHBOARD, MODE_PRIVATE);
+        isBalanceVisible = preferences.getBoolean(KEY_BALANCE_VISIBLE, false);
+    }
+
+    private void savePrivacyPreference() {
+        getSharedPreferences(PREF_DASHBOARD, MODE_PRIVATE)
+                .edit()
+                .putBoolean(KEY_BALANCE_VISIBLE, isBalanceVisible)
+                .apply();
+    }
+
+    private void applyBalancePrivacyState() {
+        if (textTotalBalance == null || textIncomeAmount == null || textExpensesAmount == null) {
+            return;
+        }
+
+        if (isBalanceVisible) {
+            textTotalBalance.setText(formatMoney(currentTotalBalance));
+            textIncomeAmount.setText(formatMoney(currentMonthIncome));
+            textExpensesAmount.setText(formatMoney(currentTotalExpenses));
+        } else {
+            textTotalBalance.setText("••••••");
+            textIncomeAmount.setText("••••••");
+            textExpensesAmount.setText("••••••");
+        }
+
+        if (buttonToggleBalanceVisibility != null) {
+            buttonToggleBalanceVisibility.setIconResource(isBalanceVisible
+                ? R.drawable.ic_eye_open
+                : R.drawable.ic_eye_closed);
+            buttonToggleBalanceVisibility.setContentDescription(getString(isBalanceVisible
+                ? R.string.dashboard_hide_amounts
+                : R.string.dashboard_show_amounts));
+        }
     }
 
     private int getColorCompat(@ColorRes int colorResId) {
@@ -344,19 +401,12 @@ public class DashboardActivity extends AppCompatActivity {
     private void updateDashboardTotalsAndInsight() {
         double monthlyExpenses = sumAllExpenses();
         double totalUpcomingBills = sumUpcomingUnpaidBills();
-
-        if (textIncomeAmount != null) {
-            textIncomeAmount.setText(formatMoney(currentMonthIncome));
-        }
-        if (textExpensesAmount != null) {
-            textExpensesAmount.setText(formatMoney(monthlyExpenses));
-        }
+        currentTotalExpenses = monthlyExpenses;
 
         // Balance represents monthly cash position after known upcoming unpaid bills.
         double totalBalance = currentMonthIncome - monthlyExpenses - totalUpcomingBills;
-        if (textTotalBalance != null) {
-            textTotalBalance.setText(formatMoney(totalBalance));
-        }
+        currentTotalBalance = totalBalance;
+        applyBalancePrivacyState();
 
         updateBalanceTrend(totalBalance);
 
@@ -377,6 +427,13 @@ public class DashboardActivity extends AppCompatActivity {
 
     private void updateBalanceTrend(double currentNet) {
         if (textBalanceTrend == null || textBalanceTrendCaption == null) {
+            return;
+        }
+
+        if (!isBalanceVisible) {
+            textBalanceTrend.setText("••••");
+            textBalanceTrend.setTextColor(getColorCompat(R.color.text_secondary));
+            textBalanceTrendCaption.setText(R.string.dashboard_amounts_hidden);
             return;
         }
 
@@ -972,6 +1029,18 @@ public class DashboardActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        if (buttonToggleBalanceVisibility != null) {
+            buttonToggleBalanceVisibility.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    isBalanceVisible = !isBalanceVisible;
+                    savePrivacyPreference();
+                    applyBalancePrivacyState();
+                    updateBalanceTrend(currentTotalBalance);
+                }
+            });
+        }
 
     }
 

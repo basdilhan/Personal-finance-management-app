@@ -94,6 +94,11 @@
     <string name="goal_progress_percent">%1$d%%</string>
     <string name="goal_active_count">%1$d active goals</string>
 
+    <!-- Dashboard privacy -->
+    <string name="dashboard_hide_amounts">Hide</string>
+    <string name="dashboard_show_amounts">Show</string>
+    <string name="dashboard_amounts_hidden">Hidden</string>
+
     <!-- App Lock -->
     <string name="app_lock_title">Unlock DreamSaver</string>
     <string name="app_lock_subtitle">Use your PIN or biometric to continue.</string>

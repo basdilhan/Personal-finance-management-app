@@ -203,6 +203,23 @@
                                     android:orientation="vertical"
                                     android:gravity="end">
 
+                                    <com.google.android.material.button.MaterialButton
+                                        android:id="@+id/button_toggle_balance_visibility"
+                                        style="@style/Widget.Material3.Button.TextButton"
+                                        android:layout_width="36dp"
+                                        android:layout_height="36dp"
+                                        android:minWidth="0dp"
+                                        android:minHeight="0dp"
+                                        android:contentDescription="@string/dashboard_show_amounts"
+                                        android:padding="0dp"
+                                        android:layout_marginBottom="6dp"
+                                        app:icon="@drawable/ic_eye_closed"
+                                        app:iconTint="@color/text_secondary"
+                                        app:iconPadding="0dp"
+                                        app:iconGravity="textStart"
+                                        android:insetTop="0dp"
+                                        android:insetBottom="0dp" />
+
                                     <LinearLayout
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"

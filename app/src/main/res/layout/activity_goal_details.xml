@@ -41,7 +41,7 @@
                         android:layout_height="44dp"
                         android:background="@drawable/circle_translucent"
                         android:contentDescription="Back"
-                        app:icon="@drawable/ic_arrow_down"
+                        app:icon="@drawable/ic_back"
                         app:iconTint="@color/white"
                         app:iconGravity="textStart"
                         app:iconPadding="0dp" />
