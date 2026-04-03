@@ -1,8 +1,13 @@
 package com.team.financeapp;
 
+import android.Manifest;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Build;
+import android.provider.Settings;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,9 +18,10 @@ import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.ColorRes;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.Legend;
@@ -49,8 +55,15 @@ import java.util.Map;
 public class DashboardActivity extends AppCompatActivity {
 
     private static final long BACK_PRESS_EXIT_INTERVAL_MS = 2000;
+<<<<<<< HEAD
     private static final String PREF_DASHBOARD = "dashboard_preferences";
     private static final String KEY_BALANCE_VISIBLE = "balance_visible";
+=======
+    private static final int REQUEST_NOTIFICATION_PERMISSION = 2001;
+    private static final String PREFS_NAME = "finance_preferences";
+    private static final String PREF_NOTIFICATION_PERMISSION_PROMPTED = "notification_permission_prompted";
+    private static final String PREF_NOTIFICATION_SETTINGS_HINT_SHOWN = "notification_settings_hint_shown";
+>>>>>>> origin/puli
 
     private MaterialButton btnLogout;
     private MaterialButton buttonToggleBalanceVisibility;
@@ -124,7 +137,11 @@ public class DashboardActivity extends AppCompatActivity {
         incomeRepository = new IncomeRepository(this);
         firestore = FirebaseFirestore.getInstance();
         initializeViews();
+<<<<<<< HEAD
         loadPrivacyPreference();
+=======
+        ensureNotificationPermission();
+>>>>>>> origin/puli
         BottomNavigationFragment.attach(this, R.id.bottom_navigation_container, R.id.nav_home);
         setupClickListeners();
         setupBackPressedCallback();
@@ -297,6 +314,76 @@ public class DashboardActivity extends AppCompatActivity {
         loadExpenses(userId);
         loadGoals(userId);
         loadIncome(userId);
+    }
+
+    private void ensureNotificationPermission() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            return;
+        }
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                == PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+
+        SharedPreferences preferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        boolean prompted = preferences.getBoolean(PREF_NOTIFICATION_PERMISSION_PROMPTED, false);
+        boolean shouldShowRationale = ActivityCompat.shouldShowRequestPermissionRationale(
+                this,
+                Manifest.permission.POST_NOTIFICATIONS
+        );
+
+        if (!prompted || shouldShowRationale) {
+            preferences.edit().putBoolean(PREF_NOTIFICATION_PERMISSION_PROMPTED, true).apply();
+            ActivityCompat.requestPermissions(
+                    this,
+                    new String[]{Manifest.permission.POST_NOTIFICATIONS},
+                    REQUEST_NOTIFICATION_PERMISSION
+            );
+            return;
+        }
+
+        if (!preferences.getBoolean(PREF_NOTIFICATION_SETTINGS_HINT_SHOWN, false)) {
+            preferences.edit().putBoolean(PREF_NOTIFICATION_SETTINGS_HINT_SHOWN, true).apply();
+            showNotificationSettingsDialog();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode != REQUEST_NOTIFICATION_PERMISSION) {
+            return;
+        }
+
+        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this, "Notifications enabled", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Toast.makeText(this, "Notifications are off. Goal and bill reminders may not appear.", Toast.LENGTH_LONG).show();
+    }
+
+    private void showNotificationSettingsDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("Enable notifications")
+                .setMessage("Goal and bill reminders are blocked. Enable notifications in app settings.")
+                .setPositiveButton("Open settings", (dialog, which) -> openAppNotificationSettings())
+                .setNegativeButton("Not now", null)
+                .show();
+    }
+
+    private void openAppNotificationSettings() {
+        Intent intent = new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                .putExtra(Settings.EXTRA_APP_PACKAGE, getPackageName());
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+            return;
+        }
+
+        Intent fallback = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                .setData(Uri.parse("package:" + getPackageName()));
+        startActivity(fallback);
     }
 
     private void bindUserHeader() {
