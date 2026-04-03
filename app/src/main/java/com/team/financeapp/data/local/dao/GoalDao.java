@@ -16,6 +16,9 @@ public interface GoalDao {
     @Query("SELECT * FROM goals WHERE userId = :userId AND deleted = 0 ORDER BY targetDate ASC")
     List<GoalEntity> getByUser(String userId);
 
+    @Query("SELECT * FROM goals WHERE userId = :userId ORDER BY targetDate ASC")
+    List<GoalEntity> getAllByUser(String userId);
+
     @Query("SELECT * FROM goals WHERE userId = :userId AND syncState != 'SYNCED'")
     List<GoalEntity> getPendingSync(String userId);
 
