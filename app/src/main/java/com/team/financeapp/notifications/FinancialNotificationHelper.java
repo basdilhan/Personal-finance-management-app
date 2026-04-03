@@ -62,6 +62,7 @@ public final class FinancialNotificationHelper {
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
 
         NotificationManagerCompat.from(context).notify(notificationId, builder.build());
+        NotificationCenterStore.add(context, notificationId, title, message);
     }
 
     private static void ensureChannel(Context context) {

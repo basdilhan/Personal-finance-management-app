@@ -90,6 +90,16 @@
     <string name="notifications_test_message">This is a test notification from DreamSaver.</string>
     <string name="notifications_test_sent">Test notification sent</string>
     <string name="notifications_enable_first">Enable notifications first</string>
+    <string name="notifications_clear_all">Clear all</string>
+    <string name="notifications_delete">Delete notification</string>
+    <string name="notifications_cleared">All notifications cleared</string>
+    <string name="notifications_unread_badge">%1$d new</string>
+    <string name="notifications_delete_confirm_title">Delete notification</string>
+    <string name="notifications_delete_confirm_message">Are you sure you want to delete this notification?</string>
+    <string name="notifications_delete_action">Delete</string>
+    <string name="notifications_clear_all_confirm_title">Clear all notifications</string>
+    <string name="notifications_clear_all_confirm_message">Are you sure you want to delete all notifications?</string>
+    <string name="notifications_clear_all_action">Clear all</string>
     <string name="cd_notification_icon">Notification icon</string>
 
     <!-- Goal progress states -->
