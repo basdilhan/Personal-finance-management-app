@@ -16,6 +16,9 @@ public interface BillDao {
     @Query("SELECT * FROM bills WHERE userId = :userId AND deleted = 0 ORDER BY dueDate ASC")
     List<BillEntity> getByUser(String userId);
 
+    @Query("SELECT * FROM bills WHERE userId = :userId ORDER BY dueDate ASC")
+    List<BillEntity> getAllByUser(String userId);
+
     @Query("SELECT * FROM bills WHERE userId = :userId AND syncState != 'SYNCED'")
     List<BillEntity> getPendingSync(String userId);
 

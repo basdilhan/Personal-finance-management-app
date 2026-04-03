@@ -15,6 +15,7 @@ import com.team.financeapp.data.local.AppDatabase;
 import com.team.financeapp.data.local.SyncState;
 import com.team.financeapp.data.local.dao.BillDao;
 import com.team.financeapp.data.local.entity.BillEntity;
+import com.team.financeapp.notifications.FinancialReminderScheduler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,12 +47,14 @@ public class BillRepository {
 
     private static final ExecutorService IO = Executors.newSingleThreadExecutor();
 
+    private final Context appContext;
     private final BillDao billDao;
     private final FirebaseFirestore firestore;
     private final Handler mainHandler;
 
     public BillRepository(@NonNull Context context) {
-        this.billDao = AppDatabase.getInstance(context).billDao();
+        this.appContext = context.getApplicationContext();
+        this.billDao = AppDatabase.getInstance(appContext).billDao();
         this.firestore = FirebaseFirestore.getInstance();
         this.mainHandler = new Handler(Looper.getMainLooper());
     }
@@ -76,6 +79,8 @@ public class BillRepository {
         IO.execute(() -> {
             long localId = billDao.insert(entity);
             entity.localId = localId;
+            FinancialReminderScheduler.scheduleBillReminder(appContext, entity);
+            FinancialReminderScheduler.scheduleBillAddedReminder(appContext, entity);
             mainHandler.post(callback::onSuccess);
             pushBillToRemote(entity, callback);
         });
@@ -102,6 +107,7 @@ public class BillRepository {
             existing.updatedAt = System.currentTimeMillis();
 
             billDao.update(existing);
+            FinancialReminderScheduler.scheduleBillReminder(appContext, existing);
             mainHandler.post(callback::onSuccess);
             pushBillToRemote(existing, callback);
         });
@@ -119,6 +125,7 @@ public class BillRepository {
             existing.syncState = SyncState.PENDING;
             existing.updatedAt = System.currentTimeMillis();
             billDao.update(existing);
+            FinancialReminderScheduler.cancelBillReminder(appContext, existing.remoteId);
             mainHandler.post(callback::onSuccess);
             pushBillToRemote(existing, callback);
         });
@@ -134,8 +141,17 @@ public class BillRepository {
                         remoteEntities.add(fromDocument(document));
                     }
 
+                    for (BillEntity bill : billDao.getAllByUser(userId)) {
+                        FinancialReminderScheduler.cancelBillDueReminders(appContext, bill.remoteId);
+                    }
+
                     billDao.deleteAllForUser(userId);
                     billDao.insertAll(remoteEntities);
+
+                    for (BillEntity bill : billDao.getByUser(userId)) {
+                        FinancialReminderScheduler.scheduleBillReminder(appContext, bill);
+                    }
+
                     List<Bill> latest = toBills(billDao.getByUser(userId));
                     mainHandler.post(() -> callback.onBillsLoaded(latest));
                 }))

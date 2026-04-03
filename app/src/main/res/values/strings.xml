@@ -81,6 +81,11 @@
     <string name="notifications_title">Notifications</string>
     <string name="notifications_subtitle">Stay updated with reminders and insights</string>
     <string name="notifications_empty">No notifications right now</string>
+    <string name="notifications_test_button">Test</string>
+    <string name="notifications_test_title">Test notification</string>
+    <string name="notifications_test_message">This is a test notification from DreamSaver.</string>
+    <string name="notifications_test_sent">Test notification sent</string>
+    <string name="notifications_enable_first">Enable notifications first</string>
     <string name="cd_notification_icon">Notification icon</string>
 
     <!-- Goal progress states -->
