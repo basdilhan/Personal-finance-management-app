@@ -114,8 +114,14 @@
     <string name="app_lock_save_pin">Save PIN</string>
     <string name="app_lock_pin_saved">PIN saved</string>
     <string name="app_lock_pin_removed">PIN removed</string>
+    <string name="app_lock_no_pin_set">No PIN is currently set</string>
     <string name="app_lock_pin_too_short">PIN must be at least 4 digits</string>
     <string name="app_lock_pin_mismatch">PINs do not match</string>
+    <string name="app_lock_verify_current_pin_title">Verify current PIN</string>
+    <string name="app_lock_verify_current_pin_change_message">Enter your current PIN to change it.</string>
+    <string name="app_lock_verify_current_pin_remove_message">Enter your current PIN to remove app lock.</string>
+    <string name="app_lock_current_pin_hint">Current PIN</string>
+    <string name="app_lock_invalid_current_pin">Current PIN is incorrect</string>
     <string name="app_lock_status_enabled">App lock is on</string>
     <string name="app_lock_status_disabled">App lock is off</string>
     <string name="app_lock_biometric_on">Biometric unlock is on</string>

@@ -201,6 +201,19 @@ public class AppLockSettingsActivity extends AppCompatActivity {
             return;
         }
 
+        if (AppLockManager.hasPin(this)) {
+            verifyCurrentPinThen(
+                    getString(R.string.app_lock_verify_current_pin_title),
+                    getString(R.string.app_lock_verify_current_pin_change_message),
+                    () -> saveNewPin(pin));
+            return;
+        }
+
+        saveNewPin(pin);
+    }
+
+    private void saveNewPin(String pin) {
+
         AppLockManager.setPin(this, pin);
         AppLockManager.setAppLockEnabled(this, true);
         AppLockManager.markSessionUnlocked();
@@ -216,6 +229,18 @@ public class AppLockSettingsActivity extends AppCompatActivity {
     }
 
     private void removePin() {
+        if (!AppLockManager.hasPin(this)) {
+            Toast.makeText(this, R.string.app_lock_no_pin_set, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        verifyCurrentPinThen(
+                getString(R.string.app_lock_verify_current_pin_title),
+                getString(R.string.app_lock_verify_current_pin_remove_message),
+                this::removePinAfterVerification);
+    }
+
+    private void removePinAfterVerification() {
         AppLockManager.clearPin(this);
         AppLockManager.lockSession();
 
@@ -228,6 +253,36 @@ public class AppLockSettingsActivity extends AppCompatActivity {
         inputConfirmPin.setText("");
         refreshStatusTexts();
         Toast.makeText(this, R.string.app_lock_pin_removed, Toast.LENGTH_SHORT).show();
+    }
+
+    private void verifyCurrentPinThen(String title, String message, Runnable onVerified) {
+        final TextInputEditText currentPinInput = new TextInputEditText(this);
+        currentPinInput.setHint(R.string.app_lock_current_pin_hint);
+        currentPinInput.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_VARIATION_PASSWORD);
+
+        androidx.appcompat.app.AlertDialog dialog = new MaterialAlertDialogBuilder(this)
+                .setTitle(title)
+                .setMessage(message)
+                .setView(currentPinInput)
+                .setPositiveButton(R.string.ok, null)
+                .setNegativeButton(R.string.cancel, (d, which) -> {
+                })
+                .create();
+
+        dialog.setOnShowListener(d -> dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)
+                .setOnClickListener(v -> {
+                    String currentPin = currentPinInput.getText() == null
+                            ? ""
+                            : currentPinInput.getText().toString().trim();
+                    if (!AppLockManager.verifyPin(this, currentPin)) {
+                        Toast.makeText(this, R.string.app_lock_invalid_current_pin, Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    dialog.dismiss();
+                    onVerified.run();
+                }));
+
+        dialog.show();
     }
 
     private void refreshStatusTexts() {
