@@ -121,7 +121,7 @@ public class GoalDetailsActivity extends AppCompatActivity {
      */
     private void populateData() {
         // Set icon
-        ivGoalIcon.setImageResource(goalIcon);
+        DrawableUtils.safeSetImageResource(ivGoalIcon, goalIcon, R.drawable.ic_wallet);
 
         // Set name and category
         tvGoalName.setText(goalName != null ? goalName : "Goal");

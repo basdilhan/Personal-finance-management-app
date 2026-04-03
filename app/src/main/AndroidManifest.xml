@@ -3,6 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:name=".FinanceApplication"
@@ -33,6 +36,8 @@
         <activity android:name=".GoalsActivity" android:exported="false" />
         <activity android:name=".ProfileActivity" android:exported="false" />
         <activity android:name=".EditProfileActivity" android:exported="false" />
+        <activity android:name=".AppLockActivity" android:exported="false" />
+        <activity android:name=".AppLockSettingsActivity" android:exported="false" />
         <activity android:name=".AddExpenseActivity" android:exported="false" />
         <activity android:name=".AddIncomeActivity" android:exported="false" />
         <activity android:name=".IncomeHistoryActivity" android:exported="false" />
@@ -40,6 +45,33 @@
         <activity android:name=".AddGoalActivity" android:exported="false" />
         <activity android:name=".GoalDetailsActivity" android:exported="false" />
         <activity android:name=".NotificationsActivity" android:exported="false" />
+
+        <receiver
+            android:name=".notifications.FinancialReminderReceiver"
+            android:enabled="true"
+            android:exported="false" />
+
+        <receiver
+            android:name=".notifications.FinancialRescheduleReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".notifications.DebugNotificationTriggerReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.team.financeapp.DEBUG_TRIGGER_NOTIFICATION" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

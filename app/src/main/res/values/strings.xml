@@ -70,6 +70,10 @@
     <!-- General -->
     <string name="settings_dark_theme">Dark Theme</string>
     <string name="settings_dark_theme_subtitle">Enable dark colors across the app</string>
+    <string name="settings_app_lock">App Lock</string>
+    <string name="settings_app_lock_subtitle">Secure the app with PIN and biometric unlock</string>
+    <string name="settings_app_lock_pin">App PIN</string>
+    <string name="settings_app_lock_biometric">Biometric Unlock</string>
     <string name="cd_back">Go back</string>
     <string name="cd_notifications">Open notifications</string>
     <string name="loading">Loading…</string>
@@ -81,6 +85,11 @@
     <string name="notifications_title">Notifications</string>
     <string name="notifications_subtitle">Stay updated with reminders and insights</string>
     <string name="notifications_empty">No notifications right now</string>
+    <string name="notifications_test_button">Test</string>
+    <string name="notifications_test_title">Test notification</string>
+    <string name="notifications_test_message">This is a test notification from DreamSaver.</string>
+    <string name="notifications_test_sent">Test notification sent</string>
+    <string name="notifications_enable_first">Enable notifications first</string>
     <string name="cd_notification_icon">Notification icon</string>
 
     <!-- Goal progress states -->
@@ -89,4 +98,48 @@
     <string name="goal_status_in_progress">In Progress</string>
     <string name="goal_progress_percent">%1$d%%</string>
     <string name="goal_active_count">%1$d active goals</string>
+
+    <!-- Dashboard privacy -->
+    <string name="dashboard_hide_amounts">Hide</string>
+    <string name="dashboard_show_amounts">Show</string>
+    <string name="dashboard_amounts_hidden">Hidden</string>
+
+    <!-- App Lock -->
+    <string name="app_lock_title">Unlock DreamSaver</string>
+    <string name="app_lock_subtitle">Use your PIN or biometric to continue.</string>
+    <string name="app_lock_biometric_title">Unlock with Biometric</string>
+    <string name="app_lock_biometric_subtitle">Use fingerprint or face unlock</string>
+    <string name="app_lock_use_pin">Use PIN</string>
+    <string name="app_lock_hint_pin">Enter PIN</string>
+    <string name="app_lock_confirm_pin">Confirm PIN</string>
+    <string name="app_lock_unlock">Unlock</string>
+    <string name="app_lock_invalid_pin">Invalid PIN</string>
+    <string name="app_lock_enter_pin">Enter your PIN</string>
+    <string name="app_lock_pin_required">Set a PIN before enabling app lock</string>
+    <string name="app_lock_save_pin">Save PIN</string>
+    <string name="app_lock_pin_saved">PIN saved</string>
+    <string name="app_lock_pin_removed">PIN removed</string>
+    <string name="app_lock_no_pin_set">No PIN is currently set</string>
+    <string name="app_lock_pin_too_short">PIN must be at least 4 digits</string>
+    <string name="app_lock_pin_mismatch">PINs do not match</string>
+    <string name="app_lock_verify_current_pin_title">Verify current PIN</string>
+    <string name="app_lock_verify_current_pin_change_message">Enter your current PIN to change it.</string>
+    <string name="app_lock_verify_current_pin_remove_message">Enter your current PIN to remove app lock.</string>
+    <string name="app_lock_current_pin_hint">Current PIN</string>
+    <string name="app_lock_invalid_current_pin">Current PIN is incorrect</string>
+    <string name="app_lock_status_enabled">App lock is on</string>
+    <string name="app_lock_status_disabled">App lock is off</string>
+    <string name="app_lock_biometric_on">Biometric unlock is on</string>
+    <string name="app_lock_biometric_off">Biometric unlock is off</string>
+    <string name="app_lock_biometric_not_available">Biometric is not available on this device</string>
+    <string name="app_lock_timeout_info">App locks after %1$s in the background.</string>
+    <string name="app_lock_disable_verify_title">Turn off app lock</string>
+    <string name="app_lock_disable_verify_message">Verify your identity to turn off app lock.</string>
+    <string name="app_lock_use_biometric">Use biometric</string>
+    <string name="app_lock_disable_biometric_title">Verify biometric</string>
+    <string name="app_lock_disable_biometric_subtitle">Authenticate to turn off app lock</string>
+    <string name="app_lock_disable_pin_title">Enter PIN</string>
+    <string name="app_lock_disable_pin_message">Enter your PIN to turn off app lock.</string>
+    <string name="app_lock_disabled_success">App lock turned off</string>
+    <string name="remove">Remove</string>
 </resources>

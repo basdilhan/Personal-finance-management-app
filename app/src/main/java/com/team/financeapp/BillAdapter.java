@@ -88,8 +88,8 @@ public class BillAdapter extends RecyclerView.Adapter<BillAdapter.BillViewHolder
         }
 
         public void bind(Bill bill, OnBillItemClickListener listener) {
-            ivCategoryIcon.setImageResource(bill.getCategoryIcon());
-            statusIndicator.setBackgroundResource(bill.getIndicatorColor());
+            DrawableUtils.safeSetImageResource(ivCategoryIcon, bill.getCategoryIcon(), R.drawable.ic_receipt);
+            DrawableUtils.safeSetBackgroundResource(statusIndicator, bill.getIndicatorColor(), R.drawable.circle_blue_light);
             tvBillName.setText(bill.getName());
             
             // Format due date

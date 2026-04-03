@@ -134,32 +134,52 @@ public class AddExpenseActivity extends AppCompatActivity {
     /**
      * Show date picker dialog for selecting expense date
      */
+    private android.widget.DatePicker expenseDatePicker;
+
     private void showDatePickerDialog() {
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
 
-        DatePickerDialog datePickerDialog = new DatePickerDialog(
-                AddExpenseActivity.this,
-                android.R.style.Theme_DeviceDefault_Light_Dialog,
-                new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker view, int selectedYear, int selectedMonth, int selectedDay) {
-                        calendar.set(Calendar.YEAR, selectedYear);
-                        calendar.set(Calendar.MONTH, selectedMonth);
-                        calendar.set(Calendar.DAY_OF_MONTH, selectedDay);
+        // Create AlertDialog with DatePicker and buttons
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(AddExpenseActivity.this);
+        builder.setTitle("Select Date");
 
-                        String formattedDate = dateFormat.format(calendar.getTime());
-                        etDate.setText(formattedDate);
-                    }
-                },
-                year,
-                month,
-                day
-        );
+        // Create a DatePicker
+        expenseDatePicker = new android.widget.DatePicker(AddExpenseActivity.this);
+        expenseDatePicker.init(year, month, day, null);
+        expenseDatePicker.setMaxDate(System.currentTimeMillis());
 
-        datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
-        datePickerDialog.show();
+        builder.setView(expenseDatePicker);
+
+        // Add Select Date button
+        builder.setPositiveButton("Select Date", new android.content.DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(android.content.DialogInterface dialog, int which) {
+                // Get selected date from DatePicker
+                int selectedYear = expenseDatePicker.getYear();
+                int selectedMonth = expenseDatePicker.getMonth();
+                int selectedDay = expenseDatePicker.getDayOfMonth();
+
+                // Update calendar with selected date
+                calendar.set(Calendar.YEAR, selectedYear);
+                calendar.set(Calendar.MONTH, selectedMonth);
+                calendar.set(Calendar.DAY_OF_MONTH, selectedDay);
+
+                // Format and display the date
+                String formattedDate = dateFormat.format(calendar.getTime());
+                etDate.setText(formattedDate);
+            }
+        });
+
+        builder.setNegativeButton("Cancel", new android.content.DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(android.content.DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        builder.create().show();
     }
 
     private void saveExpense() {

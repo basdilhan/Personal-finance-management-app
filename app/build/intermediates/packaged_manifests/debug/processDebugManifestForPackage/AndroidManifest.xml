@@ -2,13 +2,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.team.financeapp"
     android:versionCode="1"
-    android:versionName="1.0" >
+    android:versionName="V2026" >
 
     <uses-sdk
         android:minSdkVersion="24"
         android:targetSdkVersion="34" />
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
+
+    <!-- suppress DeprecatedClassUsageInspection -->
+    <uses-permission android:name="android.permission.USE_FINGERPRINT" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -33,7 +37,6 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:testOnly="true"
         android:theme="@style/Theme.FinanceApp" >
         <activity
             android:name="com.team.financeapp.HomeActivity"
@@ -73,6 +76,12 @@
             android:exported="false" />
         <activity
             android:name="com.team.financeapp.EditProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.team.financeapp.AppLockActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.team.financeapp.AppLockSettingsActivity"
             android:exported="false" />
         <activity
             android:name="com.team.financeapp.AddExpenseActivity"

@@ -14,6 +14,7 @@ import com.team.financeapp.data.local.AppDatabase;
 import com.team.financeapp.data.local.SyncState;
 import com.team.financeapp.data.local.dao.GoalDao;
 import com.team.financeapp.data.local.entity.GoalEntity;
+import com.team.financeapp.notifications.FinancialReminderScheduler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -55,12 +56,14 @@ public class GoalRepository {
 
     private static final ExecutorService IO = Executors.newSingleThreadExecutor();
 
+    private final Context appContext;
     private final GoalDao goalDao;
     private final FirebaseFirestore firestore;
     private final Handler mainHandler;
 
     public GoalRepository(@NonNull Context context) {
-        this.goalDao = AppDatabase.getInstance(context).goalDao();
+        this.appContext = context.getApplicationContext();
+        this.goalDao = AppDatabase.getInstance(appContext).goalDao();
         this.firestore = FirebaseFirestore.getInstance();
         this.mainHandler = new Handler(Looper.getMainLooper());
     }
@@ -94,6 +97,8 @@ public class GoalRepository {
         IO.execute(() -> {
             long localId = goalDao.insert(entity);
             entity.localId = localId;
+            FinancialReminderScheduler.scheduleGoalReminder(appContext, entity);
+            FinancialReminderScheduler.scheduleGoalAddedReminder(appContext, entity);
 
             // Convert back to Goal with the new ID
             Goal savedGoal = new Goal(
@@ -151,6 +156,7 @@ public class GoalRepository {
 
                 // Update in local database
                 goalDao.update(existingEntity);
+                FinancialReminderScheduler.scheduleGoalReminder(appContext, existingEntity);
                 mainHandler.post(callback::onSuccess);
 
                 // Try to push to remote
@@ -184,6 +190,7 @@ public class GoalRepository {
                 entity.syncState = SyncState.PENDING;
                 entity.updatedAt = System.currentTimeMillis();
                 goalDao.update(entity);
+                FinancialReminderScheduler.cancelGoalReminder(appContext, entity.remoteId);
 
                 mainHandler.post(callback::onSuccess);
 
@@ -218,6 +225,8 @@ public class GoalRepository {
                             remoteEntity.localId = localEntity.localId;
                             goalDao.update(remoteEntity);
                         }
+
+                        FinancialReminderScheduler.scheduleGoalReminder(appContext, remoteEntity);
                     }
 
                     List<Goal> latest = toGoals(goalDao.getByUser(userId));

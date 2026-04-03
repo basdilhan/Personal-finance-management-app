@@ -33,7 +33,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     @Override
     public void onBindViewHolder(@NonNull NotificationViewHolder holder, int position) {
         NotificationItem item = notifications.get(position);
-        holder.icon.setImageResource(item.getIconRes());
+        DrawableUtils.safeSetImageResource(holder.icon, item.getIconRes(), R.drawable.ic_notification);
         holder.title.setText(item.getTitle());
         holder.message.setText(item.getMessage());
         holder.time.setText(item.getTimeLabel());

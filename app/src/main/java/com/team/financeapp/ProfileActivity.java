@@ -34,6 +34,7 @@ public class ProfileActivity extends AppCompatActivity {
     private TextView tvAccountType;
     private MaterialButton btnEditProfile;
     private MaterialButton btnChangePassword;
+    private MaterialButton btnAppLock;
     private MaterialButton btnBack;
     private SwitchMaterial switchDarkTheme;
     private FirebaseFirestore firestore;
@@ -70,6 +71,7 @@ public class ProfileActivity extends AppCompatActivity {
         tvAccountType = findViewById(R.id.tv_account_type);
         btnEditProfile = findViewById(R.id.button_edit_profile);
         btnChangePassword = findViewById(R.id.button_change_password);
+        btnAppLock = findViewById(R.id.button_app_lock);
         btnBack = findViewById(R.id.button_back);
         switchDarkTheme = findViewById(R.id.switch_dark_theme);
     }
@@ -168,6 +170,13 @@ public class ProfileActivity extends AppCompatActivity {
                 navigateToChangePassword();
             }
         });
+
+        btnAppLock.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                navigateToAppLockSettings();
+            }
+        });
     }
 
     /**
@@ -206,6 +215,11 @@ public class ProfileActivity extends AppCompatActivity {
      */
     private void navigateToEditProfile() {
         Intent intent = new Intent(ProfileActivity.this, EditProfileActivity.class);
+        startActivity(intent);
+    }
+
+    private void navigateToAppLockSettings() {
+        Intent intent = new Intent(ProfileActivity.this, AppLockSettingsActivity.class);
         startActivity(intent);
     }
 }

@@ -60,6 +60,21 @@
                         android:textColor="@color/dashboard_header_subtitle"
                         android:textSize="12sp" />
                 </LinearLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_test_notification"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="42dp"
+                    android:layout_marginStart="12dp"
+                    android:background="@drawable/circle_translucent"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:minWidth="0dp"
+                    android:minHeight="0dp"
+                    android:paddingHorizontal="14dp"
+                    android:text="@string/notifications_test_button"
+                    android:textColor="@color/white" />
             </LinearLayout>
         </LinearLayout>
 

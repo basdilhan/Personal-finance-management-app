@@ -1,7 +1,13 @@
 package com.team.financeapp;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Build;
+import android.provider.Settings;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,9 +18,10 @@ import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.ColorRes;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.Legend;
@@ -48,8 +55,15 @@ import java.util.Map;
 public class DashboardActivity extends AppCompatActivity {
 
     private static final long BACK_PRESS_EXIT_INTERVAL_MS = 2000;
+    private static final String PREF_DASHBOARD = "dashboard_preferences";
+    private static final String KEY_BALANCE_VISIBLE = "balance_visible";
+    private static final int REQUEST_NOTIFICATION_PERMISSION = 2001;
+    private static final String PREFS_NAME = "finance_preferences";
+    private static final String PREF_NOTIFICATION_PERMISSION_PROMPTED = "notification_permission_prompted";
+    private static final String PREF_NOTIFICATION_SETTINGS_HINT_SHOWN = "notification_settings_hint_shown";
 
     private MaterialButton btnLogout;
+    private MaterialButton buttonToggleBalanceVisibility;
     private View actionAddExpense, actionAddIncome, actionAddBill, actionAddGoal;
     private View btnNotifications;
     private View notificationBadge;
@@ -105,6 +119,9 @@ public class DashboardActivity extends AppCompatActivity {
     private List<GoalSummary> latestGoals = new ArrayList<>();
     private List<IncomeEntry> latestIncomes = new ArrayList<>();
     private double currentMonthIncome = 0.0d;
+    private double currentTotalBalance = 0.0d;
+    private double currentTotalExpenses = 0.0d;
+    private boolean isBalanceVisible = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,6 +134,8 @@ public class DashboardActivity extends AppCompatActivity {
         incomeRepository = new IncomeRepository(this);
         firestore = FirebaseFirestore.getInstance();
         initializeViews();
+        loadPrivacyPreference();
+        ensureNotificationPermission();
         BottomNavigationFragment.attach(this, R.id.bottom_navigation_container, R.id.nav_home);
         setupClickListeners();
         setupBackPressedCallback();
@@ -127,8 +146,19 @@ public class DashboardActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        // Always start hidden when user returns to the app for better privacy.
+        isBalanceVisible = false;
+        savePrivacyPreference();
         BottomNavigationFragment.attach(this, R.id.bottom_navigation_container, R.id.nav_home);
         loadDashboardData();
+    }
+
+    @Override
+    protected void onPause() {
+        // Hide sensitive wallet figures whenever dashboard leaves foreground.
+        isBalanceVisible = false;
+        savePrivacyPreference();
+        super.onPause();
     }
 
     /**
@@ -146,6 +176,7 @@ public class DashboardActivity extends AppCompatActivity {
         textTotalBalance = findViewById(R.id.text_total_balance);
         textIncomeAmount = findViewById(R.id.text_income_amount);
         textExpensesAmount = findViewById(R.id.text_expenses_amount);
+        buttonToggleBalanceVisibility = findViewById(R.id.button_toggle_balance_visibility);
         textBalanceTrend = findViewById(R.id.text_balance_trend);
         textBalanceTrendCaption = findViewById(R.id.text_balance_trend_caption);
         textAlertMessage = findViewById(R.id.text_alert_message);
@@ -184,6 +215,43 @@ public class DashboardActivity extends AppCompatActivity {
         actionAddGoal = findViewById(R.id.action_add_goal);
         btnNotifications = findViewById(R.id.btn_notifications);
         notificationBadge = findViewById(R.id.notification_badge);
+    }
+
+    private void loadPrivacyPreference() {
+        SharedPreferences preferences = getSharedPreferences(PREF_DASHBOARD, MODE_PRIVATE);
+        isBalanceVisible = preferences.getBoolean(KEY_BALANCE_VISIBLE, false);
+    }
+
+    private void savePrivacyPreference() {
+        getSharedPreferences(PREF_DASHBOARD, MODE_PRIVATE)
+                .edit()
+                .putBoolean(KEY_BALANCE_VISIBLE, isBalanceVisible)
+                .apply();
+    }
+
+    private void applyBalancePrivacyState() {
+        if (textTotalBalance == null || textIncomeAmount == null || textExpensesAmount == null) {
+            return;
+        }
+
+        if (isBalanceVisible) {
+            textTotalBalance.setText(formatMoney(currentTotalBalance));
+            textIncomeAmount.setText(formatMoney(currentMonthIncome));
+            textExpensesAmount.setText(formatMoney(currentTotalExpenses));
+        } else {
+            textTotalBalance.setText("••••••");
+            textIncomeAmount.setText("••••••");
+            textExpensesAmount.setText("••••••");
+        }
+
+        if (buttonToggleBalanceVisibility != null) {
+            buttonToggleBalanceVisibility.setIconResource(isBalanceVisible
+                ? R.drawable.ic_eye_open
+                : R.drawable.ic_eye_closed);
+            buttonToggleBalanceVisibility.setContentDescription(getString(isBalanceVisible
+                ? R.string.dashboard_hide_amounts
+                : R.string.dashboard_show_amounts));
+        }
     }
 
     private int getColorCompat(@ColorRes int colorResId) {
@@ -240,6 +308,76 @@ public class DashboardActivity extends AppCompatActivity {
         loadExpenses(userId);
         loadGoals(userId);
         loadIncome(userId);
+    }
+
+    private void ensureNotificationPermission() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            return;
+        }
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                == PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+
+        SharedPreferences preferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        boolean prompted = preferences.getBoolean(PREF_NOTIFICATION_PERMISSION_PROMPTED, false);
+        boolean shouldShowRationale = ActivityCompat.shouldShowRequestPermissionRationale(
+                this,
+                Manifest.permission.POST_NOTIFICATIONS
+        );
+
+        if (!prompted || shouldShowRationale) {
+            preferences.edit().putBoolean(PREF_NOTIFICATION_PERMISSION_PROMPTED, true).apply();
+            ActivityCompat.requestPermissions(
+                    this,
+                    new String[]{Manifest.permission.POST_NOTIFICATIONS},
+                    REQUEST_NOTIFICATION_PERMISSION
+            );
+            return;
+        }
+
+        if (!preferences.getBoolean(PREF_NOTIFICATION_SETTINGS_HINT_SHOWN, false)) {
+            preferences.edit().putBoolean(PREF_NOTIFICATION_SETTINGS_HINT_SHOWN, true).apply();
+            showNotificationSettingsDialog();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode != REQUEST_NOTIFICATION_PERMISSION) {
+            return;
+        }
+
+        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this, "Notifications enabled", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Toast.makeText(this, "Notifications are off. Goal and bill reminders may not appear.", Toast.LENGTH_LONG).show();
+    }
+
+    private void showNotificationSettingsDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("Enable notifications")
+                .setMessage("Goal and bill reminders are blocked. Enable notifications in app settings.")
+                .setPositiveButton("Open settings", (dialog, which) -> openAppNotificationSettings())
+                .setNegativeButton("Not now", null)
+                .show();
+    }
+
+    private void openAppNotificationSettings() {
+        Intent intent = new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                .putExtra(Settings.EXTRA_APP_PACKAGE, getPackageName());
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+            return;
+        }
+
+        Intent fallback = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                .setData(Uri.parse("package:" + getPackageName()));
+        startActivity(fallback);
     }
 
     private void bindUserHeader() {
@@ -344,19 +482,12 @@ public class DashboardActivity extends AppCompatActivity {
     private void updateDashboardTotalsAndInsight() {
         double monthlyExpenses = sumAllExpenses();
         double totalUpcomingBills = sumUpcomingUnpaidBills();
-
-        if (textIncomeAmount != null) {
-            textIncomeAmount.setText(formatMoney(currentMonthIncome));
-        }
-        if (textExpensesAmount != null) {
-            textExpensesAmount.setText(formatMoney(monthlyExpenses));
-        }
+        currentTotalExpenses = monthlyExpenses;
 
         // Balance represents monthly cash position after known upcoming unpaid bills.
         double totalBalance = currentMonthIncome - monthlyExpenses - totalUpcomingBills;
-        if (textTotalBalance != null) {
-            textTotalBalance.setText(formatMoney(totalBalance));
-        }
+        currentTotalBalance = totalBalance;
+        applyBalancePrivacyState();
 
         updateBalanceTrend(totalBalance);
 
@@ -377,6 +508,13 @@ public class DashboardActivity extends AppCompatActivity {
 
     private void updateBalanceTrend(double currentNet) {
         if (textBalanceTrend == null || textBalanceTrendCaption == null) {
+            return;
+        }
+
+        if (!isBalanceVisible) {
+            textBalanceTrend.setText("••••");
+            textBalanceTrend.setTextColor(getColorCompat(R.color.text_secondary));
+            textBalanceTrendCaption.setText(R.string.dashboard_amounts_hidden);
             return;
         }
 
@@ -691,7 +829,7 @@ public class DashboardActivity extends AppCompatActivity {
         dueView.setText(formatDueLabel(bill.getDueDate()));
         amountView.setText(formatMoney(bill.getAmount()));
         if (iconView != null) {
-            iconView.setImageResource(resolveBillIcon(bill));
+            DrawableUtils.safeSetImageResource(iconView, resolveBillIcon(bill), R.drawable.ic_receipt);
         }
     }
 
@@ -972,6 +1110,18 @@ public class DashboardActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        if (buttonToggleBalanceVisibility != null) {
+            buttonToggleBalanceVisibility.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    isBalanceVisible = !isBalanceVisible;
+                    savePrivacyPreference();
+                    applyBalancePrivacyState();
+                    updateBalanceTrend(currentTotalBalance);
+                }
+            });
+        }
 
     }
 

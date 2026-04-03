@@ -156,7 +156,7 @@ public class IncomeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         }
 
         void bind(IncomeEntry income, OnIncomeItemClickListener listener) {
-            ivIncomeIcon.setImageResource(income.getSourceIcon());
+            DrawableUtils.safeSetImageResource(ivIncomeIcon, income.getSourceIcon(), R.drawable.ic_wallet);
             tvSourceName.setText(income.getSource());
             tvIncomeNote.setText(income.getNote());
             tvIncomeTime.setText(income.getTime());

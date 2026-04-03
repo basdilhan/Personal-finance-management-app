@@ -16,7 +16,9 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
+import com.team.financeapp.AppLockManager;
 import com.team.financeapp.R;
+import com.team.financeapp.notifications.FinancialReminderScheduler;
 
 public class AuthManager {
 
@@ -53,6 +55,7 @@ public class AuthManager {
                             return;
                         }
                         upsertUserProfile(user, null);
+                        AppLockManager.markSessionUnlocked();
                         callback.onSuccess();
                         return;
                     }
@@ -81,6 +84,7 @@ public class AuthManager {
                     user.updateProfile(profileUpdate)
                             .addOnCompleteListener(activity, profileTask -> {
                                 upsertUserProfile(user, fullName);
+                                AppLockManager.markSessionUnlocked();
                                 callback.onSuccess();
                             });
                 });
@@ -106,6 +110,7 @@ public class AuthManager {
                             return;
                         }
                         upsertUserProfile(user, null);
+                        AppLockManager.markSessionUnlocked();
                         callback.onSuccess();
                         return;
                     }
@@ -114,6 +119,11 @@ public class AuthManager {
     }
 
     public void signOut(Context context) {
+        AppLockManager.lockSession();
+        String userId = getCurrentUserId();
+        if (!TextUtils.isEmpty(userId)) {
+            FinancialReminderScheduler.cancelAllForUser(context.getApplicationContext(), userId);
+        }
         firebaseAuth.signOut();
         getGoogleSignInClient(context).signOut();
     }
