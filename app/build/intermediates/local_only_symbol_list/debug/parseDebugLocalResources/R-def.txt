@@ -409,6 +409,13 @@ string app_lock_biometric_on
 string app_lock_biometric_subtitle
 string app_lock_biometric_title
 string app_lock_confirm_pin
+string app_lock_disable_biometric_subtitle
+string app_lock_disable_biometric_title
+string app_lock_disable_pin_message
+string app_lock_disable_pin_title
+string app_lock_disable_verify_message
+string app_lock_disable_verify_title
+string app_lock_disabled_success
 string app_lock_enter_pin
 string app_lock_hint_pin
 string app_lock_invalid_pin
@@ -424,6 +431,7 @@ string app_lock_subtitle
 string app_lock_timeout_info
 string app_lock_title
 string app_lock_unlock
+string app_lock_use_biometric
 string app_lock_use_pin
 string app_name
 string bills_empty_state

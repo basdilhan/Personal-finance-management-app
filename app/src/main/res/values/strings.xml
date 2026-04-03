@@ -117,5 +117,13 @@
     <string name="app_lock_biometric_off">Biometric unlock is off</string>
     <string name="app_lock_biometric_not_available">Biometric is not available on this device</string>
     <string name="app_lock_timeout_info">App locks after %1$s in the background.</string>
+    <string name="app_lock_disable_verify_title">Turn off app lock</string>
+    <string name="app_lock_disable_verify_message">Verify your identity to turn off app lock.</string>
+    <string name="app_lock_use_biometric">Use biometric</string>
+    <string name="app_lock_disable_biometric_title">Verify biometric</string>
+    <string name="app_lock_disable_biometric_subtitle">Authenticate to turn off app lock</string>
+    <string name="app_lock_disable_pin_title">Enter PIN</string>
+    <string name="app_lock_disable_pin_message">Enter your PIN to turn off app lock.</string>
+    <string name="app_lock_disabled_success">App lock turned off</string>
     <string name="remove">Remove</string>
 </resources>

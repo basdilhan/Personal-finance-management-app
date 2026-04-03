@@ -51,6 +51,13 @@
     <string name="app_lock_biometric_subtitle">Use fingerprint or face unlock</string>
     <string name="app_lock_biometric_title">Unlock with Biometric</string>
     <string name="app_lock_confirm_pin">Confirm PIN</string>
+    <string name="app_lock_disable_biometric_subtitle">Authenticate to turn off app lock</string>
+    <string name="app_lock_disable_biometric_title">Verify biometric</string>
+    <string name="app_lock_disable_pin_message">Enter your PIN to turn off app lock.</string>
+    <string name="app_lock_disable_pin_title">Enter PIN</string>
+    <string name="app_lock_disable_verify_message">Verify your identity to turn off app lock.</string>
+    <string name="app_lock_disable_verify_title">Turn off app lock</string>
+    <string name="app_lock_disabled_success">App lock turned off</string>
     <string name="app_lock_enter_pin">Enter your PIN</string>
     <string name="app_lock_hint_pin">Enter PIN</string>
     <string name="app_lock_invalid_pin">Invalid PIN</string>
@@ -66,6 +73,7 @@
     <string name="app_lock_timeout_info">App locks after %1$s in the background.</string>
     <string name="app_lock_title">Unlock DreamSaver</string>
     <string name="app_lock_unlock">Unlock</string>
+    <string name="app_lock_use_biometric">Use biometric</string>
     <string name="app_lock_use_pin">Use PIN</string>
     <string name="app_name">DreamSaver</string>
     <string name="bills_empty_state">No bills to track\nAll your bills will appear here</string>

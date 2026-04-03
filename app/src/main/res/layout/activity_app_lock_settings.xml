@@ -15,9 +15,11 @@
         <com.google.android.material.button.MaterialButton
             android:id="@+id/button_back"
             style="@style/Widget.Material3.Button.OutlinedButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/cd_back" />
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:contentDescription="@string/cd_back"
+            app:icon="@drawable/ic_back"
+            app:iconTint="@color/text_primary" />
 
         <TextView
             android:layout_width="wrap_content"
