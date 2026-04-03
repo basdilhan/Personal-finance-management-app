@@ -55,15 +55,12 @@ import java.util.Map;
 public class DashboardActivity extends AppCompatActivity {
 
     private static final long BACK_PRESS_EXIT_INTERVAL_MS = 2000;
-<<<<<<< HEAD
     private static final String PREF_DASHBOARD = "dashboard_preferences";
     private static final String KEY_BALANCE_VISIBLE = "balance_visible";
-=======
     private static final int REQUEST_NOTIFICATION_PERMISSION = 2001;
     private static final String PREFS_NAME = "finance_preferences";
     private static final String PREF_NOTIFICATION_PERMISSION_PROMPTED = "notification_permission_prompted";
     private static final String PREF_NOTIFICATION_SETTINGS_HINT_SHOWN = "notification_settings_hint_shown";
->>>>>>> origin/puli
 
     private MaterialButton btnLogout;
     private MaterialButton buttonToggleBalanceVisibility;
@@ -137,11 +134,8 @@ public class DashboardActivity extends AppCompatActivity {
         incomeRepository = new IncomeRepository(this);
         firestore = FirebaseFirestore.getInstance();
         initializeViews();
-<<<<<<< HEAD
         loadPrivacyPreference();
-=======
         ensureNotificationPermission();
->>>>>>> origin/puli
         BottomNavigationFragment.attach(this, R.id.bottom_navigation_container, R.id.nav_home);
         setupClickListeners();
         setupBackPressedCallback();
