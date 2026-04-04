@@ -1,6 +1,7 @@
 package com.team.financeapp.notifications;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 
 import androidx.annotation.NonNull;
 import androidx.work.BackoffPolicy;
@@ -26,6 +27,7 @@ public class FinancialReminderMonitorWorker extends Worker {
     private static final int[] BILL_REMINDER_OFFSETS_DAYS = new int[]{3, 1, 0};
     private static final int[] GOAL_REMINDER_OFFSETS_DAYS = new int[]{7, 3, 0};
     private static final long DAY_MS = 24L * 60L * 60L * 1000L;
+    private static final String GOAL_NUDGE_PREFS = "goal_progress_nudges";
 
     public FinancialReminderMonitorWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
@@ -149,9 +151,67 @@ public class FinancialReminderMonitorWorker extends Worker {
                     );
                 }
             }
+
+            maybeSendGoalProgressNudge(context, goal, now);
         }
 
         return Result.success();
+    }
+
+    private void maybeSendGoalProgressNudge(@NonNull Context context, @NonNull GoalEntity goal, long now) {
+        if (goal.targetDate <= 0L || goal.targetAmount <= 0.0d || now >= goal.targetDate) {
+            return;
+        }
+
+        long startMillis = goal.createdAt > 0L ? goal.createdAt : goal.updatedAt;
+        if (startMillis <= 0L || startMillis >= goal.targetDate) {
+            return;
+        }
+
+        double elapsedRatio = (double) (now - startMillis) / (double) (goal.targetDate - startMillis);
+        elapsedRatio = Math.max(0.0d, Math.min(1.0d, elapsedRatio));
+        if (elapsedRatio < 0.10d) {
+            return;
+        }
+
+        double expectedSavedByNow = goal.targetAmount * elapsedRatio;
+        if (goal.currentAmount >= expectedSavedByNow * 0.90d) {
+            return;
+        }
+
+        long dayBucket = now / DAY_MS;
+        String goalKey = goal.remoteId == null || goal.remoteId.trim().isEmpty()
+                ? String.valueOf(goal.localId)
+                : goal.remoteId;
+        String nudgeKey = "goal_nudge_" + goalKey + "_" + dayBucket;
+
+        SharedPreferences preferences = context.getSharedPreferences(GOAL_NUDGE_PREFS, Context.MODE_PRIVATE);
+        if (preferences.getBoolean(nudgeKey, false)) {
+            return;
+        }
+
+        long daysLeft = Math.max(1L, (long) Math.ceil((goal.targetDate - now) / (double) DAY_MS));
+        double remaining = Math.max(0.0d, goal.targetAmount - goal.currentAmount);
+        double recommendedDaily = remaining / daysLeft;
+
+        String title = "Savings goal progress check";
+        String message = String.format(
+                Locale.getDefault(),
+                "To reach %s, save about LKR %.2f/day for the next %d days.",
+                goal.name,
+                recommendedDaily,
+                daysLeft
+        );
+
+        int notificationId = buildNotificationId(
+                FinancialReminderWorker.TYPE_GOAL,
+                goalKey,
+                goal.localId,
+                -2,
+                (int) (dayBucket % 2)
+        );
+        FinancialNotificationHelper.showReminderNotification(context, notificationId, title, message);
+        preferences.edit().putBoolean(nudgeKey, true).apply();
     }
 
     public static void schedule(@NonNull Context context) {

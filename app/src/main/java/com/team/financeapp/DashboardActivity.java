@@ -852,15 +852,38 @@ public class DashboardActivity extends AppCompatActivity {
 
     private String formatDueLabel(long dueDate) {
         long normalizedDueDate = normalizeEpochMillis(dueDate);
-        long diff = normalizedDueDate - System.currentTimeMillis();
-        long days = diff / (24L * 60L * 60L * 1000L);
-        if (days <= 0) {
+        long days = daysFromToday(normalizedDueDate);
+        if (days == 0) {
             return "Due today";
         }
         if (days == 1) {
             return "Due tomorrow";
         }
+        if (days == -1) {
+            return "Overdue by 1 day";
+        }
+        if (days < 0) {
+            return String.format(Locale.getDefault(), "Overdue by %d days", Math.abs(days));
+        }
         return String.format(Locale.getDefault(), "Due in %d days", days);
+    }
+
+    private long daysFromToday(long targetMillis) {
+        Calendar today = Calendar.getInstance();
+        today.set(Calendar.HOUR_OF_DAY, 0);
+        today.set(Calendar.MINUTE, 0);
+        today.set(Calendar.SECOND, 0);
+        today.set(Calendar.MILLISECOND, 0);
+
+        Calendar target = Calendar.getInstance();
+        target.setTimeInMillis(targetMillis);
+        target.set(Calendar.HOUR_OF_DAY, 0);
+        target.set(Calendar.MINUTE, 0);
+        target.set(Calendar.SECOND, 0);
+        target.set(Calendar.MILLISECOND, 0);
+
+        long diff = target.getTimeInMillis() - today.getTimeInMillis();
+        return diff / (24L * 60L * 60L * 1000L);
     }
 
     private double sumCurrentMonthExpenses() {
