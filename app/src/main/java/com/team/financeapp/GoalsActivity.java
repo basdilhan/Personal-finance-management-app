@@ -60,7 +60,6 @@ public class GoalsActivity extends AppCompatActivity implements GoalAdapter.OnGo
         BottomNavigationFragment.attach(this, R.id.bottom_navigation_container, R.id.nav_goals);
         setupFilterChips();
         loadGoals();
-        calculateTotalSaved();
     }
 
     @Override
@@ -69,7 +68,6 @@ public class GoalsActivity extends AppCompatActivity implements GoalAdapter.OnGo
         BottomNavigationFragment.attach(this, R.id.bottom_navigation_container, R.id.nav_goals);
         // Refresh goals when returning to this activity
         loadGoals();
-        calculateTotalSaved();
     }
 
     /**
@@ -426,9 +424,8 @@ public class GoalsActivity extends AppCompatActivity implements GoalAdapter.OnGo
                 goalsList.clear();
                 allGoalsList.clear();
                 allGoalsList.addAll(goals);
-                goalsList.addAll(goals);
-                goalAdapter.updateGoals(goalsList);
-                updateEmptyState();
+                filterGoals(currentFilterId);
+                calculateTotalSaved();
             }
 
             @Override
@@ -518,9 +515,8 @@ public class GoalsActivity extends AppCompatActivity implements GoalAdapter.OnGo
         );
         allGoalsList.add(emergencyGoal);
 
-        goalsList.addAll(allGoalsList);
-        goalAdapter.updateGoals(goalsList);
-        updateEmptyState();
+        filterGoals(currentFilterId);
+        calculateTotalSaved();
     }
 
     /**
@@ -542,6 +538,5 @@ public class GoalsActivity extends AppCompatActivity implements GoalAdapter.OnGo
      */
     public void refreshGoals() {
         loadGoals();
-        calculateTotalSaved();
     }
 }
