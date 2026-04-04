@@ -75,6 +75,7 @@ public class DashboardActivity extends AppCompatActivity {
     private TextView textExpensesAmount;
     private TextView textBalanceTrend;
     private TextView textBalanceTrendCaption;
+    private TextView textInsightAmount;
     private TextView textAlertMessage;
     private TextView textLegendHousingPercent;
     private TextView textLegendFoodPercent;
@@ -179,6 +180,7 @@ public class DashboardActivity extends AppCompatActivity {
         buttonToggleBalanceVisibility = findViewById(R.id.button_toggle_balance_visibility);
         textBalanceTrend = findViewById(R.id.text_balance_trend);
         textBalanceTrendCaption = findViewById(R.id.text_balance_trend_caption);
+        textInsightAmount = findViewById(R.id.text_insight_amount);
         textAlertMessage = findViewById(R.id.text_alert_message);
         textGoalName = findViewById(R.id.text_goal_name);
         textGoalDeadline = findViewById(R.id.text_goal_deadline);
@@ -446,6 +448,7 @@ public class DashboardActivity extends AppCompatActivity {
                                 getString(document, "name", "Savings Goal"),
                                 getDouble(document, "targetAmount", 0.0d),
                                 getDouble(document, "currentAmount", 0.0d),
+                                getDouble(document, "addedSavingsAmount", 0.0d),
                                  getLong(document, "targetDate", 0L),
                                 getLong(document, "updatedAt", 0L) // Get updatedAt timestamp
                         ));
@@ -459,6 +462,7 @@ public class DashboardActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> {
                     latestGoals = Collections.emptyList();
                     updateGoalCard();
+                    updateDashboardTotalsAndInsight();
                 });
     }
 
@@ -480,27 +484,45 @@ public class DashboardActivity extends AppCompatActivity {
     }
 
     private void updateDashboardTotalsAndInsight() {
-        double monthlyExpenses = sumAllExpenses();
-        double totalUpcomingBills = sumUpcomingUnpaidBills();
-        currentTotalExpenses = monthlyExpenses;
+        double expensesTotal = sumAllExpenses();
+        double paidBillsTotal = sumPaidBills();
+        double dueBillsTotal = sumDueBills();
+        double totalGoalSavings = sumGoalAddedSavings();
+        double totalCashOut = expensesTotal + paidBillsTotal + totalGoalSavings;
+        currentTotalExpenses = totalCashOut;
 
-        // Balance represents monthly cash position after known upcoming unpaid bills.
-        double totalBalance = currentMonthIncome - monthlyExpenses - totalUpcomingBills;
+        // Portfolio balance follows: cash in - cash out.
+        double totalBalance = currentMonthIncome - totalCashOut;
         currentTotalBalance = totalBalance;
         applyBalancePrivacyState();
 
         updateBalanceTrend(totalBalance);
 
-        if (textAlertMessage != null) {
-            if (monthlyExpenses <= 0.0d && totalUpcomingBills <= 0.0d) {
-                textAlertMessage.setText("No expenses or bills yet for this account. Add entries to unlock personalized insights.");
-            } else if (currentMonthIncome <= 0.0d) {
-                textAlertMessage.setText("You've recorded spending, but no income entries yet. Add income to track your balance.");
+        double insightBalance = currentMonthIncome - totalCashOut - dueBillsTotal;
+        if (textInsightAmount != null) {
+            if (isBalanceVisible) {
+                textInsightAmount.setVisibility(View.VISIBLE);
+                textInsightAmount.setText(formatMoney(insightBalance));
+                textInsightAmount.setTextColor(getColorCompat(insightBalance >= 0 ? R.color.success : R.color.error));
             } else {
-                if (totalBalance >= 0) {
-                    textAlertMessage.setText(String.format(Locale.getDefault(), "Great job. You still have %s available after expenses and upcoming bills.", formatMoney(totalBalance)));
+                textInsightAmount.setVisibility(View.GONE);
+            }
+        }
+
+        if (textAlertMessage != null) {
+            if (totalCashOut <= 0.0d && dueBillsTotal <= 0.0d) {
+                textAlertMessage.setText("No cash-out activity or due bills yet. Add expenses, pay bills, or save toward a goal to see your insight.");
+            } else if (currentMonthIncome <= 0.0d) {
+                textAlertMessage.setText("You've recorded spending and bills, but no income entries yet. Add income to see your remaining balance.");
+            } else {
+                if (insightBalance >= 0) {
+                    textAlertMessage.setText(String.format(Locale.getDefault(),
+                            "After cash out and due bills, you still have %s available. Nice buffer.",
+                            formatMoney(insightBalance)));
                 } else {
-                    textAlertMessage.setText(String.format(Locale.getDefault(), "Heads up: you're short by %s after expenses and upcoming bills.", formatMoney(Math.abs(totalBalance))));
+                    textAlertMessage.setText(String.format(Locale.getDefault(),
+                            "After cash out and due bills, you're short by %s. Review bills or spending to close the gap.",
+                            formatMoney(Math.abs(insightBalance))));
                 }
             }
         }
@@ -907,6 +929,26 @@ public class DashboardActivity extends AppCompatActivity {
         return sum;
     }
 
+    private double sumPaidBills() {
+        double sum = 0.0d;
+        for (Bill bill : latestBills) {
+            if ("paid".equalsIgnoreCase(bill.getStatus())) {
+                sum += bill.getAmount();
+            }
+        }
+        return sum;
+    }
+
+    private double sumDueBills() {
+        double sum = 0.0d;
+        for (Bill bill : latestBills) {
+            if (!"paid".equalsIgnoreCase(bill.getStatus())) {
+                sum += bill.getAmount();
+            }
+        }
+        return sum;
+    }
+
     private double sumIncomeForMonth(int year, int month) {
         double sum = 0.0d;
         for (IncomeEntry entry : latestIncomes) {
@@ -951,10 +993,10 @@ public class DashboardActivity extends AppCompatActivity {
         return sum;
     }
 
-    private double sumGoalCurrentAmounts() {
+    private double sumGoalAddedSavings() {
         double sum = 0.0d;
         for (GoalSummary goal : latestGoals) {
-            sum += goal.currentAmount;
+            sum += goal.addedSavingsAmount;
         }
         return sum;
     }
@@ -1038,13 +1080,15 @@ public class DashboardActivity extends AppCompatActivity {
         final String name;
         final double targetAmount;
         final double currentAmount;
+        final double addedSavingsAmount;
         final long targetDate;
         final long updatedAt;
 
-        GoalSummary(String name, double targetAmount, double currentAmount, long targetDate, long updatedAt) {
+        GoalSummary(String name, double targetAmount, double currentAmount, double addedSavingsAmount, long targetDate, long updatedAt) {
             this.name = name;
             this.targetAmount = targetAmount;
             this.currentAmount = currentAmount;
+            this.addedSavingsAmount = addedSavingsAmount;
             this.targetDate = targetDate;
             this.updatedAt = updatedAt;
         }

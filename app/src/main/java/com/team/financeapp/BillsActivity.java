@@ -120,10 +120,6 @@ public class BillsActivity extends AppCompatActivity {
             filteredList = allBillsList.stream()
                     .filter(b -> "urgent".equals(b.getStatus()))
                     .collect(Collectors.toList());
-        } else if (chipId == R.id.chip_due_soon) {
-            filteredList = allBillsList.stream()
-                    .filter(b -> "due_soon".equals(b.getStatus()))
-                    .collect(Collectors.toList());
         } else if (chipId == R.id.chip_paid) {
             filteredList = allBillsList.stream()
                     .filter(b -> "paid".equals(b.getStatus()))
@@ -140,6 +136,21 @@ public class BillsActivity extends AppCompatActivity {
         billsList.addAll(filteredList);
         billAdapter.updateBills(billsList);
         updateEmptyState();
+    }
+
+    private void applyCurrentFilter() {
+        if (chipGroupFilter == null) {
+            return;
+        }
+        int checkedChipId = chipGroupFilter.getCheckedChipId();
+        if (checkedChipId == View.NO_ID) {
+            billsList.clear();
+            billsList.addAll(allBillsList);
+            billAdapter.updateBills(billsList);
+            updateEmptyState();
+            return;
+        }
+        filterBills(checkedChipId);
     }
 
     /**
@@ -227,10 +238,7 @@ public class BillsActivity extends AppCompatActivity {
                 allBillsList.addAll(bills);
                 allBillsList.sort((b1, b2) -> Long.compare(b1.getDueDate(), b2.getDueDate()));
 
-                billsList.clear();
-                billsList.addAll(allBillsList);
-                billAdapter.updateBills(billsList);
-                updateEmptyState();
+                applyCurrentFilter();
                 calculateTotalDue();
             }
 
@@ -248,7 +256,9 @@ public class BillsActivity extends AppCompatActivity {
         double totalDue = 0;
 
         for (Bill bill : allBillsList) {
-            totalDue += bill.getAmount();
+            if (!"paid".equals(bill.getStatus())) {
+                totalDue += bill.getAmount();
+            }
         }
 
         tvTotalDueAmount.setText(String.format("LKR %.2f", totalDue));
@@ -263,17 +273,108 @@ public class BillsActivity extends AppCompatActivity {
     }
 
     private void showBillActions(Bill bill) {
-        String[] actions = {"Edit", "Delete"};
+        boolean isPaid = "paid".equals(bill.getStatus());
+        String[] actions = isPaid
+                ? new String[]{"Edit", "Mark as Pending", "Delete"}
+                : new String[]{"Edit", "Mark as Paid", "Delete"};
+
         new AlertDialog.Builder(this)
                 .setTitle("Bill Options")
                 .setItems(actions, (dialog, which) -> {
                     if (which == 0) {
                         openEditBill(bill);
                     } else if (which == 1) {
+                        if (isPaid) {
+                            confirmMarkAsPending(bill);
+                        } else {
+                            confirmMarkAsPaid(bill);
+                        }
+                    } else if (which == 2) {
                         confirmDeleteBill(bill);
                     }
                 })
                 .show();
+    }
+
+    private void confirmMarkAsPaid(Bill bill) {
+        new AlertDialog.Builder(this)
+                .setTitle("Mark as Paid")
+                .setMessage("Mark this bill as paid?")
+                .setPositiveButton("Mark Paid", (dialog, which) -> updateBillStatus(bill, "paid", R.drawable.circle_success_light))
+                .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
+                .show();
+    }
+
+    private void confirmMarkAsPending(Bill bill) {
+        new AlertDialog.Builder(this)
+                .setTitle("Mark as Pending")
+                .setMessage("Move this bill back to pending?")
+                .setPositiveButton("Mark Pending", (dialog, which) -> {
+                    String restoredStatus = resolveStatusByDueDate(bill.getDueDate());
+                    updateBillStatus(bill, restoredStatus, resolveIndicatorByStatus(restoredStatus));
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
+                .show();
+    }
+
+    private void updateBillStatus(Bill originalBill, String newStatus, int newIndicator) {
+        String userId = authManager.getCurrentUserId();
+        if (userId == null || userId.isEmpty()) {
+            Toast.makeText(this, "Please login again", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Bill updatedBill = new Bill(
+                originalBill.getId(),
+                originalBill.getName(),
+                originalBill.getDescription(),
+                originalBill.getAmount(),
+                originalBill.getDueDate(),
+                originalBill.getCategory(),
+                originalBill.getCategoryIcon(),
+                newStatus,
+                newIndicator
+        );
+
+        billRepository.updateBill(userId, updatedBill, new BillRepository.ModifyBillCallback() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(BillsActivity.this,
+                        "paid".equals(newStatus) ? "Bill marked as paid" : "Bill marked as pending",
+                        Toast.LENGTH_SHORT).show();
+                loadBills();
+            }
+
+            @Override
+            public void onError(String message) {
+                Toast.makeText(BillsActivity.this, message, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private String resolveStatusByDueDate(long dueDateMillis) {
+        long now = System.currentTimeMillis();
+        long days = (dueDateMillis - now) / (24L * 60L * 60L * 1000L);
+        if (days <= 3) {
+            return "urgent";
+        }
+        if (days <= 7) {
+            return "due_soon";
+        }
+        return "pending";
+    }
+
+    private int resolveIndicatorByStatus(String status) {
+        if ("paid".equals(status)) {
+            return R.drawable.circle_success_light;
+        }
+        if ("urgent".equals(status)) {
+            return R.drawable.circle_urgent;
+        }
+        if ("due_soon".equals(status)) {
+            return R.drawable.circle_warning;
+        }
+        return R.drawable.circle_blue_light;
     }
 
     private void openEditBill(Bill bill) {

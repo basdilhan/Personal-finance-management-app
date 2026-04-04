@@ -177,6 +177,37 @@ public class GoalRepository {
         });
     }
 
+    public void addGoalSavings(@NonNull String userId, int goalLocalId, double amountToAdd, @NonNull UpdateGoalCallback callback) {
+        IO.execute(() -> {
+            GoalEntity existingEntity = goalDao.getById(goalLocalId);
+            if (existingEntity == null || !userId.equals(existingEntity.userId)) {
+                mainHandler.post(() -> callback.onError("Goal not found"));
+                return;
+            }
+
+            existingEntity.currentAmount += amountToAdd;
+            existingEntity.addedSavingsAmount += amountToAdd;
+            existingEntity.syncState = SyncState.PENDING;
+            existingEntity.updatedAt = System.currentTimeMillis();
+
+            goalDao.update(existingEntity);
+            FinancialReminderScheduler.scheduleGoalReminder(appContext, existingEntity);
+            mainHandler.post(callback::onSuccess);
+
+            pushGoalToRemote(existingEntity, new SaveGoalCallback() {
+                @Override
+                public void onSuccess(Goal goal) {
+                    // Remote sync successful
+                }
+
+                @Override
+                public void onError(String message) {
+                    // Goal already updated locally
+                }
+            });
+        });
+    }
+
     /**
      * Delete a goal (soft delete)
      * Marks as deleted in local database and syncs to Firestore
@@ -247,6 +278,7 @@ public class GoalRepository {
         payload.put("description", entity.description);
         payload.put("targetAmount", entity.targetAmount);
         payload.put("currentAmount", entity.currentAmount);
+        payload.put("addedSavingsAmount", entity.addedSavingsAmount);
         payload.put("targetDate", entity.targetDate);
         payload.put("category", entity.category);
         payload.put("categoryIcon", entity.categoryIcon);
@@ -270,6 +302,7 @@ public class GoalRepository {
                             entity.description,
                             entity.targetAmount,
                             entity.currentAmount,
+                            entity.addedSavingsAmount,
                             entity.targetDate,
                             entity.category,
                             entity.categoryIcon,
@@ -323,6 +356,7 @@ public class GoalRepository {
                     entity.description,
                     entity.targetAmount,
                     entity.currentAmount,
+                        entity.addedSavingsAmount,
                     entity.targetDate,
                     entity.category,
                     entity.categoryIcon,
@@ -342,6 +376,7 @@ public class GoalRepository {
         entity.description = goal.getDescription();
         entity.targetAmount = goal.getTargetAmount();
         entity.currentAmount = goal.getCurrentAmount();
+        entity.addedSavingsAmount = goal.getAddedSavingsAmount();
         entity.targetDate = goal.getTargetDate();
         entity.category = goal.getCategory();
         entity.categoryIcon = goal.getCategoryIcon();
@@ -360,6 +395,7 @@ public class GoalRepository {
         entity.description = getString(document, "description", "");
         entity.targetAmount = getDouble(document, "targetAmount", 0.0d);
         entity.currentAmount = getDouble(document, "currentAmount", 0.0d);
+        entity.addedSavingsAmount = getDouble(document, "addedSavingsAmount", 0.0d);
         entity.targetDate = getLong(document, "targetDate", 0L);
         entity.category = getString(document, "category", "Other");
         entity.categoryIcon = (int) getLong(document, "categoryIcon", R.drawable.ic_wallet);

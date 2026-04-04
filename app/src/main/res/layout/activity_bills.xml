@@ -134,13 +134,6 @@
                     android:text="Urgent" />
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/chip_due_soon"
-                    style="@style/Widget.Material3.Chip.Filter"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Due Soon" />
-
-                <com.google.android.material.chip.Chip
                     android:id="@+id/chip_paid"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"

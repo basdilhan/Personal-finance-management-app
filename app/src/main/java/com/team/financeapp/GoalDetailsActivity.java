@@ -250,23 +250,10 @@ public class GoalDetailsActivity extends AppCompatActivity {
         currentAmount += amountToAdd;
         savingsUpdated = true;
 
-        // Create Goal object with updated amount
-        Goal updatedGoal = new Goal(
-                goalId,
-                goalName,
-                goalDescription,
-                targetAmount,
-                currentAmount,  // Updated amount
-                targetDate,
-                category,
-                goalIcon,
-                R.drawable.circle_primary_light
-        );
-
         // Save to database
         String userId = authManager.getCurrentUserId();
         if (userId != null) {
-            goalRepository.updateGoal(userId, updatedGoal, new GoalRepository.UpdateGoalCallback() {
+            goalRepository.addGoalSavings(userId, goalId, amountToAdd, new GoalRepository.UpdateGoalCallback() {
                 @Override
                 public void onSuccess() {
                     String successMessage = String.format(Locale.getDefault(), "LKR %.0f added to %s", amountToAdd, goalName);

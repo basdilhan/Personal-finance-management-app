@@ -26,6 +26,8 @@ public class GoalEntity {
 
     public double currentAmount;
 
+    public double addedSavingsAmount;
+
     public long targetDate;
 
     @NonNull
