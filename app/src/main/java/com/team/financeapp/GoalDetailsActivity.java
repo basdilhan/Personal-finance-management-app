@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.button.MaterialButton;
 import com.team.financeapp.auth.AuthManager;
 import com.team.financeapp.data.repository.GoalRepository;
+import com.team.financeapp.notifications.FinancialNotificationHelper;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -271,6 +272,8 @@ public class GoalDetailsActivity extends AppCompatActivity {
                     String successMessage = String.format(Locale.getDefault(), "LKR %.0f added to %s", amountToAdd, goalName);
                     Toast.makeText(GoalDetailsActivity.this, successMessage, Toast.LENGTH_SHORT).show();
 
+                    sendSavingsGuidanceNotification(amountToAdd);
+
                     if (currentAmount >= targetAmount && targetAmount > 0) {
                         Toast.makeText(GoalDetailsActivity.this, "Congratulations! Goal reached.", Toast.LENGTH_LONG).show();
                     }
@@ -286,6 +289,50 @@ public class GoalDetailsActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, "User not authenticated", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void sendSavingsGuidanceNotification(double amountAdded) {
+        if (targetAmount <= 0) {
+            return;
+        }
+
+        String safeGoalName = (goalName == null || goalName.trim().isEmpty()) ? "your goal" : goalName.trim();
+        double remaining = Math.max(0, targetAmount - currentAmount);
+
+        String title = "Savings added to " + safeGoalName;
+        String message;
+
+        if (remaining <= 0) {
+            message = String.format(Locale.getDefault(),
+                    "Great work! You added LKR %.0f and completed %s.",
+                    amountAdded,
+                    safeGoalName);
+        } else {
+            long daysLeft = calculateDaysLeft(targetDate);
+            double perDay = remaining / (double) daysLeft;
+            message = String.format(Locale.getDefault(),
+                    "You added LKR %.0f. Remaining LKR %.0f. Save about LKR %.0f/day for the next %d day(s) to reach %s.",
+                    amountAdded,
+                    remaining,
+                    perDay,
+                    daysLeft,
+                    safeGoalName);
+        }
+
+        int notificationId = (int) (System.currentTimeMillis() & 0x7fffffff);
+        FinancialNotificationHelper.showReminderNotification(this, notificationId, title, message);
+    }
+
+    private long calculateDaysLeft(long targetTimestamp) {
+        if (targetTimestamp <= 0) {
+            return 1L;
+        }
+
+        long now = System.currentTimeMillis();
+        long oneDayMs = 24L * 60L * 60L * 1000L;
+        long millisLeft = targetTimestamp - now;
+        long days = (long) Math.ceil((double) millisLeft / (double) oneDayMs);
+        return Math.max(1L, days);
     }
 
     private void sendUpdatedGoalResultIfNeeded() {
