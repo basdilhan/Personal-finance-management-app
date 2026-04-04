@@ -1,7 +1,100 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="accent">#FBBF24</color>
+    <color name="accent_dark">#F59E0B</color>
+    <color name="accent_overlay">#3A2A05</color>
+    <color name="background">#0F172A</color>
+    <color name="background_light">#111827</color>
+    <color name="black">#FF000000</color>
+    <color name="card_background">#1E293B</color>
+    <color name="card_background_light">#273449</color>
+    <color name="dashboard_chart_center">#E2E8F0</color>
+    <color name="dashboard_chart_hole">#1E293B</color>
+    <color name="dashboard_chart_other">#64748B</color>
+    <color name="dashboard_header_subtitle">#C7D2FE</color>
+    <color name="dashboard_insight_bg">#2A2110</color>
+    <color name="dashboard_insight_body">#FCD34D</color>
+    <color name="dashboard_insight_stroke">#4A3413</color>
+    <color name="dashboard_insight_title">#FDE68A</color>
+    <color name="divider">#334155</color>
+    <color name="error">#F87171</color>
+    <color name="gradient_end">#6366F1</color>
+    <color name="gradient_mid">#4F46E5</color>
+    <color name="gradient_start">#3730A3</color>
+    <color name="grey_dark">#CBD5E1</color>
+    <color name="grey_light">#334155</color>
+    <color name="grey_medium">#64748B</color>
+    <color name="info">#60A5FA</color>
+    <color name="primary">#8B8DFF</color>
+    <color name="primary_dark">#6366F1</color>
+    <color name="primary_light">#A5B4FC</color>
+    <color name="primary_overlay">#1E1B4B</color>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="success">#34D399</color>
+    <color name="success_dark">#10B981</color>
+    <color name="surface">#1E293B</color>
+    <color name="surface_elevated">#334155</color>
+    <color name="teal_200">#FF80CBC4</color>
+    <color name="teal_700">#FF00897B</color>
+    <color name="text_hint">#94A3B8</color>
+    <color name="text_on_card">#E2E8F0</color>
+    <color name="text_on_primary">#FFFFFF</color>
+    <color name="text_primary">#F8FAFC</color>
+    <color name="text_secondary">#CBD5E1</color>
+    <color name="warning">#FB923C</color>
+    <color name="white">#FFFFFFFF</color>
     <style name="Base.Theme.FinanceApp" parent="Theme.Material3.DayNight.NoActionBar">
         
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryVariant">@color/primary_dark</item>
+        <item name="colorOnPrimary">@color/text_on_primary</item>
+
         
+        <item name="colorSecondary">@color/accent</item>
+        <item name="colorSecondaryVariant">@color/accent_dark</item>
+        <item name="colorOnSecondary">@color/white</item>
+
+        
+        <item name="android:colorBackground">@color/background</item>
+        <item name="colorSurface">@color/surface</item>
+        <item name="colorSurfaceVariant">@color/surface_elevated</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+
+        
+        <item name="android:statusBarColor">@color/background</item>
+        <item name="android:navigationBarColor">@color/background</item>
+        <item name="android:windowLightStatusBar">false</item>
+
+        
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
+        <item name="android:textColorHint">@color/text_hint</item>
+
+        
+        <item name="materialButtonStyle">@style/Widget.FinanceApp.Button</item>
+        <item name="textInputStyle">@style/Widget.FinanceApp.TextInputLayout</item>
+        <item name="materialCardViewStyle">@style/Widget.FinanceApp.Card</item>
+    </style>
+    <style name="Theme.FinanceApp" parent="Base.Theme.FinanceApp"/>
+    <style name="Widget.FinanceApp.Button" parent="Widget.Material3.Button">
+        <item name="android:textColor">@color/white</item>
+        <item name="backgroundTint">@color/primary</item>
+        <item name="cornerRadius">8dp</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="fontFamily">sans-serif-medium</item>
+    </style>
+    <style name="Widget.FinanceApp.Card" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardCornerRadius">12dp</item>
+        <item name="cardElevation">4dp</item>
+        <item name="cardBackgroundColor">@color/card_background</item>
+    </style>
+    <style name="Widget.FinanceApp.TextInputLayout" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeColor">@color/primary</item>
+        <item name="hintTextColor">@color/text_secondary</item>
+        <item name="android:textColorHint">@color/text_hint</item>
     </style>
 </resources>

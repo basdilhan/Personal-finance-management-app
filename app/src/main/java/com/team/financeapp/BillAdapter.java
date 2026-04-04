@@ -20,9 +20,25 @@ import java.util.Locale;
 public class BillAdapter extends RecyclerView.Adapter<BillAdapter.BillViewHolder> {
 
     private List<Bill> bills;
+    private OnBillItemClickListener listener;
+
+    public interface OnBillItemClickListener {
+        void onBillClick(Bill bill);
+
+        void onBillLongClick(Bill bill);
+    }
 
     public BillAdapter(List<Bill> bills) {
         this.bills = bills;
+    }
+
+    public BillAdapter(List<Bill> bills, OnBillItemClickListener listener) {
+        this.bills = bills;
+        this.listener = listener;
+    }
+
+    public void setOnBillItemClickListener(OnBillItemClickListener listener) {
+        this.listener = listener;
     }
 
     @NonNull
@@ -36,7 +52,7 @@ public class BillAdapter extends RecyclerView.Adapter<BillAdapter.BillViewHolder
     @Override
     public void onBindViewHolder(@NonNull BillViewHolder holder, int position) {
         Bill bill = bills.get(position);
-        holder.bind(bill);
+        holder.bind(bill, listener);
     }
 
     @Override
@@ -71,9 +87,9 @@ public class BillAdapter extends RecyclerView.Adapter<BillAdapter.BillViewHolder
             tvAmount = itemView.findViewById(R.id.tv_bill_amount);
         }
 
-        public void bind(Bill bill) {
-            ivCategoryIcon.setImageResource(bill.getCategoryIcon());
-            statusIndicator.setBackgroundResource(bill.getIndicatorColor());
+        public void bind(Bill bill, OnBillItemClickListener listener) {
+            DrawableUtils.safeSetImageResource(ivCategoryIcon, bill.getCategoryIcon(), R.drawable.ic_receipt);
+            DrawableUtils.safeSetBackgroundResource(statusIndicator, bill.getIndicatorColor(), R.drawable.circle_blue_light);
             tvBillName.setText(bill.getName());
             
             // Format due date
@@ -82,6 +98,19 @@ public class BillAdapter extends RecyclerView.Adapter<BillAdapter.BillViewHolder
             tvDueDate.setText("Due: " + formattedDate);
             
             tvAmount.setText(String.format("LKR %.2f", bill.getAmount()));
+
+            itemView.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onBillClick(bill);
+                }
+            });
+            itemView.setOnLongClickListener(v -> {
+                if (listener != null) {
+                    listener.onBillLongClick(bill);
+                    return true;
+                }
+                return false;
+            });
         }
     }
 }

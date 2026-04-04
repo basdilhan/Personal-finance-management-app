@@ -26,11 +26,27 @@ public class ExpenseAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     private List<Object> items; // Mix of String (dates) and Expense objects
     private List<Expense> expenses;
+    private OnExpenseItemClickListener listener;
+
+    public interface OnExpenseItemClickListener {
+        void onExpenseClick(Expense expense);
+
+        void onExpenseLongClick(Expense expense);
+    }
 
     public ExpenseAdapter(List<Expense> expenses) {
         this.expenses = expenses;
         this.items = new ArrayList<>();
         groupExpensesByDate();
+    }
+
+    public ExpenseAdapter(List<Expense> expenses, OnExpenseItemClickListener listener) {
+        this(expenses);
+        this.listener = listener;
+    }
+
+    public void setOnExpenseItemClickListener(OnExpenseItemClickListener listener) {
+        this.listener = listener;
     }
 
     /**
@@ -122,7 +138,7 @@ public class ExpenseAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             ((DateHeaderViewHolder) holder).bind(dateLabel);
         } else if (holder instanceof ExpenseViewHolder) {
             Expense expense = (Expense) items.get(position);
-            ((ExpenseViewHolder) holder).bind(expense);
+            ((ExpenseViewHolder) holder).bind(expense, listener);
         }
     }
 
@@ -175,11 +191,24 @@ public class ExpenseAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             tvAmount = itemView.findViewById(R.id.tv_amount);
         }
 
-        public void bind(Expense expense) {
-            ivCategoryIcon.setImageResource(expense.getCategoryIcon());
+        public void bind(Expense expense, OnExpenseItemClickListener listener) {
+            DrawableUtils.safeSetImageResource(ivCategoryIcon, expense.getCategoryIcon(), R.drawable.ic_receipt);
             tvCategoryName.setText(expense.getCategory());
             tvTime.setText(expense.getTime());
             tvAmount.setText(String.format("LKR %.2f", expense.getAmount()));
+
+            itemView.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onExpenseClick(expense);
+                }
+            });
+            itemView.setOnLongClickListener(v -> {
+                if (listener != null) {
+                    listener.onExpenseLongClick(expense);
+                    return true;
+                }
+                return false;
+            });
         }
     }
 }

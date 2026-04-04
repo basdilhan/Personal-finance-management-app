@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.team.financeapp-mergeDebugResources-29:/values-large-v4/values-large-v4.xml",
+            "outputFile": "com.team.financeapp-mergeDebugResources-47:/values-large-v4/values-large-v4.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\pulin\\.gradle\\caches\\8.9\\transforms\\157a9ceb9d0f0b36243a86aad1aa5b78\\transformed\\appcompat-1.6.1\\res\\values-large-v4\\values-large-v4.xml",
+                    "source": "C:\\Users\\ASUS\\.gradle\\caches\\9.2.1\\transforms\\0ecce84873fbde75f65776919b19d274\\workspace\\transformed\\appcompat-1.6.1\\res\\values-large-v4\\values-large-v4.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10",
                         "startColumns": "4,4,4,4,4,4,4,4,4",
@@ -14,7 +14,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\pulin\\.gradle\\caches\\8.9\\transforms\\b7c8278e4ef6583f08edc806c9d7ada4\\transformed\\material-1.10.0\\res\\values-large-v4\\values-large-v4.xml",
+                    "source": "C:\\Users\\ASUS\\.gradle\\caches\\9.2.1\\transforms\\ade5a52c2cecb4fd276c33dd5c0392da\\workspace\\transformed\\material-1.10.0\\res\\values-large-v4\\values-large-v4.xml",
                     "from": {
                         "startLines": "2,3,4,5",
                         "startColumns": "4,4,4,4",

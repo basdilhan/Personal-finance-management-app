@@ -49,9 +49,9 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
                         android:text="Manage your payments"
-                        android:textColor="@color/white"
+                        android:textColor="@color/dashboard_header_subtitle"
                         android:textSize="12sp"
-                        android:alpha="0.85" />
+                        android:alpha="0.9" />
                 </LinearLayout>
 
                 <!-- Logout Button (Right) -->
@@ -74,7 +74,7 @@
                 android:layout_height="wrap_content"
                 android:elevation="8dp"
                 app:cardCornerRadius="16dp"
-                app:cardBackgroundColor="@color/white">
+                app:cardBackgroundColor="@color/card_background">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -134,13 +134,6 @@
                     android:text="Urgent" />
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/chip_due_soon"
-                    style="@style/Widget.Material3.Chip.Filter"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Due Soon" />
-
-                <com.google.android.material.chip.Chip
                     android:id="@+id/chip_paid"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
@@ -191,7 +184,7 @@
                     android:layout_height="wrap_content"
                     app:cardCornerRadius="20dp"
                     app:cardElevation="4dp"
-                    app:cardBackgroundColor="@color/white">
+                    app:cardBackgroundColor="@color/card_background">
 
                     <LinearLayout
                         android:layout_width="match_parent"

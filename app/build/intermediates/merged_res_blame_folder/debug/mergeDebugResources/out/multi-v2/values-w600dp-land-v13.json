@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.team.financeapp-mergeDebugResources-29:/values-w600dp-land-v13/values-w600dp-land-v13.xml",
+            "outputFile": "com.team.financeapp-mergeDebugResources-47:/values-w600dp-land-v13/values-w600dp-land-v13.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\pulin\\.gradle\\caches\\8.9\\transforms\\b7c8278e4ef6583f08edc806c9d7ada4\\transformed\\material-1.10.0\\res\\values-w600dp-land-v13\\values-w600dp-land-v13.xml",
+                    "source": "C:\\Users\\ASUS\\.gradle\\caches\\9.2.1\\transforms\\ade5a52c2cecb4fd276c33dd5c0392da\\workspace\\transformed\\material-1.10.0\\res\\values-w600dp-land-v13\\values-w600dp-land-v13.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",

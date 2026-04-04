@@ -9,6 +9,7 @@ public class Goal {
     private String description;
     private double targetAmount;
     private double currentAmount;
+    private double addedSavingsAmount;
     private long targetDate; // timestamp in milliseconds
     private String category;
     private int categoryIcon; // drawable resource id for the category icon
@@ -19,11 +20,17 @@ public class Goal {
      */
     public Goal(int id, String name, String description, double targetAmount, double currentAmount, 
                 long targetDate, String category, int categoryIcon, int progressCircleBackground) {
+        this(id, name, description, targetAmount, currentAmount, 0.0d, targetDate, category, categoryIcon, progressCircleBackground);
+    }
+
+    public Goal(int id, String name, String description, double targetAmount, double currentAmount,
+                double addedSavingsAmount, long targetDate, String category, int categoryIcon, int progressCircleBackground) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.targetAmount = targetAmount;
         this.currentAmount = currentAmount;
+        this.addedSavingsAmount = addedSavingsAmount;
         this.targetDate = targetDate;
         this.category = category;
         this.categoryIcon = categoryIcon;
@@ -35,10 +42,16 @@ public class Goal {
      */
     public Goal(String name, String description, double targetAmount, double currentAmount,
                 long targetDate, String category, int categoryIcon, int progressCircleBackground) {
+        this(name, description, targetAmount, currentAmount, 0.0d, targetDate, category, categoryIcon, progressCircleBackground);
+    }
+
+    public Goal(String name, String description, double targetAmount, double currentAmount,
+                double addedSavingsAmount, long targetDate, String category, int categoryIcon, int progressCircleBackground) {
         this.name = name;
         this.description = description;
         this.targetAmount = targetAmount;
         this.currentAmount = currentAmount;
+        this.addedSavingsAmount = addedSavingsAmount;
         this.targetDate = targetDate;
         this.category = category;
         this.categoryIcon = categoryIcon;
@@ -64,6 +77,10 @@ public class Goal {
 
     public double getCurrentAmount() {
         return currentAmount;
+    }
+
+    public double getAddedSavingsAmount() {
+        return addedSavingsAmount;
     }
 
     public long getTargetDate() {
@@ -106,6 +123,10 @@ public class Goal {
 
     public void setCurrentAmount(double currentAmount) {
         this.currentAmount = currentAmount;
+    }
+
+    public void setAddedSavingsAmount(double addedSavingsAmount) {
+        this.addedSavingsAmount = addedSavingsAmount;
     }
 
     public void setTargetAmount(double targetAmount) {

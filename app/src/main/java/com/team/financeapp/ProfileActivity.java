@@ -1,16 +1,24 @@
 package com.team.financeapp;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.switchmaterial.SwitchMaterial;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * User Profile Activity
@@ -26,28 +34,21 @@ public class ProfileActivity extends AppCompatActivity {
     private TextView tvAccountType;
     private MaterialButton btnEditProfile;
     private MaterialButton btnChangePassword;
+    private MaterialButton btnAppLock;
     private MaterialButton btnBack;
-    private SharedPreferences sharedPreferences;
-    private static final String PREF_NAME = "profile_pref";
-    private static final String KEY_USER_NAME = "user_name";
-    private static final String KEY_USER_EMAIL = "user_email";
-    private static final String KEY_USER_PHONE = "user_phone";
-
-    private String userName = "John Doe";
-    private String userEmail = "john.doe@example.com";
-    private String userPhone = "+94 76 123 4567";
-    private String joinDate = "January 15, 2024";
-    private String accountType = "Free Account";
+    private SwitchMaterial switchDarkTheme;
+    private FirebaseFirestore firestore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-        sharedPreferences = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+        firestore = FirebaseFirestore.getInstance();
 
         initializeViews();
         loadUserData();
+        setupThemeToggle();
         setupClickListeners();
     }
 
@@ -70,23 +71,79 @@ public class ProfileActivity extends AppCompatActivity {
         tvAccountType = findViewById(R.id.tv_account_type);
         btnEditProfile = findViewById(R.id.button_edit_profile);
         btnChangePassword = findViewById(R.id.button_change_password);
+        btnAppLock = findViewById(R.id.button_app_lock);
         btnBack = findViewById(R.id.button_back);
+        switchDarkTheme = findViewById(R.id.switch_dark_theme);
     }
 
     /**
      * Load and display user data
      */
     private void loadUserData() {
-        // Load from SharedPreferences, use defaults if not found
-        userName = sharedPreferences.getString(KEY_USER_NAME, userName);
-        userEmail = sharedPreferences.getString(KEY_USER_EMAIL, userEmail);
-        userPhone = sharedPreferences.getString(KEY_USER_PHONE, userPhone);
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) {
+            startActivity(new Intent(ProfileActivity.this, LoginActivity.class));
+            finish();
+            return;
+        }
 
-        tvUserName.setText(userName);
-        tvUserEmail.setText(userEmail);
-        tvUserPhone.setText(userPhone);
-        tvJoinDate.setText("Joined: " + joinDate);
-        tvAccountType.setText(accountType);
+        String fallbackName = user.getDisplayName();
+        if (fallbackName == null || fallbackName.trim().isEmpty()) {
+            fallbackName = "User";
+        }
+
+        String email = user.getEmail() == null ? "-" : user.getEmail();
+        tvUserName.setText(fallbackName);
+        tvUserEmail.setText(email);
+        tvJoinDate.setText("Joined: " + formatJoinDate(user));
+        tvAccountType.setText(resolveAccountType(user));
+
+        firestore.collection("users")
+                .document(user.getUid())
+                .get()
+                .addOnSuccessListener(this::bindFirestoreUser)
+                .addOnFailureListener(e -> {
+                    tvUserPhone.setText("Not set");
+                });
+    }
+
+    private void bindFirestoreUser(DocumentSnapshot snapshot) {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) {
+            return;
+        }
+
+        String firestoreName = snapshot.getString("name");
+        if (firestoreName != null && !firestoreName.trim().isEmpty()) {
+            tvUserName.setText(firestoreName.trim());
+        }
+
+        String firestoreEmail = snapshot.getString("email");
+        if (firestoreEmail != null && !firestoreEmail.trim().isEmpty()) {
+            tvUserEmail.setText(firestoreEmail.trim());
+        }
+
+        String phone = snapshot.getString("phone");
+        tvUserPhone.setText(phone == null || phone.trim().isEmpty() ? "Not set" : phone.trim());
+    }
+
+    private String formatJoinDate(FirebaseUser user) {
+        long createdAt = user.getMetadata() == null ? 0L : user.getMetadata().getCreationTimestamp();
+        if (createdAt <= 0L) {
+            return "-";
+        }
+        return new SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault()).format(new Date(createdAt));
+    }
+
+    private String resolveAccountType(FirebaseUser user) {
+        if (user.getProviderData() != null) {
+            for (com.google.firebase.auth.UserInfo info : user.getProviderData()) {
+                if ("google.com".equals(info.getProviderId())) {
+                    return "Google Account";
+                }
+            }
+        }
+        return "Email Account";
     }
 
     /**
@@ -113,13 +170,43 @@ public class ProfileActivity extends AppCompatActivity {
                 navigateToChangePassword();
             }
         });
+
+        btnAppLock.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                navigateToAppLockSettings();
+            }
+        });
+    }
+
+    /**
+     * Initialize and handle dark mode toggle.
+     */
+    private void setupThemeToggle() {
+        if (switchDarkTheme == null) {
+            return;
+        }
+
+        switchDarkTheme.setChecked(ThemePreferenceManager.isDarkModeActive(this));
+        switchDarkTheme.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            int targetMode = isChecked
+                    ? AppCompatDelegate.MODE_NIGHT_YES
+                    : AppCompatDelegate.MODE_NIGHT_NO;
+
+            if (ThemePreferenceManager.getThemeMode(ProfileActivity.this) == targetMode) {
+                return;
+            }
+
+            ThemePreferenceManager.saveThemeMode(ProfileActivity.this, targetMode);
+            AppCompatDelegate.setDefaultNightMode(targetMode);
+        });
     }
 
     /**
      * Navigate to Change Password activity
      */
     private void navigateToChangePassword() {
-        Intent intent = new Intent(ProfileActivity.this, ForgotPasswordActivity.class);
+        Intent intent = new Intent(ProfileActivity.this, ChangePasswordActivity.class);
         startActivity(intent);
     }
 
@@ -128,6 +215,11 @@ public class ProfileActivity extends AppCompatActivity {
      */
     private void navigateToEditProfile() {
         Intent intent = new Intent(ProfileActivity.this, EditProfileActivity.class);
+        startActivity(intent);
+    }
+
+    private void navigateToAppLockSettings() {
+        Intent intent = new Intent(ProfileActivity.this, AppLockSettingsActivity.class);
         startActivity(intent);
     }
 }

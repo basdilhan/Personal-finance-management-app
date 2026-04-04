@@ -41,7 +41,7 @@
                         android:layout_height="44dp"
                         android:background="@drawable/circle_translucent"
                         android:contentDescription="Back"
-                        app:icon="@drawable/ic_arrow_down"
+                        app:icon="@drawable/ic_back"
                         app:iconTint="@color/white"
                         app:iconGravity="textStart"
                         app:iconPadding="0dp" />
@@ -110,7 +110,7 @@
                 android:layout_marginTop="-24dp"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="8dp"
-                app:cardBackgroundColor="@color/white">
+                app:cardBackgroundColor="@color/card_background">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -251,7 +251,7 @@
                 android:layout_marginTop="16dp"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="2dp"
-                app:cardBackgroundColor="@color/white">
+                app:cardBackgroundColor="@color/card_background">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -359,10 +359,15 @@
                     android:id="@+id/btn_edit_goal"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
+                    android:includeFontPadding="true"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
                     android:text="Edit Goal"
                     android:textAllCaps="false"
                     android:textSize="16sp"
                     app:icon="@drawable/ic_receipt"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
                     app:cornerRadius="12dp" />
 
                 <!-- Add Savings Button -->
@@ -371,11 +376,16 @@
                     style="@style/Widget.Material3.Button.OutlinedButton"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
+                    android:includeFontPadding="true"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
                     android:layout_marginTop="12dp"
                     android:text="Add Savings"
                     android:textAllCaps="false"
                     android:textSize="16sp"
                     app:icon="@drawable/ic_add"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
                     app:cornerRadius="12dp"
                     app:strokeColor="@color/primary" />
 
@@ -385,6 +395,9 @@
                     style="@style/Widget.Material3.Button.TextButton"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
+                    android:includeFontPadding="true"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
                     android:layout_marginTop="12dp"
                     android:text="Delete Goal"
                     android:textAllCaps="false"
@@ -392,6 +405,8 @@
                     android:textSize="16sp"
                     app:icon="@drawable/ic_receipt"
                     app:iconTint="@color/error"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
                     app:cornerRadius="12dp"
                     app:rippleColor="@color/error" />
             </LinearLayout>

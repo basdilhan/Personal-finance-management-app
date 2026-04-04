@@ -192,6 +192,9 @@
                     android:id="@+id/button_register"
                     android:layout_width="0dp"
                     android:layout_height="56dp"
+                    android:includeFontPadding="true"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
                     android:layout_marginTop="20dp"
                     android:background="@drawable/button_gradient"
                     android:text="@string/btn_register"
@@ -199,9 +202,28 @@
                     android:textSize="16sp"
                     android:textStyle="bold"
                     app:cornerRadius="8dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/text_password_hint" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_google_sign_up"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:includeFontPadding="true"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:layout_marginTop="12dp"
+                    android:text="@string/btn_google_sign_in"
+                    android:textSize="15sp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/button_register" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.cardview.widget.CardView>

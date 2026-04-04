@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
+import com.team.financeapp.data.repository.GoalRepository;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -39,6 +40,7 @@ public class AddGoalActivity extends AppCompatActivity {
     private TextView tvTitle, tvSubtitle;
     private Calendar calendar;
     private SimpleDateFormat dateFormat;
+    private GoalRepository goalRepository;
 
     private boolean isEditMode = false;
     private int goalId = -1;
@@ -66,6 +68,9 @@ public class AddGoalActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_goal);
+
+        // Initialize GoalRepository
+        goalRepository = new GoalRepository(this);
 
         // Check if edit mode
         isEditMode = getIntent().getBooleanExtra(EXTRA_EDIT_MODE, false);
@@ -100,6 +105,8 @@ public class AddGoalActivity extends AppCompatActivity {
 
         // Initialize calendar and date format
         calendar = Calendar.getInstance();
+        // Set to tomorrow as default
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
         dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
         // Update UI for edit mode
@@ -171,8 +178,16 @@ public class AddGoalActivity extends AppCompatActivity {
             }
         });
 
+        // Also set on the parent layout to ensure clickability
+        etTargetDate.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                showDatePickerDialog();
+                etTargetDate.clearFocus();
+            }
+        });
+
         // Make target date field non-editable for better UX (only click to open calendar)
-        etTargetDate.setFocusable(false);
+        etTargetDate.setFocusableInTouchMode(false);
         etTargetDate.setClickable(true);
 
         btnSave.setOnClickListener(new View.OnClickListener() {
@@ -191,40 +206,71 @@ public class AddGoalActivity extends AppCompatActivity {
     }
 
     /**
-     * Show date picker dialog for selecting target date
+     * Show date picker dialog with explicit Select Date button
      */
     private void showDatePickerDialog() {
-        // Get current date values
+        // Get current date values from calendar
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
 
-        // Create and show DatePickerDialog
-        DatePickerDialog datePickerDialog = new DatePickerDialog(
-                AddGoalActivity.this,
-                android.R.style.Theme_Material_Light_Dialog_Alert,
-                new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker view, int selectedYear, int selectedMonth, int selectedDay) {
-                        // Update calendar with selected date
-                        calendar.set(Calendar.YEAR, selectedYear);
-                        calendar.set(Calendar.MONTH, selectedMonth);
-                        calendar.set(Calendar.DAY_OF_MONTH, selectedDay);
+        // Create AlertDialog with DatePicker and buttons
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(AddGoalActivity.this);
+        builder.setTitle("Select Target Date");
 
-                        // Format and display the date
-                        String formattedDate = dateFormat.format(calendar.getTime());
-                        etTargetDate.setText(formattedDate);
-                    }
-                },
-                year,
-                month,
-                day
-        );
+        // Create a DatePicker
+        DatePicker datePicker = new DatePicker(AddGoalActivity.this);
+        datePicker.init(year, month, day, null);
 
         // Set minimum date to today
-        datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis());
+        Calendar minDate = Calendar.getInstance();
+        minDate.set(Calendar.HOUR_OF_DAY, 0);
+        minDate.set(Calendar.MINUTE, 0);
+        minDate.set(Calendar.SECOND, 0);
+        minDate.set(Calendar.MILLISECOND, 0);
+        datePicker.setMinDate(minDate.getTimeInMillis());
 
-        datePickerDialog.show();
+        builder.setView(datePicker);
+
+        // Add Select Date button
+        builder.setPositiveButton("Select Date", new android.content.DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(android.content.DialogInterface dialog, int which) {
+                // Get selected date from DatePicker
+                int selectedYear = datePicker.getYear();
+                int selectedMonth = datePicker.getMonth();
+                int selectedDay = datePicker.getDayOfMonth();
+
+                // Update calendar with selected date
+                calendar.set(Calendar.YEAR, selectedYear);
+                calendar.set(Calendar.MONTH, selectedMonth);
+                calendar.set(Calendar.DAY_OF_MONTH, selectedDay);
+                // Reset time to midnight
+                calendar.set(Calendar.HOUR_OF_DAY, 0);
+                calendar.set(Calendar.MINUTE, 0);
+                calendar.set(Calendar.SECOND, 0);
+                calendar.set(Calendar.MILLISECOND, 0);
+
+                // Format and display the date
+                String formattedDate = dateFormat.format(calendar.getTime());
+                etTargetDate.setText(formattedDate);
+
+                // Log for debugging
+                android.util.Log.d("DatePicker", "Selected date: " + formattedDate + " | Millis: " + calendar.getTimeInMillis());
+
+                dialog.dismiss();
+            }
+        });
+
+        // Add Cancel button
+        builder.setNegativeButton("Cancel", new android.content.DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(android.content.DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
     }
 
     private void saveGoal() {
@@ -252,13 +298,106 @@ public class AddGoalActivity extends AppCompatActivity {
             return;
         }
 
-        // TODO: Save to database
-        if (isEditMode) {
-            Toast.makeText(this, "Goal updated: " + goalName + " - LKR " + targetAmount, Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(this, "Goal created: " + goalName + " - LKR " + targetAmount, Toast.LENGTH_SHORT).show();
+        if (targetDate.isEmpty()) {
+            Toast.makeText(this, "Please select a target date", Toast.LENGTH_SHORT).show();
+            return;
         }
-        finish();
+
+        // Get current user ID
+        String userId = new com.team.financeapp.auth.AuthManager().getCurrentUserId();
+        if (userId == null) {
+            Toast.makeText(this, "User not authenticated", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        try {
+            double targetAmountValue = Double.parseDouble(targetAmount);
+            double currentAmountValue = currentAmount.isEmpty() ? 0 : Double.parseDouble(currentAmount);
+
+            // Parse the date string to get the correct timestamp
+            long targetDateMillis = 0;
+            if (!targetDate.isEmpty()) {
+                try {
+                    Date parsedDate = dateFormat.parse(targetDate);
+                    if (parsedDate != null) {
+                        targetDateMillis = parsedDate.getTime();
+                    }
+                } catch (java.text.ParseException e) {
+                    e.printStackTrace();
+                    targetDateMillis = calendar.getTimeInMillis();
+                }
+            } else {
+                targetDateMillis = calendar.getTimeInMillis();
+            }
+
+            // Create Goal object
+            Goal goal = new Goal(
+                    goalName,
+                    "",  // description - can be enhanced later
+                    targetAmountValue,
+                    currentAmountValue,
+                    targetDateMillis,
+                    goalType,
+                    R.drawable.ic_wallet,  // default icon
+                    R.drawable.circle_primary_light  // default progress background
+            );
+
+            // Show loading state
+            btnSave.setEnabled(false);
+            btnSave.setText("Saving...");
+
+            if (isEditMode) {
+                // Update existing goal
+                goal = new Goal(
+                        goalId,
+                        goalName,
+                        "",
+                        targetAmountValue,
+                        currentAmountValue,
+                        targetDateMillis,
+                        goalType,
+                        R.drawable.ic_wallet,
+                        R.drawable.circle_primary_light
+                );
+
+                goalRepository.updateGoal(userId, goal, new GoalRepository.UpdateGoalCallback() {
+                    @Override
+                    public void onSuccess() {
+                        btnSave.setEnabled(true);
+                        btnSave.setText("Update Goal");
+                        Toast.makeText(AddGoalActivity.this, "Goal updated: " + goalName + " - LKR " + targetAmount, Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+
+                    @Override
+                    public void onError(String message) {
+                        btnSave.setEnabled(true);
+                        btnSave.setText("Update Goal");
+                        Toast.makeText(AddGoalActivity.this, "Error: " + message, Toast.LENGTH_SHORT).show();
+                    }
+                });
+            } else {
+                // Save new goal
+                goalRepository.saveGoal(userId, goal, new GoalRepository.SaveGoalCallback() {
+                    @Override
+                    public void onSuccess(Goal savedGoal) {
+                        btnSave.setEnabled(true);
+                        btnSave.setText("Save Goal");
+                        Toast.makeText(AddGoalActivity.this, "Goal created: " + goalName + " - LKR " + targetAmount, Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+
+                    @Override
+                    public void onError(String message) {
+                        btnSave.setEnabled(true);
+                        btnSave.setText("Save Goal");
+                        Toast.makeText(AddGoalActivity.this, "Error: " + message, Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        } catch (NumberFormatException e) {
+            Toast.makeText(this, "Invalid amount entered", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override

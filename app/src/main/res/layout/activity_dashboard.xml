@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8FAFC">
+    android:background="@color/background">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -82,8 +82,8 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Welcome back,"
-                                    android:textColor="#E0E7FF"
+                                    android:text="@string/dashboard_welcome_back"
+                                    android:textColor="@color/dashboard_header_subtitle"
                                     android:textSize="13sp"
                                     android:letterSpacing="0.02" />
 
@@ -96,6 +96,18 @@
                                     android:textSize="18sp"
                                     android:textStyle="bold"
                                     android:layout_marginTop="2dp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="6dp"
+                                    android:background="@drawable/badge_primary"
+                                    android:paddingHorizontal="10dp"
+                                    android:paddingVertical="3dp"
+                                    android:text="@string/dashboard_identity_badge"
+                                    android:textColor="@color/primary_dark"
+                                    android:textSize="11sp"
+                                    android:textStyle="bold" />
                             </LinearLayout>
                         </LinearLayout>
 
@@ -115,7 +127,8 @@
                                     android:layout_width="42dp"
                                     android:layout_height="42dp"
                                     android:background="@drawable/circle_translucent"
-                                    android:src="@drawable/ic_notification"
+                                    android:contentDescription="@string/cd_notifications"
+                                    android:src="@drawable/ic_notifications_bell"
                                     android:padding="10dp"
                                     android:scaleType="centerInside" />
 
@@ -154,7 +167,7 @@
                         android:layout_marginTop="24dp"
                         app:cardCornerRadius="24dp"
                         app:cardElevation="12dp"
-                        app:cardBackgroundColor="@color/white">
+                        app:cardBackgroundColor="@color/card_background">
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -178,8 +191,8 @@
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="Total Balance"
-                                        android:textColor="#64748B"
+                                        android:text="@string/dashboard_total_balance_title"
+                                        android:textColor="@color/text_secondary"
                                         android:textSize="14sp"
                                         android:letterSpacing="0.03" />
 
@@ -188,7 +201,7 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="LKR 285,750.00"
-                                        android:textColor="#1E293B"
+                                        android:textColor="@color/text_primary"
                                         android:textSize="32sp"
                                         android:textStyle="bold"
                                         android:fontFamily="sans-serif-medium"
@@ -202,6 +215,23 @@
                                     android:orientation="vertical"
                                     android:gravity="end">
 
+                                    <com.google.android.material.button.MaterialButton
+                                        android:id="@+id/button_toggle_balance_visibility"
+                                        style="@style/Widget.Material3.Button.TextButton"
+                                        android:layout_width="36dp"
+                                        android:layout_height="36dp"
+                                        android:minWidth="0dp"
+                                        android:minHeight="0dp"
+                                        android:contentDescription="@string/dashboard_show_amounts"
+                                        android:padding="0dp"
+                                        android:layout_marginBottom="6dp"
+                                        app:icon="@drawable/ic_eye_closed"
+                                        app:iconTint="@color/text_secondary"
+                                        app:iconPadding="0dp"
+                                        app:iconGravity="textStart"
+                                        android:insetTop="0dp"
+                                        android:insetBottom="0dp" />
+
                                     <LinearLayout
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
@@ -214,23 +244,25 @@
                                             android:layout_width="14dp"
                                             android:layout_height="14dp"
                                             android:src="@drawable/ic_trending_up"
-                                            app:tint="#10B981" />
+                                            app:tint="@color/success" />
 
                                         <TextView
+                                            android:id="@+id/text_balance_trend"
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
                                             android:text="+12.5%"
-                                            android:textColor="#10B981"
+                                            android:textColor="@color/success"
                                             android:textSize="12sp"
                                             android:textStyle="bold"
                                             android:layout_marginStart="4dp" />
                                     </LinearLayout>
 
                                     <TextView
+                                        android:id="@+id/text_balance_trend_caption"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="vs last month"
-                                        android:textColor="#94A3B8"
+                                        android:textColor="@color/text_hint"
                                         android:textSize="11sp"
                                         android:layout_marginTop="4dp" />
                                 </LinearLayout>
@@ -268,7 +300,7 @@
                                             android:layout_height="22dp"
                                             android:layout_gravity="center"
                                             android:src="@drawable/ic_arrow_down"
-                                            app:tint="#10B981" />
+                                            app:tint="@color/success" />
                                     </FrameLayout>
 
                                     <LinearLayout
@@ -280,8 +312,8 @@
                                         <TextView
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
-                                            android:text="Income"
-                                            android:textColor="#64748B"
+                                            android:text="@string/dashboard_income_label"
+                                            android:textColor="@color/text_secondary"
                                             android:textSize="12sp" />
 
                                         <TextView
@@ -289,7 +321,7 @@
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
                                             android:text="LKR 185,000"
-                                            android:textColor="#10B981"
+                                            android:textColor="@color/success"
                                             android:textSize="17sp"
                                             android:textStyle="bold"
                                             android:layout_marginTop="2dp" />
@@ -300,7 +332,7 @@
                                 <View
                                     android:layout_width="1dp"
                                     android:layout_height="match_parent"
-                                    android:background="#E2E8F0"
+                                    android:background="@color/divider"
                                     android:layout_marginHorizontal="8dp" />
 
                                 <!-- Expenses -->
@@ -322,7 +354,7 @@
                                             android:layout_height="22dp"
                                             android:layout_gravity="center"
                                             android:src="@drawable/ic_arrow_up"
-                                            app:tint="#EF4444" />
+                                            app:tint="@color/error" />
                                     </FrameLayout>
 
                                     <LinearLayout
@@ -334,8 +366,8 @@
                                         <TextView
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
-                                            android:text="Expenses"
-                                            android:textColor="#64748B"
+                                            android:text="@string/dashboard_expense_label"
+                                            android:textColor="@color/text_secondary"
                                             android:textSize="12sp" />
 
                                         <TextView
@@ -343,7 +375,7 @@
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
                                             android:text="LKR 72,500"
-                                            android:textColor="#EF4444"
+                                            android:textColor="@color/error"
                                             android:textSize="17sp"
                                             android:textStyle="bold"
                                             android:layout_marginTop="2dp" />
@@ -368,8 +400,8 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Quick Actions"
-                    android:textColor="#1E293B"
+                    android:text="@string/dashboard_quick_actions_title"
+                    android:textColor="@color/text_primary"
                     android:textSize="18sp"
                     android:textStyle="bold"
                     android:fontFamily="sans-serif-medium" />
@@ -407,8 +439,8 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Expense"
-                            android:textColor="#475569"
+                            android:text="@string/dashboard_action_expense"
+                            android:textColor="@color/text_secondary"
                             android:textSize="12sp"
                             android:layout_marginTop="8dp" />
                     </LinearLayout>
@@ -439,8 +471,8 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Income"
-                            android:textColor="#475569"
+                            android:text="@string/dashboard_action_income"
+                            android:textColor="@color/text_secondary"
                             android:textSize="12sp"
                             android:layout_marginTop="8dp" />
                     </LinearLayout>
@@ -471,8 +503,8 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Bill"
-                            android:textColor="#475569"
+                            android:text="@string/dashboard_action_bill"
+                            android:textColor="@color/text_secondary"
                             android:textSize="12sp"
                             android:layout_marginTop="8dp" />
                     </LinearLayout>
@@ -503,8 +535,8 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Goal"
-                            android:textColor="#475569"
+                            android:text="@string/dashboard_action_goal"
+                            android:textColor="@color/text_secondary"
                             android:textSize="12sp"
                             android:layout_marginTop="8dp" />
                     </LinearLayout>
@@ -518,9 +550,9 @@
                     android:layout_marginTop="24dp"
                     app:cardCornerRadius="20dp"
                     app:cardElevation="0dp"
-                    app:cardBackgroundColor="#FFF7ED"
+                    app:cardBackgroundColor="@color/dashboard_insight_bg"
                     app:strokeWidth="1dp"
-                    app:strokeColor="#FFEDD5">
+                    app:strokeColor="@color/dashboard_insight_stroke">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -540,7 +572,7 @@
                                 android:layout_height="24dp"
                                 android:layout_gravity="center"
                                 android:src="@drawable/ic_lightbulb"
-                                app:tint="#F59E0B" />
+                                app:tint="@color/accent" />
                         </FrameLayout>
 
                         <LinearLayout
@@ -553,17 +585,28 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="💡 Smart Insight"
-                                android:textColor="#92400E"
+                                android:text="@string/dashboard_insight_title"
+                                android:textColor="@color/dashboard_insight_title"
                                 android:textSize="14sp"
                                 android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/text_insight_amount"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="LKR 0.00"
+                                android:textColor="@color/text_primary"
+                                android:textSize="20sp"
+                                android:textStyle="bold"
+                                android:fontFamily="sans-serif-medium"
+                                android:layout_marginTop="4dp" />
 
                             <TextView
                                 android:id="@+id/text_alert_message"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="You've saved 15% more this month compared to last month. Keep it up!"
-                                android:textColor="#B45309"
+                                android:textColor="@color/dashboard_insight_body"
                                 android:textSize="13sp"
                                 android:lineSpacingExtra="3dp"
                                 android:layout_marginTop="4dp" />
@@ -573,7 +616,7 @@
                             android:layout_width="20dp"
                             android:layout_height="20dp"
                             android:src="@drawable/ic_chevron_right"
-                            app:tint="#D97706" />
+                            app:tint="@color/accent_dark" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -582,8 +625,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="28dp"
-                    android:text="Expense Breakdown"
-                    android:textColor="#1E293B"
+                    android:text="@string/dashboard_expense_breakdown_title"
+                    android:textColor="@color/text_primary"
                     android:textSize="18sp"
                     android:textStyle="bold"
                     android:fontFamily="sans-serif-medium" />
@@ -595,7 +638,7 @@
                     android:layout_marginTop="12dp"
                     app:cardCornerRadius="20dp"
                     app:cardElevation="2dp"
-                    app:cardBackgroundColor="@color/white">
+                    app:cardBackgroundColor="@color/card_background">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -615,7 +658,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="16dp"
                             android:text="Categories"
-                            android:textColor="#1E293B"
+                            android:textColor="@color/text_primary"
                             android:textSize="14sp"
                             android:textStyle="bold" />
 
@@ -650,15 +693,16 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="Housing"
-                                        android:textColor="#1E293B"
+                                        android:textColor="@color/text_primary"
                                         android:textSize="13sp"
                                         android:textStyle="bold" />
 
                                     <TextView
+                                        android:id="@+id/text_legend_housing_percent"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="45%"
-                                        android:textColor="#64748B"
+                                        android:textColor="@color/text_secondary"
                                         android:textSize="12sp" />
                                 </LinearLayout>
                             </LinearLayout>
@@ -686,15 +730,16 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="Food"
-                                        android:textColor="#1E293B"
+                                        android:textColor="@color/text_primary"
                                         android:textSize="13sp"
                                         android:textStyle="bold" />
 
                                     <TextView
+                                        android:id="@+id/text_legend_food_percent"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="25%"
-                                        android:textColor="#64748B"
+                                        android:textColor="@color/text_secondary"
                                         android:textSize="12sp" />
                                 </LinearLayout>
                             </LinearLayout>
@@ -722,15 +767,16 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="Transport"
-                                        android:textColor="#1E293B"
+                                        android:textColor="@color/text_primary"
                                         android:textSize="13sp"
                                         android:textStyle="bold" />
 
                                     <TextView
+                                        android:id="@+id/text_legend_transport_percent"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="15%"
-                                        android:textColor="#64748B"
+                                        android:textColor="@color/text_secondary"
                                         android:textSize="12sp" />
                                 </LinearLayout>
                             </LinearLayout>
@@ -767,15 +813,16 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="Entertainment"
-                                        android:textColor="#1E293B"
+                                        android:textColor="@color/text_primary"
                                         android:textSize="13sp"
                                         android:textStyle="bold" />
 
                                     <TextView
+                                        android:id="@+id/text_legend_entertainment_percent"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="10%"
-                                        android:textColor="#64748B"
+                                        android:textColor="@color/text_secondary"
                                         android:textSize="12sp" />
                                 </LinearLayout>
                             </LinearLayout>
@@ -803,15 +850,16 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="Other"
-                                        android:textColor="#1E293B"
+                                        android:textColor="@color/text_primary"
                                         android:textSize="13sp"
                                         android:textStyle="bold" />
 
                                     <TextView
+                                        android:id="@+id/text_legend_other_percent"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="5%"
-                                        android:textColor="#64748B"
+                                        android:textColor="@color/text_secondary"
                                         android:textSize="12sp" />
                                 </LinearLayout>
                             </LinearLayout>
@@ -822,6 +870,38 @@
                                 android:layout_height="1dp"
                                 android:layout_weight="1" />
                         </LinearLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:text="@string/dashboard_income_breakdown_title"
+                    android:textColor="@color/text_primary"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif-medium" />
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_income_chart"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="2dp"
+                    app:cardBackgroundColor="@color/card_background">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="20dp">
+
+                        <com.github.mikephil.charting.charts.PieChart
+                            android:id="@+id/pie_chart_income"
+                            android:layout_width="match_parent"
+                            android:layout_height="220dp" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -838,7 +918,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="Savings Goals"
-                        android:textColor="#1E293B"
+                        android:textColor="@color/text_primary"
                         android:textSize="18sp"
                         android:textStyle="bold"
                         android:fontFamily="sans-serif-medium" />
@@ -848,7 +928,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="View All"
-                        android:textColor="#6366F1"
+                        android:textColor="@color/primary"
                         android:textSize="14sp"
                         android:textStyle="bold"
                         android:padding="8dp" />
@@ -862,7 +942,7 @@
                     android:layout_marginTop="12dp"
                     app:cardCornerRadius="20dp"
                     app:cardElevation="2dp"
-                    app:cardBackgroundColor="@color/white">
+                    app:cardBackgroundColor="@color/card_background">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -887,7 +967,7 @@
                                     android:layout_height="28dp"
                                     android:layout_gravity="center"
                                     android:src="@drawable/ic_laptop"
-                                    app:tint="#6366F1" />
+                                    app:tint="@color/primary" />
                             </FrameLayout>
 
                             <LinearLayout
@@ -902,7 +982,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Family Savings Fund"
-                                    android:textColor="#1E293B"
+                                    android:textColor="@color/text_primary"
                                     android:textSize="16sp"
                                     android:textStyle="bold" />
 
@@ -911,7 +991,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Target: March 2026"
-                                    android:textColor="#94A3B8"
+                                    android:textColor="@color/text_hint"
                                     android:textSize="13sp"
                                     android:layout_marginTop="2dp" />
                             </LinearLayout>
@@ -929,7 +1009,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="30%"
-                                    android:textColor="#6366F1"
+                                    android:textColor="@color/primary"
                                     android:textSize="14sp"
                                     android:textStyle="bold" />
                             </LinearLayout>
@@ -971,7 +1051,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="LKR 150,000"
-                                    android:textColor="#6366F1"
+                                    android:textColor="@color/primary"
                                     android:textSize="15sp"
                                     android:textStyle="bold" />
 
@@ -979,7 +1059,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text=" saved"
-                                    android:textColor="#64748B"
+                                    android:textColor="@color/text_secondary"
                                     android:textSize="14sp" />
 
                                 <View
@@ -992,7 +1072,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="LKR 500,000"
-                                    android:textColor="#94A3B8"
+                                    android:textColor="@color/text_hint"
                                     android:textSize="14sp" />
                             </LinearLayout>
                         </LinearLayout>
@@ -1012,7 +1092,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="Upcoming Bills"
-                        android:textColor="#1E293B"
+                        android:textColor="@color/text_primary"
                         android:textSize="18sp"
                         android:textStyle="bold"
                         android:fontFamily="sans-serif-medium" />
@@ -1022,7 +1102,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="View All"
-                        android:textColor="#6366F1"
+                        android:textColor="@color/primary"
                         android:textSize="14sp"
                         android:textStyle="bold"
                         android:padding="8dp" />
@@ -1042,9 +1122,9 @@
                         android:layout_height="wrap_content"
                         app:cardCornerRadius="16dp"
                         app:cardElevation="2dp"
-                        app:cardBackgroundColor="@color/white"
+                        app:cardBackgroundColor="@color/card_background"
                         app:strokeWidth="1dp"
-                        app:strokeColor="#FEE2E2">
+                        app:strokeColor="@color/error">
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -1064,11 +1144,12 @@
                                     android:background="@drawable/circle_yellow_light">
 
                                     <ImageView
+                                        android:id="@+id/image_bill_1_icon"
                                         android:layout_width="26dp"
                                         android:layout_height="26dp"
                                         android:layout_gravity="center"
                                         android:src="@drawable/ic_electricity"
-                                        app:tint="#F59E0B" />
+                                        app:tint="@color/accent" />
                                 </FrameLayout>
 
                                 <!-- Urgent Indicator -->
@@ -1087,10 +1168,11 @@
                                 android:layout_marginStart="14dp">
 
                                 <TextView
+                                    android:id="@+id/text_bill_1_name"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Electricity Bill"
-                                    android:textColor="#1E293B"
+                                    android:textColor="@color/text_primary"
                                     android:textSize="15sp"
                                     android:textStyle="bold" />
 
@@ -1107,10 +1189,11 @@
                                         android:background="@drawable/circle_red" />
 
                                     <TextView
+                                        android:id="@+id/text_bill_1_due"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="Due Tomorrow"
-                                        android:textColor="#EF4444"
+                                        android:textColor="@color/error"
                                         android:textSize="12sp"
                                         android:textStyle="bold"
                                         android:layout_marginStart="6dp" />
@@ -1124,10 +1207,11 @@
                                 android:gravity="end">
 
                                 <TextView
+                                    android:id="@+id/text_bill_1_amount"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="LKR 1,200"
-                                    android:textColor="#1E293B"
+                                    android:textColor="@color/text_primary"
                                     android:textSize="17sp"
                                     android:textStyle="bold" />
 
@@ -1138,8 +1222,8 @@
                                     android:layout_height="32dp"
                                     android:text="Pay Now"
                                     android:textSize="11sp"
-                                    android:textColor="#6366F1"
-                                    app:backgroundTint="#EEF2FF"
+                                    android:textColor="@color/primary"
+                                    app:backgroundTint="@color/primary_overlay"
                                     app:cornerRadius="8dp"
                                     android:insetTop="0dp"
                                     android:insetBottom="0dp"
@@ -1157,7 +1241,7 @@
                         android:layout_marginTop="12dp"
                         app:cardCornerRadius="16dp"
                         app:cardElevation="2dp"
-                        app:cardBackgroundColor="@color/white">
+                        app:cardBackgroundColor="@color/card_background">
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -1172,11 +1256,12 @@
                                 android:background="@drawable/circle_blue_light">
 
                                 <ImageView
+                                    android:id="@+id/image_bill_2_icon"
                                     android:layout_width="26dp"
                                     android:layout_height="26dp"
                                     android:layout_gravity="center"
                                     android:src="@drawable/ic_water"
-                                    app:tint="#3B82F6" />
+                                    app:tint="@color/info" />
                             </FrameLayout>
 
                             <LinearLayout
@@ -1187,27 +1272,30 @@
                                 android:layout_marginStart="14dp">
 
                                 <TextView
+                                    android:id="@+id/text_bill_2_name"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Water Bill"
-                                    android:textColor="#1E293B"
+                                    android:textColor="@color/text_primary"
                                     android:textSize="15sp"
                                     android:textStyle="bold" />
 
                                 <TextView
+                                    android:id="@+id/text_bill_2_due"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Due in 5 days"
-                                    android:textColor="#64748B"
+                                    android:textColor="@color/text_secondary"
                                     android:textSize="12sp"
                                     android:layout_marginTop="4dp" />
                             </LinearLayout>
 
                             <TextView
+                                android:id="@+id/text_bill_2_amount"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="LKR 800"
-                                android:textColor="#1E293B"
+                                android:textColor="@color/text_primary"
                                 android:textSize="17sp"
                                 android:textStyle="bold" />
                         </LinearLayout>
@@ -1221,7 +1309,7 @@
                         android:layout_marginTop="12dp"
                         app:cardCornerRadius="16dp"
                         app:cardElevation="2dp"
-                        app:cardBackgroundColor="@color/white">
+                        app:cardBackgroundColor="@color/card_background">
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -1236,11 +1324,12 @@
                                 android:background="@drawable/circle_purple_light">
 
                                 <ImageView
+                                    android:id="@+id/image_bill_3_icon"
                                     android:layout_width="26dp"
                                     android:layout_height="26dp"
                                     android:layout_gravity="center"
                                     android:src="@drawable/ic_wifi"
-                                    app:tint="#8B5CF6" />
+                                    app:tint="@color/primary_light" />
                             </FrameLayout>
 
                             <LinearLayout
@@ -1251,27 +1340,30 @@
                                 android:layout_marginStart="14dp">
 
                                 <TextView
+                                    android:id="@+id/text_bill_3_name"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Internet Bill"
-                                    android:textColor="#1E293B"
+                                    android:textColor="@color/text_primary"
                                     android:textSize="15sp"
                                     android:textStyle="bold" />
 
                                 <TextView
+                                    android:id="@+id/text_bill_3_due"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Due in 12 days"
-                                    android:textColor="#64748B"
+                                    android:textColor="@color/text_secondary"
                                     android:textSize="12sp"
                                     android:layout_marginTop="4dp" />
                             </LinearLayout>
 
                             <TextView
+                                android:id="@+id/text_bill_3_amount"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="LKR 6,990"
-                                android:textColor="#1E293B"
+                                android:textColor="@color/text_primary"
                                 android:textSize="17sp"
                                 android:textStyle="bold" />
                         </LinearLayout>
