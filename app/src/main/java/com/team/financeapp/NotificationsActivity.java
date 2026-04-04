@@ -8,20 +8,17 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.button.MaterialButton;
-import com.team.financeapp.auth.AuthManager;
-import com.team.financeapp.data.repository.BillRepository;
-import com.team.financeapp.data.repository.GoalRepository;
 import com.team.financeapp.notifications.FinancialNotificationHelper;
+import com.team.financeapp.notifications.NotificationCenterStore;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * Activity that shows in-app financial notifications and reminders.
@@ -30,15 +27,13 @@ public class NotificationsActivity extends AppCompatActivity {
 
     public static final String EXTRA_AUTO_TEST_NOTIFICATION = "extra_auto_test_notification";
 
-    private MaterialButton btnBack;
-    private MaterialButton btnTestNotification;
+    private View btnBack;
+    private View btnClearAll;
+    private TextView tvUnreadBadge;
     private RecyclerView rvNotifications;
     private TextView tvEmptyState;
-    private AuthManager authManager;
-    private BillRepository billRepository;
-    private GoalRepository goalRepository;
     private final List<NotificationItem> notifications = new ArrayList<>();
-    private int pendingSources = 0;
+    private NotificationAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,16 +41,27 @@ public class NotificationsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_notifications);
 
         btnBack = findViewById(R.id.btn_back);
-        btnTestNotification = findViewById(R.id.btn_test_notification);
+        btnClearAll = findViewById(R.id.btn_clear_all_notifications);
+        tvUnreadBadge = findViewById(R.id.tv_unread_badge);
         rvNotifications = findViewById(R.id.rv_notifications);
         tvEmptyState = findViewById(R.id.tv_notifications_empty);
-        authManager = new AuthManager();
-        billRepository = new BillRepository(this);
-        goalRepository = new GoalRepository(this);
 
         btnBack.setOnClickListener(v -> finish());
-        btnTestNotification.setOnClickListener(v -> sendTestNotification());
+        btnClearAll.setOnClickListener(v -> showClearAllConfirmation());
         rvNotifications.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new NotificationAdapter(notifications, new NotificationAdapter.NotificationActionListener() {
+            @Override
+            public void onMarkedRead(NotificationItem item, int position) {
+                NotificationCenterStore.markRead(NotificationsActivity.this, item.getId());
+                updateUnreadBadge();
+            }
+
+            @Override
+            public void onDelete(NotificationItem item, int position) {
+                showDeleteConfirmation(item, position);
+            }
+        });
+        rvNotifications.setAdapter(adapter);
 
         loadNotifications();
 
@@ -64,147 +70,87 @@ public class NotificationsActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadNotifications();
+    }
+
     private void loadNotifications() {
-        String userId = authManager.getCurrentUserId();
-        if (userId == null || userId.trim().isEmpty()) {
-            renderNotifications(new ArrayList<>());
-            return;
-        }
-
         notifications.clear();
-        pendingSources = 2;
-
-        billRepository.loadBills(userId, new BillRepository.LoadBillsCallback() {
-            @Override
-            public void onBillsLoaded(List<Bill> bills) {
-                notifications.addAll(mapBillNotifications(bills));
-                onSourceFinished();
-            }
-
-            @Override
-            public void onError(String message) {
-                onSourceFailed(message);
-            }
-        });
-
-        goalRepository.loadGoals(userId, new GoalRepository.LoadGoalsCallback() {
-            @Override
-            public void onGoalsLoaded(List<Goal> goals) {
-                notifications.addAll(mapGoalNotifications(goals));
-                onSourceFinished();
-            }
-
-            @Override
-            public void onError(String message) {
-                onSourceFailed(message);
-            }
-        });
+        notifications.addAll(NotificationCenterStore.getAll(this));
+        renderNotifications();
     }
 
-    private void onSourceFinished() {
-        pendingSources--;
-        if (pendingSources > 0) {
-            return;
-        }
-
-        notifications.sort(Comparator.comparing(NotificationItem::getTimeLabel));
-        renderNotifications(notifications);
-    }
-
-    private void onSourceFailed(String message) {
-        pendingSources--;
-        if (message != null && !message.trim().isEmpty()) {
-            Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-        }
-        if (pendingSources <= 0) {
-            renderNotifications(notifications);
-        }
-    }
-
-    private void renderNotifications(List<NotificationItem> items) {
-        if (items.isEmpty()) {
-            tvEmptyState.setText("No notifications yet");
+    private void renderNotifications() {
+        if (notifications.isEmpty()) {
+            tvEmptyState.setText(R.string.notifications_empty);
             tvEmptyState.setVisibility(View.VISIBLE);
             rvNotifications.setVisibility(View.GONE);
+            btnClearAll.setVisibility(View.GONE);
+            tvUnreadBadge.setVisibility(View.GONE);
             return;
         }
 
+        btnClearAll.setVisibility(View.VISIBLE);
         tvEmptyState.setVisibility(View.GONE);
         rvNotifications.setVisibility(View.VISIBLE);
-        rvNotifications.setAdapter(new NotificationAdapter(items));
+        adapter.notifyDataSetChanged();
+        updateUnreadBadge();
     }
 
-    private List<NotificationItem> mapBillNotifications(List<Bill> bills) {
-        List<NotificationItem> list = new ArrayList<>();
-        long now = System.currentTimeMillis();
-        long threeDaysMs = 3L * 24L * 60L * 60L * 1000L;
-
-        for (Bill bill : bills) {
-            if ("paid".equalsIgnoreCase(bill.getStatus())) {
-                continue;
+    private void updateUnreadBadge() {
+        int unreadCount = 0;
+        for (NotificationItem item : notifications) {
+            if (item.isUnread()) {
+                unreadCount++;
             }
-
-            long remaining = bill.getDueDate() - now;
-            if (remaining < 0L || remaining > threeDaysMs) {
-                continue;
-            }
-
-            list.add(new NotificationItem(
-                    "Bill Reminder",
-                    String.format(
-                            Locale.getDefault(),
-                            "%s is due soon. Amount: LKR %.2f",
-                            bill.getName(),
-                            bill.getAmount()
-                    ),
-                    dueLabel(remaining),
-                    R.drawable.ic_bills,
-                    true
-            ));
         }
 
-        return list;
+        if (unreadCount <= 0) {
+            tvUnreadBadge.setVisibility(View.GONE);
+            return;
+        }
+
+        tvUnreadBadge.setText(getString(R.string.notifications_unread_badge, unreadCount));
+        tvUnreadBadge.setVisibility(View.VISIBLE);
     }
 
-    private List<NotificationItem> mapGoalNotifications(List<Goal> goals) {
-        List<NotificationItem> list = new ArrayList<>();
-        long now = System.currentTimeMillis();
-        long sevenDaysMs = 7L * 24L * 60L * 60L * 1000L;
-
-        for (Goal goal : goals) {
-            if (goal.getProgressPercentage() >= 100) {
-                continue;
-            }
-
-            long remaining = goal.getTargetDate() - now;
-            if (remaining < 0L || remaining > sevenDaysMs) {
-                continue;
-            }
-
-            list.add(new NotificationItem(
-                    "Savings Goal Reminder",
-                    String.format(
-                            Locale.getDefault(),
-                            "%s target date is close. Remaining: LKR %.2f",
-                            goal.getName(),
-                            goal.getRemainingAmount()
-                    ),
-                    dueLabel(remaining),
-                    R.drawable.ic_savings,
-                    true
-            ));
-        }
-
-        return list;
+    private void showDeleteConfirmation(NotificationItem item, int position) {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.notifications_delete_confirm_title)
+                .setMessage(R.string.notifications_delete_confirm_message)
+                .setNegativeButton(R.string.cancel, null)
+                .setPositiveButton(R.string.notifications_delete_action, (dialog, which) ->
+                        deleteNotification(item, position)
+                )
+                .show();
     }
 
-    private String dueLabel(long remainingMs) {
-        long oneDay = 24L * 60L * 60L * 1000L;
-        if (remainingMs <= oneDay) {
-            return "Due today";
-        }
-        long days = (long) Math.ceil((double) remainingMs / (double) oneDay);
-        return "In " + days + " day" + (days > 1 ? "s" : "");
+    private void showClearAllConfirmation() {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.notifications_clear_all_confirm_title)
+                .setMessage(R.string.notifications_clear_all_confirm_message)
+                .setNegativeButton(R.string.cancel, null)
+                .setPositiveButton(R.string.notifications_clear_all_action, (dialog, which) ->
+                        clearAllNotifications()
+                )
+                .show();
+    }
+
+    private void deleteNotification(NotificationItem item, int position) {
+        NotificationCenterStore.delete(this, item.getId());
+        NotificationManagerCompat.from(this).cancel(item.getNotificationId());
+        notifications.remove(position);
+        renderNotifications();
+    }
+
+    private void clearAllNotifications() {
+        NotificationCenterStore.clearAll(this);
+        NotificationManagerCompat.from(this).cancelAll();
+        notifications.clear();
+        renderNotifications();
+        Toast.makeText(this, R.string.notifications_cleared, Toast.LENGTH_SHORT).show();
     }
 
     private void sendTestNotification() {

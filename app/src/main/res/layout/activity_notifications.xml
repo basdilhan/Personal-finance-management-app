@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background">
@@ -32,7 +33,7 @@
                     android:layout_height="42dp"
                     android:background="@drawable/circle_translucent"
                     android:contentDescription="@string/cd_back"
-                    app:icon="@drawable/ic_arrow_down"
+                    app:icon="@drawable/ic_back"
                     app:iconTint="@color/white"
                     app:iconGravity="textStart"
                     app:iconPadding="0dp" />
@@ -44,13 +45,38 @@
                     android:layout_weight="1"
                     android:orientation="vertical">
 
-                    <TextView
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/notifications_title"
-                        android:textColor="@color/white"
-                        android:textSize="22sp"
-                        android:textStyle="bold" />
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/notifications_title"
+                            android:textColor="@color/white"
+                            android:textSize="22sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tv_unread_badge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:background="@drawable/pill_translucent"
+                            android:ellipsize="end"
+                            android:maxWidth="92dp"
+                            android:minWidth="46dp"
+                            android:paddingHorizontal="8dp"
+                            android:paddingVertical="2dp"
+                            android:singleLine="true"
+                            android:textColor="@color/white"
+                            android:textSize="11sp"
+                            android:textStyle="bold"
+                            android:visibility="gone"
+                                tools:text="3 new" />
+                    </LinearLayout>
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -60,21 +86,42 @@
                         android:textColor="@color/dashboard_header_subtitle"
                         android:textSize="12sp" />
                 </LinearLayout>
+            </LinearLayout>
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_test_notification"
-                    style="@style/Widget.Material3.Button.TextButton"
+            <LinearLayout
+                android:id="@+id/btn_clear_all_notifications"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/pill_translucent"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackgroundBorderless"
+                android:gravity="center_vertical"
+                android:minHeight="42dp"
+                android:orientation="horizontal"
+                android:paddingStart="12dp"
+                android:paddingTop="10dp"
+                android:paddingEnd="12dp"
+                android:paddingBottom="10dp">
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:contentDescription="@string/notifications_clear_all"
+                    android:src="@drawable/ic_delete"
+                    app:tint="@color/white" />
+
+                <TextView
                     android:layout_width="wrap_content"
-                    android:layout_height="42dp"
-                    android:layout_marginStart="12dp"
-                    android:background="@drawable/circle_translucent"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
-                    android:minWidth="0dp"
-                    android:minHeight="0dp"
-                    android:paddingHorizontal="14dp"
-                    android:text="@string/notifications_test_button"
-                    android:textColor="@color/white" />
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:includeFontPadding="true"
+                    android:text="@string/notifications_clear_all"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
             </LinearLayout>
         </LinearLayout>
 

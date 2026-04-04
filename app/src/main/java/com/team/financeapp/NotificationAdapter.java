@@ -16,10 +16,18 @@ import java.util.List;
  */
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.NotificationViewHolder> {
 
-    private final List<NotificationItem> notifications;
+    public interface NotificationActionListener {
+        void onMarkedRead(NotificationItem item, int position);
 
-    public NotificationAdapter(List<NotificationItem> notifications) {
+        void onDelete(NotificationItem item, int position);
+    }
+
+    private final List<NotificationItem> notifications;
+    private final NotificationActionListener listener;
+
+    public NotificationAdapter(List<NotificationItem> notifications, NotificationActionListener listener) {
         this.notifications = notifications;
+        this.listener = listener;
     }
 
     @NonNull
@@ -38,11 +46,25 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         holder.message.setText(item.getMessage());
         holder.time.setText(item.getTimeLabel());
         holder.unreadDot.setVisibility(item.isUnread() ? View.VISIBLE : View.GONE);
+        holder.delete.setOnClickListener(v -> {
+            int adapterPosition = holder.getAdapterPosition();
+            if (adapterPosition == RecyclerView.NO_POSITION) {
+                return;
+            }
+            listener.onDelete(notifications.get(adapterPosition), adapterPosition);
+        });
 
         holder.itemView.setOnClickListener(v -> {
-            if (item.isUnread()) {
-                item.setUnread(false);
-                notifyItemChanged(position);
+            int adapterPosition = holder.getAdapterPosition();
+            if (adapterPosition == RecyclerView.NO_POSITION) {
+                return;
+            }
+
+            NotificationItem current = notifications.get(adapterPosition);
+            if (current.isUnread()) {
+                current.setUnread(false);
+                notifyItemChanged(adapterPosition);
+                listener.onMarkedRead(current, adapterPosition);
             }
         });
     }
@@ -58,6 +80,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         private final TextView message;
         private final TextView time;
         private final View unreadDot;
+        private final View delete;
 
         NotificationViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -66,6 +89,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             message = itemView.findViewById(R.id.tv_notification_message);
             time = itemView.findViewById(R.id.tv_notification_time);
             unreadDot = itemView.findViewById(R.id.view_unread_dot);
+            delete = itemView.findViewById(R.id.btn_delete_notification);
         }
     }
 }

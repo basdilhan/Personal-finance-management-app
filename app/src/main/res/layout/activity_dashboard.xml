@@ -116,7 +116,7 @@
                                     android:layout_height="42dp"
                                     android:background="@drawable/circle_translucent"
                                     android:contentDescription="@string/cd_notifications"
-                                    android:src="@drawable/ic_notification"
+                                    android:src="@drawable/ic_notifications_bell"
                                     android:padding="10dp"
                                     android:scaleType="centerInside" />
 
