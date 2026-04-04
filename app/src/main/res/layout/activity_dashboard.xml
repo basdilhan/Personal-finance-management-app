@@ -82,7 +82,7 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Welcome back,"
+                                    android:text="@string/dashboard_welcome_back"
                                     android:textColor="@color/dashboard_header_subtitle"
                                     android:textSize="13sp"
                                     android:letterSpacing="0.02" />
@@ -96,6 +96,18 @@
                                     android:textSize="18sp"
                                     android:textStyle="bold"
                                     android:layout_marginTop="2dp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="6dp"
+                                    android:background="@drawable/badge_primary"
+                                    android:paddingHorizontal="10dp"
+                                    android:paddingVertical="3dp"
+                                    android:text="@string/dashboard_identity_badge"
+                                    android:textColor="@color/primary_dark"
+                                    android:textSize="11sp"
+                                    android:textStyle="bold" />
                             </LinearLayout>
                         </LinearLayout>
 
@@ -116,7 +128,7 @@
                                     android:layout_height="42dp"
                                     android:background="@drawable/circle_translucent"
                                     android:contentDescription="@string/cd_notifications"
-                                    android:src="@drawable/ic_notification"
+                                    android:src="@drawable/ic_notifications_bell"
                                     android:padding="10dp"
                                     android:scaleType="centerInside" />
 
@@ -179,7 +191,7 @@
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="Total Balance"
+                                        android:text="@string/dashboard_total_balance_title"
                                         android:textColor="@color/text_secondary"
                                         android:textSize="14sp"
                                         android:letterSpacing="0.03" />
@@ -300,7 +312,7 @@
                                         <TextView
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
-                                            android:text="Income"
+                                            android:text="@string/dashboard_income_label"
                                             android:textColor="@color/text_secondary"
                                             android:textSize="12sp" />
 
@@ -354,7 +366,7 @@
                                         <TextView
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
-                                            android:text="Expenses"
+                                            android:text="@string/dashboard_expense_label"
                                             android:textColor="@color/text_secondary"
                                             android:textSize="12sp" />
 
@@ -388,7 +400,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Quick Actions"
+                    android:text="@string/dashboard_quick_actions_title"
                     android:textColor="@color/text_primary"
                     android:textSize="18sp"
                     android:textStyle="bold"
@@ -427,7 +439,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Expense"
+                            android:text="@string/dashboard_action_expense"
                             android:textColor="@color/text_secondary"
                             android:textSize="12sp"
                             android:layout_marginTop="8dp" />
@@ -459,7 +471,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Income"
+                            android:text="@string/dashboard_action_income"
                             android:textColor="@color/text_secondary"
                             android:textSize="12sp"
                             android:layout_marginTop="8dp" />
@@ -491,7 +503,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Bill"
+                            android:text="@string/dashboard_action_bill"
                             android:textColor="@color/text_secondary"
                             android:textSize="12sp"
                             android:layout_marginTop="8dp" />
@@ -523,7 +535,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Goal"
+                            android:text="@string/dashboard_action_goal"
                             android:textColor="@color/text_secondary"
                             android:textSize="12sp"
                             android:layout_marginTop="8dp" />
@@ -573,7 +585,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Smart Insight"
+                                android:text="@string/dashboard_insight_title"
                                 android:textColor="@color/dashboard_insight_title"
                                 android:textSize="14sp"
                                 android:textStyle="bold" />
@@ -602,7 +614,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="28dp"
-                    android:text="Expense Breakdown"
+                    android:text="@string/dashboard_expense_breakdown_title"
                     android:textColor="@color/text_primary"
                     android:textSize="18sp"
                     android:textStyle="bold"
@@ -854,7 +866,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="24dp"
-                    android:text="Income Breakdown"
+                    android:text="@string/dashboard_income_breakdown_title"
                     android:textColor="@color/text_primary"
                     android:textSize="18sp"
                     android:textStyle="bold"

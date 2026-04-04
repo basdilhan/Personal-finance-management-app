@@ -5,11 +5,13 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.media.AudioAttributes;
 import android.media.RingtoneManager;
+import android.graphics.BitmapFactory;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
@@ -51,17 +53,28 @@ public final class FinancialNotificationHelper {
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_notification)
+                .setLargeIcon(loadAppIcon(context))
+            .setColor(ContextCompat.getColor(context, R.color.accent))
                 .setContentTitle(title)
                 .setContentText(message)
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setDefaults(NotificationCompat.DEFAULT_ALL)
+                .setDefaults(NotificationCompat.DEFAULT_ALL)
                 .setAutoCancel(true)
                 .setContentIntent(pendingIntent)
-            .setCategory(NotificationCompat.CATEGORY_REMINDER)
-            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+                .setCategory(NotificationCompat.CATEGORY_REMINDER)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
 
         NotificationManagerCompat.from(context).notify(notificationId, builder.build());
+        NotificationCenterStore.add(context, notificationId, title, message);
+    }
+
+    private static android.graphics.Bitmap loadAppIcon(Context context) {
+        try {
+            return BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher_round);
+        } catch (Exception ignored) {
+            return null;
+        }
     }
 
     private static void ensureChannel(Context context) {
