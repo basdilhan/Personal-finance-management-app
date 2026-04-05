@@ -195,6 +195,22 @@ public class GoalDetailsActivity extends AppCompatActivity {
             }
         });
 
+        // Disable "Add Savings" button if goal is already completed
+        int progressPercentage = 0;
+        if (targetAmount > 0) {
+            progressPercentage = (int) ((currentAmount / targetAmount) * 100);
+        }
+
+        if (progressPercentage >= 100) {
+            btnAddSavings.setEnabled(false);
+            btnAddSavings.setAlpha(0.5f);  // Make button appear grayed out
+            btnAddSavings.setText("Goal Completed");  // This is a status message
+        } else {
+            btnAddSavings.setEnabled(true);
+            btnAddSavings.setAlpha(1.0f);
+            btnAddSavings.setText(R.string.btn_add_savings);  // Use string resource
+        }
+
         btnAddSavings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -212,8 +228,28 @@ public class GoalDetailsActivity extends AppCompatActivity {
 
     /**
      * Show dialog to add savings to this goal
+     * Checks if goal is already completed before allowing to add savings
      */
     private void showAddSavingsDialog() {
+        // Calculate current progress percentage
+        int progressPercentage = 0;
+        if (targetAmount > 0) {
+            progressPercentage = (int) ((currentAmount / targetAmount) * 100);
+        }
+
+        // Check if goal is already completed (100% or more)
+        if (progressPercentage >= 100) {
+            // Show popup message that goal is completed
+            new AlertDialog.Builder(this)
+                    .setTitle("Goal Completed")
+                    .setMessage("This goal has already reached its target amount! You cannot add more savings to a completed goal.")
+                    .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
+                    .setCancelable(false)
+                    .show();
+            return;
+        }
+
+        // Goal is not completed, show add savings dialog
         EditText input = new EditText(this);
         input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
         input.setHint("Enter amount in LKR");
@@ -243,6 +279,23 @@ public class GoalDetailsActivity extends AppCompatActivity {
 
         if (amountToAdd <= 0) {
             Toast.makeText(this, "Amount should be greater than zero", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Calculate remaining amount to reach target
+        double remainingAmount = Math.max(0, targetAmount - currentAmount);
+
+        // Check if adding this amount would exceed the target
+        if (amountToAdd > remainingAmount && remainingAmount > 0) {
+            new AlertDialog.Builder(this)
+                    .setTitle("Amount Exceeds Target")
+                    .setMessage("The amount you want to add (LKR " + String.format(Locale.getDefault(), "%.0f", amountToAdd)
+                            + ") exceeds the remaining target (LKR " + String.format(Locale.getDefault(), "%.0f", remainingAmount) + ").\n\n"
+                            + "Goal Target: LKR " + String.format(Locale.getDefault(), "%.0f", targetAmount) + "\n"
+                            + "Current Savings: LKR " + String.format(Locale.getDefault(), "%.0f", currentAmount) + "\n"
+                            + "Remaining: LKR " + String.format(Locale.getDefault(), "%.0f", remainingAmount))
+                    .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
+                    .show();
             return;
         }
 
