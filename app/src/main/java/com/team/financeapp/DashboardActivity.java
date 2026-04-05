@@ -444,6 +444,10 @@ public class DashboardActivity extends AppCompatActivity {
                 .addOnSuccessListener(querySnapshot -> {
                     List<GoalSummary> goals = new ArrayList<>();
                     for (QueryDocumentSnapshot document : querySnapshot) {
+                        Boolean deleted = document.getBoolean("deleted");
+                        if (Boolean.TRUE.equals(deleted)) {
+                            continue;
+                        }
                         goals.add(new GoalSummary(
                                 getString(document, "name", "Savings Goal"),
                                 getDouble(document, "targetAmount", 0.0d),
