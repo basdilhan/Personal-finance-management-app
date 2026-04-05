@@ -29,6 +29,7 @@ public class ProfileActivity extends AppCompatActivity {
     private ImageView profileIcon;
     private TextView tvUserName;
     private TextView tvUserEmail;
+    private TextView tvUserAge;
     private TextView tvUserPhone;
     private TextView tvJoinDate;
     private TextView tvAccountType;
@@ -66,6 +67,7 @@ public class ProfileActivity extends AppCompatActivity {
         profileIcon = findViewById(R.id.profile_icon);
         tvUserName = findViewById(R.id.tv_user_name);
         tvUserEmail = findViewById(R.id.tv_user_email);
+        tvUserAge = findViewById(R.id.tv_user_age);
         tvUserPhone = findViewById(R.id.tv_user_phone);
         tvJoinDate = findViewById(R.id.tv_join_date);
         tvAccountType = findViewById(R.id.tv_account_type);
@@ -103,6 +105,7 @@ public class ProfileActivity extends AppCompatActivity {
                 .get()
                 .addOnSuccessListener(this::bindFirestoreUser)
                 .addOnFailureListener(e -> {
+                    tvUserAge.setText("Not set");
                     tvUserPhone.setText("Not set");
                 });
     }
@@ -121,6 +124,13 @@ public class ProfileActivity extends AppCompatActivity {
         String firestoreEmail = snapshot.getString("email");
         if (firestoreEmail != null && !firestoreEmail.trim().isEmpty()) {
             tvUserEmail.setText(firestoreEmail.trim());
+        }
+
+        Long age = snapshot.getLong("age");
+        if (age == null || age <= 0L || age > 120L) {
+            tvUserAge.setText("Not set");
+        } else {
+            tvUserAge.setText(String.valueOf(age));
         }
 
         String phone = snapshot.getString("phone");
