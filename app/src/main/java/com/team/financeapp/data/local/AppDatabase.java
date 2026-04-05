@@ -17,7 +17,7 @@ import com.team.financeapp.data.local.entity.IncomeEntity;
 
 @Database(
         entities = {BillEntity.class, ExpenseEntity.class, GoalEntity.class, IncomeEntity.class},
-    version = 3,
+    version = 4,
         exportSchema = false
 )
 public abstract class AppDatabase extends RoomDatabase {

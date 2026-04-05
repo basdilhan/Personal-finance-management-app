@@ -44,4 +44,6 @@ public class BillEntity {
     public String syncState = "PENDING";
 
     public boolean deleted;
+
+    public boolean isRecurring;
 }
