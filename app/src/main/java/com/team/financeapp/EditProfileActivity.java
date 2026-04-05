@@ -25,6 +25,7 @@ public class EditProfileActivity extends AppCompatActivity {
 
     private TextInputEditText etUserName;
     private TextInputEditText etUserEmail;
+    private TextInputEditText etUserAge;
     private TextInputEditText etUserPhone;
     private MaterialButton btnSave;
     private MaterialButton btnCancel;
@@ -48,6 +49,7 @@ public class EditProfileActivity extends AppCompatActivity {
     private void initializeViews() {
         etUserName = findViewById(R.id.et_user_name);
         etUserEmail = findViewById(R.id.et_user_email);
+        etUserAge = findViewById(R.id.et_user_age);
         etUserPhone = findViewById(R.id.et_user_phone);
         btnSave = findViewById(R.id.button_save);
         btnCancel = findViewById(R.id.button_cancel);
@@ -78,6 +80,7 @@ public class EditProfileActivity extends AppCompatActivity {
                 .addOnSuccessListener(snapshot -> {
                     String firestoreName = snapshot.getString("name");
                     String firestoreEmail = snapshot.getString("email");
+                    Long age = snapshot.getLong("age");
                     String phone = snapshot.getString("phone");
 
                     if (firestoreName != null && !firestoreName.trim().isEmpty()) {
@@ -85,6 +88,9 @@ public class EditProfileActivity extends AppCompatActivity {
                     }
                     if (firestoreEmail != null && !firestoreEmail.trim().isEmpty()) {
                         etUserEmail.setText(firestoreEmail.trim());
+                    }
+                    if (age != null && age > 0L && age <= 120L) {
+                        etUserAge.setText(String.valueOf(age));
                     }
                     if (phone != null && !phone.trim().isEmpty()) {
                         etUserPhone.setText(phone.trim());
@@ -117,7 +123,9 @@ public class EditProfileActivity extends AppCompatActivity {
     private void saveProfileData() {
         String name = etUserName.getText().toString().trim();
         String email = etUserEmail.getText().toString().trim();
+        String ageText = etUserAge.getText().toString().trim();
         String phone = etUserPhone.getText().toString().trim();
+        int age;
 
         // Validation
         if (name.isEmpty()) {
@@ -135,6 +143,26 @@ public class EditProfileActivity extends AppCompatActivity {
         if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             Toast.makeText(this, "Please enter a valid email", Toast.LENGTH_SHORT).show();
             etUserEmail.requestFocus();
+            return;
+        }
+
+        if (ageText.isEmpty()) {
+            Toast.makeText(this, "Please enter your age", Toast.LENGTH_SHORT).show();
+            etUserAge.requestFocus();
+            return;
+        }
+
+        try {
+            age = Integer.parseInt(ageText);
+        } catch (NumberFormatException exception) {
+            Toast.makeText(this, "Age must be a whole number", Toast.LENGTH_SHORT).show();
+            etUserAge.requestFocus();
+            return;
+        }
+
+        if (age < 13 || age > 120) {
+            Toast.makeText(this, "Age must be between 13 and 120", Toast.LENGTH_SHORT).show();
+            etUserAge.requestFocus();
             return;
         }
 
@@ -157,6 +185,7 @@ public class EditProfileActivity extends AppCompatActivity {
                     userDoc.put("uid", user.getUid());
                     userDoc.put("name", name);
                     userDoc.put("email", email);
+                    userDoc.put("age", age);
                     userDoc.put("phone", phone);
                     userDoc.put("photoUrl", user.getPhotoUrl() == null ? "" : user.getPhotoUrl().toString());
                     userDoc.put("updatedAt", System.currentTimeMillis());
