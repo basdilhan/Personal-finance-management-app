@@ -156,6 +156,31 @@
                      />
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <!-- Remaining Days Display (Disabled) -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:hint="Remaining Days"
+                    app:startIconDrawable="@drawable/ic_calendar"
+                    app:startIconTint="#6366F1"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_remaining_days"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="none"
+                        android:enabled="false"
+                        android:focusable="false"
+                        android:clickable="false"
+                        android:cursorVisible="false"
+                        android:editable="false"
+                        android:textColor="#666666"
+                        android:textColorHint="#94A3B8"
+                        android:text="0 days" />
+                </com.google.android.material.textfield.TextInputLayout>
+
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
