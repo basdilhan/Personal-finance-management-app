@@ -101,6 +101,11 @@
     <string name="notifications_clear_all_confirm_message">Are you sure you want to delete all notifications?</string>
     <string name="notifications_clear_all_action">Clear all</string>
     <string name="cd_notification_icon">Notification icon</string>
+    <string name="notification_details_badge">Notification details</string>
+    <string name="notification_details_label">Description</string>
+    <string name="notification_details_hint">Tap outside or use the button below to close</string>
+    <string name="notification_details_close">Got it</string>
+    <string name="notification_details_time_now">Just now</string>
 
     <!-- Goal progress states -->
     <string name="goal_status_completed">Completed</string>

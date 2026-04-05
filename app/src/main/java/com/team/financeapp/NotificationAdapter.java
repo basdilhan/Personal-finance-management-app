@@ -19,6 +19,8 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     public interface NotificationActionListener {
         void onMarkedRead(NotificationItem item, int position);
 
+        void onShowDetails(NotificationItem item, int position);
+
         void onDelete(NotificationItem item, int position);
     }
 
@@ -66,6 +68,8 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                 notifyItemChanged(adapterPosition);
                 listener.onMarkedRead(current, adapterPosition);
             }
+
+            listener.onShowDetails(current, adapterPosition);
         });
     }
 
