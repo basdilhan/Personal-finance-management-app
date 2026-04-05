@@ -44,6 +44,8 @@ public final class FinancialNotificationHelper {
 
         Intent intent = new Intent(context, NotificationsActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.putExtra(NotificationsActivity.EXTRA_NOTIFICATION_TITLE, title);
+        intent.putExtra(NotificationsActivity.EXTRA_NOTIFICATION_MESSAGE, message);
         PendingIntent pendingIntent = PendingIntent.getActivity(
                 context,
                 notificationId,

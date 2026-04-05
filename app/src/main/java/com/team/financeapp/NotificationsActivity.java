@@ -1,12 +1,17 @@
 package com.team.financeapp;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.net.Uri;
 import android.provider.Settings;
+import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ImageView;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,6 +19,7 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.team.financeapp.notifications.FinancialNotificationHelper;
 import com.team.financeapp.notifications.NotificationCenterStore;
 
@@ -26,6 +32,8 @@ import java.util.List;
 public class NotificationsActivity extends AppCompatActivity {
 
     public static final String EXTRA_AUTO_TEST_NOTIFICATION = "extra_auto_test_notification";
+    public static final String EXTRA_NOTIFICATION_TITLE = "extra_notification_title";
+    public static final String EXTRA_NOTIFICATION_MESSAGE = "extra_notification_message";
 
     private View btnBack;
     private View btnClearAll;
@@ -57,6 +65,11 @@ public class NotificationsActivity extends AppCompatActivity {
             }
 
             @Override
+            public void onShowDetails(NotificationItem item, int position) {
+                showNotificationDetails(item);
+            }
+
+            @Override
             public void onDelete(NotificationItem item, int position) {
                 showDeleteConfirmation(item, position);
             }
@@ -64,10 +77,18 @@ public class NotificationsActivity extends AppCompatActivity {
         rvNotifications.setAdapter(adapter);
 
         loadNotifications();
+        handleIntent(getIntent());
 
         if (getIntent() != null && getIntent().getBooleanExtra(EXTRA_AUTO_TEST_NOTIFICATION, false)) {
             sendTestNotification();
         }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        handleIntent(intent);
     }
 
     @Override
@@ -114,6 +135,56 @@ public class NotificationsActivity extends AppCompatActivity {
 
         tvUnreadBadge.setText(getString(R.string.notifications_unread_badge, unreadCount));
         tvUnreadBadge.setVisibility(View.VISIBLE);
+    }
+
+    private void handleIntent(Intent intent) {
+        if (intent == null) {
+            return;
+        }
+
+        String title = intent.getStringExtra(EXTRA_NOTIFICATION_TITLE);
+        String message = intent.getStringExtra(EXTRA_NOTIFICATION_MESSAGE);
+        if (title == null || message == null) {
+            return;
+        }
+
+        showMessagePopup(title, message, getString(R.string.notification_details_badge), R.drawable.ic_notification);
+    }
+
+    private void showNotificationDetails(NotificationItem item) {
+        if (item == null) {
+            return;
+        }
+
+        showMessagePopup(item.getTitle(), item.getMessage(), item.getTimeLabel(), item.getIconRes());
+    }
+
+    private void showMessagePopup(String title, String message, String timeLabel, int iconRes) {
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_notification_details, null, false);
+
+        ImageView iconView = dialogView.findViewById(R.id.iv_dialog_notification_icon);
+        TextView titleView = dialogView.findViewById(R.id.tv_dialog_notification_title);
+        TextView timeView = dialogView.findViewById(R.id.tv_dialog_notification_time);
+        TextView messageView = dialogView.findViewById(R.id.tv_dialog_notification_message);
+        View closeButton = dialogView.findViewById(R.id.btn_dialog_close);
+
+        iconView.setImageResource(iconRes == 0 ? R.drawable.ic_notification : iconRes);
+        titleView.setText(TextUtils.isEmpty(title) ? getString(R.string.notification_details_badge) : title);
+        timeView.setText(TextUtils.isEmpty(timeLabel) ? getString(R.string.notification_details_time_now) : timeLabel);
+        messageView.setText(TextUtils.isEmpty(message) ? getString(R.string.notifications_empty) : message);
+
+        AlertDialog dialog = new MaterialAlertDialogBuilder(this)
+                .setView(dialogView)
+                .create();
+
+        closeButton.setOnClickListener(v -> dialog.dismiss());
+        dialog.setOnShowListener(d -> {
+            if (dialog.getWindow() != null) {
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            }
+        });
+        dialog.setCanceledOnTouchOutside(true);
+        dialog.show();
     }
 
     private void showDeleteConfirmation(NotificationItem item, int position) {
