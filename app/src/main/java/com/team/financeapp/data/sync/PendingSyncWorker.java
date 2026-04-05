@@ -118,6 +118,7 @@ public class PendingSyncWorker extends Worker {
         payload.put("status", bill.status);
         payload.put("indicatorColor", bill.indicatorColor);
         payload.put("deleted", bill.deleted);
+        payload.put("isRecurring", bill.isRecurring);
         payload.put("syncState", SyncState.SYNCED);
         payload.put("createdAt", bill.createdAt);
         payload.put("updatedAt", System.currentTimeMillis());
