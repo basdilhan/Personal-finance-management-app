@@ -34,7 +34,7 @@ public class AddGoalActivity extends AppCompatActivity {
     public static final String EXTRA_GOAL_TARGET_DATE = "goal_target_date";
     public static final String EXTRA_GOAL_CATEGORY = "goal_category";
 
-    private TextInputEditText etTargetAmount, etGoalName, etTargetDate, etCurrentAmount;
+    private TextInputEditText etTargetAmount, etGoalName, etTargetDate, etCurrentAmount, etRemainingDays;
     private AutoCompleteTextView spinnerGoalType;
     private MaterialButton btnSave, btnCancel;
     private TextView tvTitle, tvSubtitle;
@@ -97,6 +97,7 @@ public class AddGoalActivity extends AppCompatActivity {
         etGoalName = findViewById(R.id.et_goal_name);
         etTargetDate = findViewById(R.id.et_target_date);
         etCurrentAmount = findViewById(R.id.et_current_amount);
+        etRemainingDays = findViewById(R.id.et_remaining_days);
         spinnerGoalType = findViewById(R.id.spinner_goal_type);
         btnSave = findViewById(R.id.btn_save);
         btnCancel = findViewById(R.id.btn_cancel);
@@ -152,6 +153,9 @@ public class AddGoalActivity extends AppCompatActivity {
             calendar.setTimeInMillis(targetDate);
             String formattedDate = dateFormat.format(new Date(targetDate));
             etTargetDate.setText(formattedDate);
+
+            // Calculate and display remaining days
+            updateRemainingDays();
         }
 
         // Set category/goal type
@@ -255,6 +259,9 @@ public class AddGoalActivity extends AppCompatActivity {
                 String formattedDate = dateFormat.format(calendar.getTime());
                 etTargetDate.setText(formattedDate);
 
+                // Calculate and display remaining days
+                updateRemainingDays();
+
                 // Log for debugging
                 android.util.Log.d("DatePicker", "Selected date: " + formattedDate + " | Millis: " + calendar.getTimeInMillis());
 
@@ -271,6 +278,33 @@ public class AddGoalActivity extends AppCompatActivity {
         });
 
         builder.show();
+    }
+
+    /**
+     * Calculate and display remaining days to target date
+     */
+    private void updateRemainingDays() {
+        long selectedDateMillis = calendar.getTimeInMillis();
+        long currentTimeMillis = System.currentTimeMillis();
+
+        // Calculate difference in milliseconds
+        long differenceMillis = selectedDateMillis - currentTimeMillis;
+
+        // Convert to days
+        long days = differenceMillis / (1000 * 60 * 60 * 24);
+
+        // Format the text
+        String remainingText;
+        if (days <= 0) {
+            remainingText = "Today";
+        } else if (days == 1) {
+            remainingText = "1 day";
+        } else {
+            remainingText = days + " days";
+        }
+
+        // Set the text to the disabled textbox
+        etRemainingDays.setText(remainingText);
     }
 
     private void saveGoal() {
