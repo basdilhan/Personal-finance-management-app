@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+pydantic
+python-dotenv
+requests
+transformers
+torch
+scikit-learn
+pandas
+joblib
+git+https://github.com/amazon-science/chronos-forecasting.git

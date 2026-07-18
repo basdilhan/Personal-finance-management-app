@@ -1,0 +1,219 @@
+description,label
+KFC,food
+Pizza Hut,food
+McDonald's,food
+Keells Super,food
+Cargills Food City,food
+Arpico Supercentre,food
+Laugfs Supermarket,food
+Spar Supermarket,food
+Sathosa,food
+Glomark,food
+Softlogic Retail,food
+Perera and Sons,food
+Breadtalk,food
+Cream and Fudge,food
+Dinemore,food
+Burger King,food
+Domino's Pizza,food
+Chinese Dragon Cafe,food
+Shanmugas,food
+Noodles Curry House,food
+Grocery items,food
+Bakery items,food
+Deli Cafe,food
+Street food vendor,food
+Tuk Tuk Bistro,food
+Hotel lunch,food
+Office canteen,food
+Rice and curry,food
+Fruit stall,food
+Fish market,food
+Vegetable seller,food
+Tea shop,food
+Lanka IOC,transport
+Ceylon Petroleum,transport
+Ceypetco Fuel,transport
+PickMe Ride,transport
+Uber Lanka,transport
+Kangaroo Cabs,transport
+Budget Taxi,transport
+Train ticket,transport
+Bus fare,transport
+SLTB Bus,transport
+Private bus fare,transport
+Expressway toll,transport
+Southern Expressway toll,transport
+Parking fee,transport
+Vehicle service,transport
+Tyre shop,transport
+Mechanic workshop,transport
+Three wheeler fare,transport
+Ferry ticket,transport
+CEB Electricity,utilities
+LECO Bill,utilities
+Ceylon Electricity Board,utilities
+Dialog Broadband,utilities
+Dialog Mobile,utilities
+Mobitel Data,utilities
+Mobitel Postpaid,utilities
+SLT Fibre,utilities
+SLT Telephone,utilities
+Airtel Lanka,utilities
+Hutch Mobile,utilities
+Water Board,utilities
+National Water Supply,utilities
+Gas bill,utilities
+Laugfs Gas,utilities
+Litro Gas,utilities
+Internet bill,utilities
+WiFi monthly,utilities
+Cable TV bill,utilities
+PeoTV subscription,utilities
+Landlord Rent,housing
+Apartment rent,housing
+Room rent,housing
+House rent payment,housing
+Property maintenance,housing
+Building insurance,housing
+Home repair,housing
+Plumber service,housing
+Electrician service,housing
+Painting service,housing
+Pest control,housing
+Security deposit,housing
+Condominium fee,housing
+Gate repair,housing
+Roof repair,housing
+Nawaloka Hospital,health
+Asiri Hospital,health
+Lanka Hospital,health
+Durdans Hospital,health
+Hemas Hospital,health
+Medical checkup,health
+Doctor consultation,health
+Pharmacy purchase,health
+Osu Sala Pharmacy,health
+SP Pharmacy,health
+Dental treatment,health
+Eye specialist,health
+Blood test,health
+X-ray scan,health
+Medicine monthly,health
+Health insurance,health
+Gym membership,health
+Yoga class,health
+Vitamin supplements,health
+Mental health counselling,health
+Daraz.lk,shopping
+Ikman.lk purchase,shopping
+Odel,shopping
+Cool Planet,shopping
+Softlogic Showroom,shopping
+Singer Sri Lanka,shopping
+Abans,shopping
+Fashion Bug,shopping
+Cotton Collection,shopping
+Nolimit,shopping
+Nike store,shopping
+Adidas store,shopping
+Clothing purchase,shopping
+Shoes purchase,shopping
+Electronics store,shopping
+Mobile phone purchase,shopping
+Laptop accessories,shopping
+Furniture shop,shopping
+Home decor,shopping
+Kitchen appliances,shopping
+Netflix,entertainment
+Spotify Premium,entertainment
+YouTube Premium,entertainment
+Amazon Prime,entertainment
+Cinema ticket,entertainment
+Scope Cinemas,entertainment
+PVR Cinemas,entertainment
+Concert ticket,entertainment
+Theme park entry,entertainment
+Arcade games,entertainment
+Book purchase,entertainment
+Magazine subscription,entertainment
+Gaming subscription,entertainment
+PlayStation Plus,entertainment
+Xbox Game Pass,entertainment
+Event ticket,entertainment
+Beach outing,entertainment
+Holiday trip,entertainment
+Sports club,entertainment
+Music streaming,entertainment
+British Council,education
+ICBT Campus,education
+SLIIT Fees,education
+University of Colombo,education
+IIT Sri Lanka,education
+NIBM Fees,education
+Coursera subscription,education
+Udemy course,education
+Online course,education
+School fees,education
+Tuition class,education
+Book shop,education
+Stationery purchase,education
+Exam registration,education
+Library membership,education
+Study materials,education
+Educational software,education
+Language course,education
+Coding bootcamp,education
+Professional certification,education
+AIA Insurance,insurance
+Sri Lanka Insurance,insurance
+Union Assurance,insurance
+Ceylinco Insurance,insurance
+Allianz Lanka,insurance
+Janashakthi Insurance,insurance
+Vehicle insurance,insurance
+Health insurance premium,insurance
+Life insurance premium,insurance
+Travel insurance,insurance
+Property insurance,insurance
+Motor insurance renewal,insurance
+Accident insurance,insurance
+Home insurance,insurance
+Crop insurance,insurance
+Bank loan EMI,loan
+Housing loan EMI,loan
+Vehicle loan payment,loan
+Credit card payment,loan
+Personal loan EMI,loan
+Microfinance payment,loan
+Education loan EMI,loan
+Gold loan payment,loan
+Pawning interest,loan
+Leasing payment,loan
+Overdraft interest,loan
+Business loan EMI,loan
+Temple donation,donation
+Church offering,donation
+Mosque donation,donation
+Charity contribution,donation
+Red Cross donation,donation
+Orphanage donation,donation
+School donation,donation
+Community fund,donation
+Flood relief fund,donation
+Disaster relief,donation
+Tech Corp Salary,income
+Monthly salary,income
+Freelance payment,income
+Fiverr earnings,income
+Upwork payment,income
+Business revenue,income
+Rent received,income
+Interest income,income
+FD interest,income
+Dividend income,income
+Part-time job,income
+Bonus payment,income
+Commission earned,income
+Side hustle income,income
+Tutoring income,income
