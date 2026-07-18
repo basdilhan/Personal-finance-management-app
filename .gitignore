@@ -9,6 +9,11 @@ app/build/
 # Local properties
 local.properties
 
+# Firebase credentials (never commit these!)
+**/firebase-service-account.json
+**/*.keystore
+**/*.jks
+
 # IDE files
 .idea/
 *.iml
