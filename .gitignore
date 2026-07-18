@@ -1,6 +1,7 @@
 # Gradle files
 .gradle/
 build/
+app/build/
 *.apk
 *.ap_
 *.dex
@@ -40,3 +41,24 @@ replay_pid*.log
 # gradle wrapper
 gradlew
 gradlew.bat
+# Ignore the raw datasets folder completely
+Ml datasets/
+
+# ML Environment and caches
+ml/__pycache__/
+ml/.pytest_cache/
+ml/.venv/
+ml/venv/
+ml/env/
+ml/.env
+
+# Ignore heavy data files but KEEP the trained models
+ml/artifacts/*.parquet
+ml/artifacts/*.csv
+
+# React / Vite Web App
+web/node_modules/
+web/dist/
+web/.env
+web/.env.local
+web/.DS_Store

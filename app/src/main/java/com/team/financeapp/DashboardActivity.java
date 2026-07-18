@@ -31,10 +31,9 @@ import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.android.material.button.MaterialButton;
 import com.team.financeapp.auth.AuthManager;
+import com.team.financeapp.data.repository.GoalRepository;
 import com.team.financeapp.data.repository.BillRepository;
 import com.team.financeapp.data.repository.ExpenseRepository;
 import com.team.financeapp.data.repository.IncomeRepository;
@@ -113,7 +112,7 @@ public class DashboardActivity extends AppCompatActivity {
     private BillRepository billRepository;
     private ExpenseRepository expenseRepository;
     private IncomeRepository incomeRepository;
-    private FirebaseFirestore firestore;
+    private GoalRepository goalRepository;
 
     private List<Bill> latestBills = new ArrayList<>();
     private List<Expense> latestExpenses = new ArrayList<>();
@@ -133,7 +132,7 @@ public class DashboardActivity extends AppCompatActivity {
         billRepository = new BillRepository(this);
         expenseRepository = new ExpenseRepository(this);
         incomeRepository = new IncomeRepository(this);
-        firestore = FirebaseFirestore.getInstance();
+        goalRepository = new GoalRepository(this);
         initializeViews();
         loadPrivacyPreference();
         ensureNotificationPermission();
@@ -215,6 +214,28 @@ public class DashboardActivity extends AppCompatActivity {
         actionAddIncome = findViewById(R.id.action_add_income);
         actionAddBill = findViewById(R.id.action_add_bill);
         actionAddGoal = findViewById(R.id.action_add_goal);
+        
+        View actionBudget = findViewById(R.id.action_budget);
+        if (actionBudget != null) {
+            actionBudget.setOnClickListener(v -> {
+                startActivity(new Intent(DashboardActivity.this, BudgetActivity.class));
+            });
+        }
+        
+        View actionForecast = findViewById(R.id.action_forecast);
+        if (actionForecast != null) {
+            actionForecast.setOnClickListener(v -> {
+                startActivity(new Intent(DashboardActivity.this, ForecastActivity.class));
+            });
+        }
+
+        View fabChatbot = findViewById(R.id.fab_chatbot);
+        if (fabChatbot != null) {
+            fabChatbot.setOnClickListener(v -> {
+                startActivity(new Intent(DashboardActivity.this, com.team.financeapp.chatbot.ChatbotActivity.class));
+            });
+        }
+
         btnNotifications = findViewById(R.id.btn_notifications);
         notificationBadge = findViewById(R.id.notification_badge);
     }
@@ -438,36 +459,32 @@ public class DashboardActivity extends AppCompatActivity {
     }
 
     private void loadGoals(String userId) {
-        firestore.collection("goals")
-                .whereEqualTo("userId", userId)
-                .get()
-                .addOnSuccessListener(querySnapshot -> {
-                    List<GoalSummary> goals = new ArrayList<>();
-                    for (QueryDocumentSnapshot document : querySnapshot) {
-                        Boolean deleted = document.getBoolean("deleted");
-                        if (Boolean.TRUE.equals(deleted)) {
-                            continue;
-                        }
-                        goals.add(new GoalSummary(
-                                getString(document, "name", "Savings Goal"),
-                                getDouble(document, "targetAmount", 0.0d),
-                                getDouble(document, "currentAmount", 0.0d),
-                                getDouble(document, "addedSavingsAmount", 0.0d),
-                                 getLong(document, "targetDate", 0L),
-                                getLong(document, "updatedAt", 0L) // Get updatedAt timestamp
-                        ));
-                    }
-                    // Sort by latest updated first (descending order)
-                    goals.sort((goal1, goal2) -> Long.compare(goal2.updatedAt, goal1.updatedAt));
-                    latestGoals = goals;
-                    updateGoalCard();
-                    updateDashboardTotalsAndInsight();
-                })
-                .addOnFailureListener(e -> {
-                    latestGoals = Collections.emptyList();
-                    updateGoalCard();
-                    updateDashboardTotalsAndInsight();
-                });
+        goalRepository.loadGoals(userId, new GoalRepository.LoadGoalsCallback() {
+            @Override
+            public void onGoalsLoaded(List<Goal> loadedGoals) {
+                List<GoalSummary> goals = new ArrayList<>();
+                for (Goal g : loadedGoals) {
+                    goals.add(new GoalSummary(
+                            g.getName(),
+                            g.getTargetAmount(),
+                            g.getCurrentAmount(),
+                            g.getAddedSavingsAmount(),
+                            g.getTargetDate(),
+                            System.currentTimeMillis() // Or a real updated_at if Goal had it
+                    ));
+                }
+                latestGoals = goals;
+                updateGoalCard();
+                updateDashboardTotalsAndInsight();
+            }
+
+            @Override
+            public void onError(String message) {
+                latestGoals = Collections.emptyList();
+                updateGoalCard();
+                updateDashboardTotalsAndInsight();
+            }
+        });
     }
 
     private void loadIncome(String userId) {
@@ -475,7 +492,6 @@ public class DashboardActivity extends AppCompatActivity {
             @Override
             public void onIncomeLoaded(List<IncomeEntry> incomes) {
                 latestIncomes = new ArrayList<>(incomes);
-                currentMonthIncome = sumAllIncome();
                 updateIncomeChartFromData();
                 updateDashboardTotalsAndInsight();
             }
@@ -488,20 +504,32 @@ public class DashboardActivity extends AppCompatActivity {
     }
 
     private void updateDashboardTotalsAndInsight() {
-        double expensesTotal = sumAllExpenses();
-        double paidBillsTotal = sumPaidBills();
-        double dueBillsTotal = sumDueBills();
-        double totalGoalSavings = sumGoalAddedSavings();
-        double totalCashOut = expensesTotal + paidBillsTotal + totalGoalSavings;
-        currentTotalExpenses = totalCashOut;
+        Calendar now = Calendar.getInstance();
+        int currentYear = now.get(Calendar.YEAR);
+        int currentMonth = now.get(Calendar.MONTH);
 
-        // Portfolio balance follows: cash in - cash out.
-        double totalBalance = currentMonthIncome - totalCashOut;
+        double monthlyIncome = sumIncomeForMonth(currentYear, currentMonth);
+        double monthlyExpenses = sumExpensesForMonth(currentYear, currentMonth);
+        
+        double monthlyPaidBills = 0.0d;
+        for (Bill bill : latestBills) {
+            if ("paid".equalsIgnoreCase(bill.getStatus()) && isInCurrentMonth(bill.getDueDate())) {
+                monthlyPaidBills += bill.getAmount();
+            }
+        }
+
+        double totalCashOut = monthlyExpenses + monthlyPaidBills;
+        currentTotalExpenses = totalCashOut;
+        currentMonthIncome = monthlyIncome;
+
+        // Portfolio balance follows: cash in - cash out for the month.
+        double totalBalance = currentMonthIncome - currentTotalExpenses;
         currentTotalBalance = totalBalance;
         applyBalancePrivacyState();
 
         updateBalanceTrend(totalBalance);
 
+        double dueBillsTotal = sumDueBills();
         double insightBalance = currentMonthIncome - totalCashOut - dueBillsTotal;
         if (textInsightAmount != null) {
             if (isBalanceVisible) {
@@ -1063,21 +1091,6 @@ public class DashboardActivity extends AppCompatActivity {
 
     private String formatMoney(double amount) {
         return String.format(Locale.getDefault(), "LKR %,.2f", amount);
-    }
-
-    private static String getString(QueryDocumentSnapshot doc, String key, String fallback) {
-        String value = doc.getString(key);
-        return value == null ? fallback : value;
-    }
-
-    private static long getLong(QueryDocumentSnapshot doc, String key, long fallback) {
-        Long value = doc.getLong(key);
-        return value == null ? fallback : value;
-    }
-
-    private static double getDouble(QueryDocumentSnapshot doc, String key, double fallback) {
-        Double value = doc.getDouble(key);
-        return value == null ? fallback : value;
     }
 
     private static class GoalSummary {

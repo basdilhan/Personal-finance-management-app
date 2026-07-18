@@ -13,9 +13,7 @@ import androidx.work.WorkManager;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
-import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.team.financeapp.data.local.AppDatabase;
 import com.team.financeapp.data.local.SyncState;
 import com.team.financeapp.data.local.dao.BillDao;
@@ -24,18 +22,22 @@ import com.team.financeapp.data.local.dao.IncomeDao;
 import com.team.financeapp.data.local.entity.BillEntity;
 import com.team.financeapp.data.local.entity.ExpenseEntity;
 import com.team.financeapp.data.local.entity.IncomeEntity;
+import com.team.financeapp.data.remote.ApiClient;
+import com.team.financeapp.data.remote.BillApiService;
+import com.team.financeapp.data.remote.ExpenseApiService;
+import com.team.financeapp.data.remote.IncomeApiService;
 
-import java.util.HashMap;
+import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import retrofit2.Response;
 
 public class PendingSyncWorker extends Worker {
 
     public static final String UNIQUE_WORK_NAME = "pending_finance_sync";
 
     private static final String TAG = "PendingSyncWorker";
-    private static final long FIRESTORE_TIMEOUT_SECONDS = 20L;
 
     public PendingSyncWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
@@ -54,14 +56,17 @@ public class PendingSyncWorker extends Worker {
         BillDao billDao = db.billDao();
         ExpenseDao expenseDao = db.expenseDao();
         IncomeDao incomeDao = db.incomeDao();
-        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+        
+        BillApiService billApiService = ApiClient.getClient().create(BillApiService.class);
+        ExpenseApiService expenseApiService = ApiClient.getClient().create(ExpenseApiService.class);
+        IncomeApiService incomeApiService = ApiClient.getClient().create(IncomeApiService.class);
 
         boolean hasFailures = false;
         int syncedCount = 0;
 
         List<BillEntity> pendingBills = billDao.getPendingSync(userId);
         for (BillEntity bill : pendingBills) {
-            if (syncBill(firestore, bill)) {
+            if (syncBill(billApiService, bill)) {
                 syncedCount++;
                 continue;
             }
@@ -73,7 +78,7 @@ public class PendingSyncWorker extends Worker {
 
         List<ExpenseEntity> pendingExpenses = expenseDao.getPendingSync(userId);
         for (ExpenseEntity expense : pendingExpenses) {
-            if (syncExpense(firestore, expense)) {
+            if (syncExpense(expenseApiService, expense)) {
                 syncedCount++;
                 continue;
             }
@@ -85,7 +90,7 @@ public class PendingSyncWorker extends Worker {
 
         List<IncomeEntity> pendingIncomes = incomeDao.getPendingSync(userId);
         for (IncomeEntity income : pendingIncomes) {
-            if (syncIncome(firestore, income)) {
+            if (syncIncome(incomeApiService, income)) {
                 syncedCount++;
                 continue;
             }
@@ -106,94 +111,112 @@ public class PendingSyncWorker extends Worker {
         return FirebaseAuth.getInstance().getCurrentUser().getUid();
     }
 
-    private boolean syncBill(FirebaseFirestore firestore, BillEntity bill) {
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("userId", bill.userId);
-        payload.put("name", bill.name);
-        payload.put("description", bill.description);
-        payload.put("amount", bill.amount);
-        payload.put("dueDate", bill.dueDate);
-        payload.put("category", bill.category);
-        payload.put("categoryIcon", bill.categoryIcon);
-        payload.put("status", bill.status);
-        payload.put("indicatorColor", bill.indicatorColor);
-        payload.put("deleted", bill.deleted);
-        payload.put("isRecurring", bill.isRecurring);
-        payload.put("syncState", SyncState.SYNCED);
-        payload.put("createdAt", bill.createdAt);
-        payload.put("updatedAt", System.currentTimeMillis());
-
+    private boolean syncBill(BillApiService apiService, BillEntity bill) {
         try {
-            Tasks.await(
-                    firestore.collection("bills").document(bill.remoteId).set(payload),
-                    FIRESTORE_TIMEOUT_SECONDS,
-                    TimeUnit.SECONDS
-            );
-            bill.syncState = SyncState.SYNCED;
-            bill.updatedAt = System.currentTimeMillis();
-            AppDatabase.getInstance(getApplicationContext()).billDao().update(bill);
-            return true;
-        } catch (Exception e) {
+            int backendId = 0;
+            try {
+                backendId = Integer.parseInt(bill.remoteId);
+            } catch (NumberFormatException ignored) {}
+
+            Response<BillEntity> response;
+            if (backendId > 0 && !bill.deleted) {
+                response = apiService.updateBill(backendId, bill).execute();
+            } else if (bill.deleted) {
+                Response<Void> deleteResponse = apiService.deleteBill(backendId).execute();
+                if (deleteResponse.isSuccessful()) {
+                    bill.syncState = SyncState.SYNCED;
+                    bill.updatedAt = System.currentTimeMillis();
+                    AppDatabase.getInstance(getApplicationContext()).billDao().update(bill);
+                    return true;
+                }
+                return false;
+            } else {
+                response = apiService.createBill(bill).execute();
+            }
+
+            if (response.isSuccessful() && response.body() != null) {
+                bill.syncState = SyncState.SYNCED;
+                bill.updatedAt = System.currentTimeMillis();
+                bill.remoteId = String.valueOf(response.body().localId);
+                AppDatabase.getInstance(getApplicationContext()).billDao().update(bill);
+                return true;
+            }
+            return false;
+        } catch (IOException e) {
             Log.e(TAG, "Bill sync failed for remoteId=" + bill.remoteId, e);
             return false;
         }
     }
 
-    private boolean syncExpense(FirebaseFirestore firestore, ExpenseEntity expense) {
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("userId", expense.userId);
-        payload.put("category", expense.category);
-        payload.put("amount", expense.amount);
-        payload.put("description", expense.description);
-        payload.put("date", expense.date);
-        payload.put("time", expense.time);
-        payload.put("categoryIcon", expense.categoryIcon);
-        payload.put("deleted", expense.deleted);
-        payload.put("syncState", SyncState.SYNCED);
-        payload.put("createdAt", expense.createdAt);
-        payload.put("updatedAt", System.currentTimeMillis());
-
+    private boolean syncExpense(ExpenseApiService apiService, ExpenseEntity expense) {
         try {
-            Tasks.await(
-                    firestore.collection("expenses").document(expense.remoteId).set(payload),
-                    FIRESTORE_TIMEOUT_SECONDS,
-                    TimeUnit.SECONDS
-            );
-            expense.syncState = SyncState.SYNCED;
-            expense.updatedAt = System.currentTimeMillis();
-            AppDatabase.getInstance(getApplicationContext()).expenseDao().update(expense);
-            return true;
-        } catch (Exception e) {
+            int backendId = 0;
+            try {
+                backendId = Integer.parseInt(expense.remoteId);
+            } catch (NumberFormatException ignored) {}
+
+            Response<ExpenseEntity> response;
+            if (backendId > 0 && !expense.deleted) {
+                response = apiService.updateExpense(backendId, expense).execute();
+            } else if (expense.deleted) {
+                Response<Void> deleteResponse = apiService.deleteExpense(backendId).execute();
+                if (deleteResponse.isSuccessful()) {
+                    expense.syncState = SyncState.SYNCED;
+                    expense.updatedAt = System.currentTimeMillis();
+                    AppDatabase.getInstance(getApplicationContext()).expenseDao().update(expense);
+                    return true;
+                }
+                return false;
+            } else {
+                response = apiService.createExpense(expense).execute();
+            }
+
+            if (response.isSuccessful() && response.body() != null) {
+                expense.syncState = SyncState.SYNCED;
+                expense.updatedAt = System.currentTimeMillis();
+                expense.remoteId = String.valueOf(response.body().localId);
+                AppDatabase.getInstance(getApplicationContext()).expenseDao().update(expense);
+                return true;
+            }
+            return false;
+        } catch (IOException e) {
             Log.e(TAG, "Expense sync failed for remoteId=" + expense.remoteId, e);
             return false;
         }
     }
 
-    private boolean syncIncome(FirebaseFirestore firestore, IncomeEntity income) {
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("userId", income.userId);
-        payload.put("source", income.source);
-        payload.put("amount", income.amount);
-        payload.put("note", income.note);
-        payload.put("date", income.date);
-        payload.put("time", income.time);
-        payload.put("sourceIcon", income.sourceIcon);
-        payload.put("deleted", income.deleted);
-        payload.put("syncState", SyncState.SYNCED);
-        payload.put("createdAt", income.createdAt);
-        payload.put("updatedAt", System.currentTimeMillis());
-
+    private boolean syncIncome(IncomeApiService apiService, IncomeEntity income) {
         try {
-            Tasks.await(
-                    firestore.collection("incomes").document(income.remoteId).set(payload),
-                    FIRESTORE_TIMEOUT_SECONDS,
-                    TimeUnit.SECONDS
-            );
-            income.syncState = SyncState.SYNCED;
-            income.updatedAt = System.currentTimeMillis();
-            AppDatabase.getInstance(getApplicationContext()).incomeDao().update(income);
-            return true;
-        } catch (Exception e) {
+            int backendId = 0;
+            try {
+                backendId = Integer.parseInt(income.remoteId);
+            } catch (NumberFormatException ignored) {}
+
+            Response<IncomeEntity> response;
+            if (backendId > 0 && !income.deleted) {
+                response = apiService.updateIncome(backendId, income).execute();
+            } else if (income.deleted) {
+                Response<Void> deleteResponse = apiService.deleteIncome(backendId).execute();
+                if (deleteResponse.isSuccessful()) {
+                    income.syncState = SyncState.SYNCED;
+                    income.updatedAt = System.currentTimeMillis();
+                    AppDatabase.getInstance(getApplicationContext()).incomeDao().update(income);
+                    return true;
+                }
+                return false;
+            } else {
+                response = apiService.createIncome(income).execute();
+            }
+
+            if (response.isSuccessful() && response.body() != null) {
+                income.syncState = SyncState.SYNCED;
+                income.updatedAt = System.currentTimeMillis();
+                income.remoteId = String.valueOf(response.body().localId);
+                AppDatabase.getInstance(getApplicationContext()).incomeDao().update(income);
+                return true;
+            }
+            return false;
+        } catch (IOException e) {
             Log.e(TAG, "Income sync failed for remoteId=" + income.remoteId, e);
             return false;
         }

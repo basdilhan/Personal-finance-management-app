@@ -1,0 +1,85 @@
+package com.team.financeapp.notifications;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.util.Log;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
+import org.json.JSONObject;
+
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
+/**
+ * Uploads the FCM device token to our backend.
+ * Called on first launch and whenever the token is refreshed.
+ */
+public class FcmTokenUploader {
+
+    private static final String TAG = "FcmTokenUploader";
+    private static final String PREFS = "fcm_prefs";
+    private static final String PREF_UPLOADED_TOKEN = "uploaded_token";
+
+    /**
+     * Uploads the token to the backend if it hasn't been uploaded yet (or if it changed).
+     */
+    public static void uploadToken(Context context, String token) {
+        SharedPreferences prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+        String lastUploaded = prefs.getString(PREF_UPLOADED_TOKEN, "");
+
+        if (token.equals(lastUploaded)) {
+            Log.d(TAG, "FCM token unchanged, skipping upload.");
+            return;
+        }
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) {
+            Log.d(TAG, "User not logged in yet, FCM token will be uploaded after login.");
+            return;
+        }
+
+        String userId = user.getUid();
+        sendTokenToBackend(context, userId, token, prefs, token);
+    }
+
+    private static void sendTokenToBackend(Context context, String userId, String token,
+                                            SharedPreferences prefs, String rawToken) {
+        new Thread(() -> {
+            try {
+                // Get backend URL from shared preferences (set after login)
+                SharedPreferences appPrefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE);
+                String baseUrl = appPrefs.getString("backend_url", "http://192.168.8.197:8080");
+
+                URL url = new URL(baseUrl + "/api/users/fcm-token");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("PUT");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestProperty("X-User-Id", userId);
+                conn.setDoOutput(true);
+                conn.setConnectTimeout(10000);
+                conn.setReadTimeout(10000);
+
+                JSONObject body = new JSONObject();
+                body.put("token", token);
+
+                try (OutputStream os = conn.getOutputStream()) {
+                    os.write(body.toString().getBytes("utf-8"));
+                }
+
+                int code = conn.getResponseCode();
+                if (code == 200) {
+                    Log.d(TAG, "FCM token uploaded successfully.");
+                    prefs.edit().putString(PREF_UPLOADED_TOKEN, rawToken).apply();
+                } else {
+                    Log.w(TAG, "FCM token upload failed with code: " + code);
+                }
+                conn.disconnect();
+            } catch (Exception e) {
+                Log.e(TAG, "Error uploading FCM token: " + e.getMessage());
+            }
+        }).start();
+    }
+}

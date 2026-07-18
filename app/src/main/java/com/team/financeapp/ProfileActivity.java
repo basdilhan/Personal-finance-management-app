@@ -11,8 +11,11 @@ import androidx.appcompat.app.AppCompatDelegate;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.team.financeapp.data.remote.ApiClient;
+import com.team.financeapp.data.remote.UserApiService;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 
@@ -38,14 +41,14 @@ public class ProfileActivity extends AppCompatActivity {
     private MaterialButton btnAppLock;
     private MaterialButton btnBack;
     private SwitchMaterial switchDarkTheme;
-    private FirebaseFirestore firestore;
+    private UserApiService userApiService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-        firestore = FirebaseFirestore.getInstance();
+        userApiService = ApiClient.getClient().create(UserApiService.class);
 
         initializeViews();
         loadUserData();
@@ -100,40 +103,42 @@ public class ProfileActivity extends AppCompatActivity {
         tvJoinDate.setText("Joined: " + formatJoinDate(user));
         tvAccountType.setText(resolveAccountType(user));
 
-        firestore.collection("users")
-                .document(user.getUid())
-                .get()
-                .addOnSuccessListener(this::bindFirestoreUser)
-                .addOnFailureListener(e -> {
+        userApiService.getCurrentUser().enqueue(new Callback<com.team.financeapp.auth.UserProfile>() {
+            @Override
+            public void onResponse(Call<com.team.financeapp.auth.UserProfile> call, Response<com.team.financeapp.auth.UserProfile> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    bindRetrofitUser(response.body());
+                } else {
                     tvUserAge.setText("Not set");
                     tvUserPhone.setText("Not set");
-                });
+                }
+            }
+
+            @Override
+            public void onFailure(Call<com.team.financeapp.auth.UserProfile> call, Throwable t) {
+                tvUserAge.setText("Not set");
+                tvUserPhone.setText("Not set");
+            }
+        });
     }
 
-    private void bindFirestoreUser(DocumentSnapshot snapshot) {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user == null) {
-            return;
+    private void bindRetrofitUser(com.team.financeapp.auth.UserProfile profile) {
+        if (profile.getDisplayName() != null && !profile.getDisplayName().trim().isEmpty()) {
+            tvUserName.setText(profile.getDisplayName().trim());
         }
 
-        String firestoreName = snapshot.getString("name");
-        if (firestoreName != null && !firestoreName.trim().isEmpty()) {
-            tvUserName.setText(firestoreName.trim());
+        if (profile.getEmail() != null && !profile.getEmail().trim().isEmpty()) {
+            tvUserEmail.setText(profile.getEmail().trim());
         }
 
-        String firestoreEmail = snapshot.getString("email");
-        if (firestoreEmail != null && !firestoreEmail.trim().isEmpty()) {
-            tvUserEmail.setText(firestoreEmail.trim());
-        }
-
-        Long age = snapshot.getLong("age");
-        if (age == null || age <= 0L || age > 120L) {
+        Integer age = profile.getAge();
+        if (age == null || age <= 0 || age > 120) {
             tvUserAge.setText("Not set");
         } else {
             tvUserAge.setText(String.valueOf(age));
         }
 
-        String phone = snapshot.getString("phone");
+        String phone = profile.getPhone();
         tvUserPhone.setText(phone == null || phone.trim().isEmpty() ? "Not set" : phone.trim());
     }
 

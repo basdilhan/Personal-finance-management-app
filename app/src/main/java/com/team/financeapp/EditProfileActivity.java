@@ -9,8 +9,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.SetOptions;
+import com.team.financeapp.data.remote.ApiClient;
+import com.team.financeapp.data.remote.UserApiService;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 
@@ -29,14 +32,14 @@ public class EditProfileActivity extends AppCompatActivity {
     private TextInputEditText etUserPhone;
     private MaterialButton btnSave;
     private MaterialButton btnCancel;
-    private FirebaseFirestore firestore;
+    private UserApiService userApiService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_profile);
 
-        firestore = FirebaseFirestore.getInstance();
+        userApiService = ApiClient.getClient().create(UserApiService.class);
 
         initializeViews();
         loadProfileData();
@@ -56,7 +59,7 @@ public class EditProfileActivity extends AppCompatActivity {
     }
 
     /**
-     * Load existing profile data from FirebaseAuth and Firestore
+     * Load existing profile data from FirebaseAuth and Server
      */
     private void loadProfileData() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -74,28 +77,31 @@ public class EditProfileActivity extends AppCompatActivity {
         etUserName.setText(fallbackName);
         etUserEmail.setText(email);
 
-        firestore.collection("users")
-                .document(user.getUid())
-                .get()
-                .addOnSuccessListener(snapshot -> {
-                    String firestoreName = snapshot.getString("name");
-                    String firestoreEmail = snapshot.getString("email");
-                    Long age = snapshot.getLong("age");
-                    String phone = snapshot.getString("phone");
+        userApiService.getCurrentUser().enqueue(new Callback<com.team.financeapp.auth.UserProfile>() {
+            @Override
+            public void onResponse(Call<com.team.financeapp.auth.UserProfile> call, Response<com.team.financeapp.auth.UserProfile> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    com.team.financeapp.auth.UserProfile profile = response.body();
+                    if (profile.getDisplayName() != null && !profile.getDisplayName().trim().isEmpty()) {
+                        etUserName.setText(profile.getDisplayName().trim());
+                    }
+                    if (profile.getEmail() != null && !profile.getEmail().trim().isEmpty()) {
+                        etUserEmail.setText(profile.getEmail().trim());
+                    }
+                    if (profile.getAge() != null && profile.getAge() > 0 && profile.getAge() <= 120) {
+                        etUserAge.setText(String.valueOf(profile.getAge()));
+                    }
+                    if (profile.getPhone() != null && !profile.getPhone().trim().isEmpty()) {
+                        etUserPhone.setText(profile.getPhone().trim());
+                    }
+                }
+            }
 
-                    if (firestoreName != null && !firestoreName.trim().isEmpty()) {
-                        etUserName.setText(firestoreName.trim());
-                    }
-                    if (firestoreEmail != null && !firestoreEmail.trim().isEmpty()) {
-                        etUserEmail.setText(firestoreEmail.trim());
-                    }
-                    if (age != null && age > 0L && age <= 120L) {
-                        etUserAge.setText(String.valueOf(age));
-                    }
-                    if (phone != null && !phone.trim().isEmpty()) {
-                        etUserPhone.setText(phone.trim());
-                    }
-                });
+            @Override
+            public void onFailure(Call<com.team.financeapp.auth.UserProfile> call, Throwable t) {
+                // Ignore failure
+            }
+        });
     }
 
     /**
@@ -118,7 +124,7 @@ public class EditProfileActivity extends AppCompatActivity {
     }
 
     /**
-     * Save profile data to FirebaseAuth and Firestore
+     * Save profile data to FirebaseAuth and Server
      */
     private void saveProfileData() {
         String name = etUserName.getText().toString().trim();
@@ -181,39 +187,45 @@ public class EditProfileActivity extends AppCompatActivity {
 
         user.updateProfile(profileUpdates)
                 .addOnCompleteListener(profileTask -> {
-                    Map<String, Object> userDoc = new HashMap<>();
-                    userDoc.put("uid", user.getUid());
-                    userDoc.put("name", name);
-                    userDoc.put("email", email);
-                    userDoc.put("age", age);
-                    userDoc.put("phone", phone);
-                    userDoc.put("photoUrl", user.getPhotoUrl() == null ? "" : user.getPhotoUrl().toString());
-                    userDoc.put("updatedAt", System.currentTimeMillis());
+                    com.team.financeapp.auth.UserProfile userProfile = new com.team.financeapp.auth.UserProfile();
+                    userProfile.setId(user.getUid());
+                    userProfile.setDisplayName(name);
+                    userProfile.setEmail(email);
+                    userProfile.setAge(age);
+                    userProfile.setPhone(phone);
+                    userProfile.setPhotoUrl(user.getPhotoUrl() == null ? "" : user.getPhotoUrl().toString());
 
-                    firestore.collection("users")
-                            .document(user.getUid())
-                            .set(userDoc, SetOptions.merge())
-                            .addOnSuccessListener(unused -> {
+                    userApiService.createOrUpdateUser(userProfile).enqueue(new Callback<com.team.financeapp.auth.UserProfile>() {
+                        @Override
+                        public void onResponse(Call<com.team.financeapp.auth.UserProfile> call, Response<com.team.financeapp.auth.UserProfile> response) {
+                            if (response.isSuccessful()) {
                                 if (user.getEmail() != null && !user.getEmail().equalsIgnoreCase(email)) {
                                     user.verifyBeforeUpdateEmail(email)
                                             .addOnSuccessListener(v -> {
-                                                Toast.makeText(this, "Profile saved. Verify new email from your inbox to complete email update.", Toast.LENGTH_LONG).show();
+                                                Toast.makeText(EditProfileActivity.this, "Profile saved. Verify new email from your inbox.", Toast.LENGTH_LONG).show();
                                                 finish();
                                             })
                                             .addOnFailureListener(e -> {
                                                 btnSave.setEnabled(true);
-                                                Toast.makeText(this, "Profile saved, but email update failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                                                Toast.makeText(EditProfileActivity.this, "Profile saved, but email update failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
                                             });
                                     return;
                                 }
 
-                                Toast.makeText(this, "Profile updated successfully", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(EditProfileActivity.this, "Profile updated successfully", Toast.LENGTH_SHORT).show();
                                 finish();
-                            })
-                            .addOnFailureListener(e -> {
+                            } else {
                                 btnSave.setEnabled(true);
-                                Toast.makeText(this, "Failed to save profile: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                            });
+                                Toast.makeText(EditProfileActivity.this, "Failed to save profile on server.", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<com.team.financeapp.auth.UserProfile> call, Throwable t) {
+                            btnSave.setEnabled(true);
+                            Toast.makeText(EditProfileActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 });
     }
 }

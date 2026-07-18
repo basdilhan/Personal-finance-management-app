@@ -6,77 +6,79 @@ import android.os.Looper;
 
 import androidx.annotation.NonNull;
 
-import com.google.firebase.Timestamp;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.team.financeapp.Expense;
-import com.team.financeapp.R;
 import com.team.financeapp.data.local.AppDatabase;
 import com.team.financeapp.data.local.SyncState;
 import com.team.financeapp.data.local.dao.ExpenseDao;
 import com.team.financeapp.data.local.entity.ExpenseEntity;
+import com.team.financeapp.data.remote.ApiClient;
+import com.team.financeapp.data.remote.ExpenseApiService;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ExpenseRepository {
 
     public interface LoadExpensesCallback {
         void onExpensesLoaded(List<Expense> expenses);
-
         void onError(String message);
     }
 
     public interface SaveExpenseCallback {
         void onSuccess();
-
         void onError(String message);
     }
 
     public interface ModifyExpenseCallback {
         void onSuccess();
-
         void onError(String message);
     }
 
     private static final ExecutorService IO = Executors.newSingleThreadExecutor();
 
     private final ExpenseDao expenseDao;
-    private final FirebaseFirestore firestore;
+    private final ExpenseApiService apiService;
     private final Handler mainHandler;
 
     public ExpenseRepository(@NonNull Context context) {
         this.expenseDao = AppDatabase.getInstance(context).expenseDao();
-        this.firestore = FirebaseFirestore.getInstance();
+        this.apiService = ApiClient.getClient().create(ExpenseApiService.class);
         this.mainHandler = new Handler(Looper.getMainLooper());
     }
 
     public void loadExpenses(@NonNull String userId, @NonNull LoadExpensesCallback callback) {
+        // 1. Load from local Room database first (offline-first)
         IO.execute(() -> {
             List<ExpenseEntity> localEntities = expenseDao.getByUser(userId);
             List<Expense> localExpenses = toExpenses(localEntities);
             mainHandler.post(() -> callback.onExpensesLoaded(localExpenses));
         });
 
+        // 2. Fetch fresh data from Spring Boot REST API
         refreshFromRemote(userId, callback);
     }
 
     public void saveExpense(@NonNull String userId, @NonNull Expense expense, @NonNull SaveExpenseCallback callback) {
         ExpenseEntity entity = fromExpense(userId, expense);
-        entity.remoteId = UUID.randomUUID().toString();
+        entity.remoteId = UUID.randomUUID().toString(); // Use as temp remote ID until real one arrives
         entity.syncState = SyncState.PENDING;
         entity.createdAt = System.currentTimeMillis();
         entity.updatedAt = entity.createdAt;
 
         IO.execute(() -> {
+            // Save locally immediately
             long localId = expenseDao.insert(entity);
             entity.localId = localId;
             mainHandler.post(callback::onSuccess);
+            
+            // Push to Spring Boot backend
             pushExpenseToRemote(entity, callback);
         });
     }
@@ -99,9 +101,12 @@ public class ExpenseRepository {
             existing.syncState = SyncState.PENDING;
             existing.updatedAt = System.currentTimeMillis();
 
+            // Update locally immediately
             expenseDao.update(existing);
             mainHandler.post(callback::onSuccess);
-            pushExpenseToRemote(existing, callback);
+            
+            // Update in Spring Boot backend
+            updateExpenseInRemote(existing, callback);
         });
     }
 
@@ -116,94 +121,140 @@ public class ExpenseRepository {
             existing.deleted = true;
             existing.syncState = SyncState.PENDING;
             existing.updatedAt = System.currentTimeMillis();
+            
+            // Soft delete locally
             expenseDao.update(existing);
             mainHandler.post(callback::onSuccess);
-            pushExpenseToRemote(existing, callback);
+            
+            // Delete in Spring Boot backend
+            deleteExpenseInRemote(existing, callback);
         });
     }
 
     private void refreshFromRemote(@NonNull String userId, @NonNull LoadExpensesCallback callback) {
-        firestore.collection("expenses")
-                .whereEqualTo("userId", userId)
-                .get()
-                .addOnSuccessListener(querySnapshot -> IO.execute(() -> {
-                    List<ExpenseEntity> remoteEntities = new ArrayList<>();
-                    for (DocumentSnapshot document : querySnapshot.getDocuments()) {
-                        remoteEntities.add(fromDocument(document));
-                    }
+        apiService.getExpenses().enqueue(new Callback<List<ExpenseEntity>>() {
+            @Override
+            public void onResponse(Call<List<ExpenseEntity>> call, Response<List<ExpenseEntity>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<ExpenseEntity> remoteEntities = response.body();
+                    IO.execute(() -> {
+                        // Mark all as SYNCED since they came from the server
+                        for (ExpenseEntity entity : remoteEntities) {
+                            entity.syncState = SyncState.SYNCED;
+                            // Spring boot sends integer IDs, but our local expects remoteId to be a string
+                            // If your backend ID is Integer, map it to remoteId
+                            entity.remoteId = String.valueOf(entity.localId); // Mapping backend ID if needed
+                        }
+                        
+                        expenseDao.deleteAllForUser(userId);
+                        expenseDao.insertAll(remoteEntities);
+                        List<Expense> latest = toExpenses(expenseDao.getByUser(userId));
+                        mainHandler.post(() -> callback.onExpensesLoaded(latest));
+                    });
+                } else {
+                    mainHandler.post(() -> callback.onError("Failed to refresh: HTTP " + response.code()));
+                }
+            }
 
-                    expenseDao.deleteAllForUser(userId);
-                    expenseDao.insertAll(remoteEntities);
-                    List<Expense> latest = toExpenses(expenseDao.getByUser(userId));
-                    mainHandler.post(() -> callback.onExpensesLoaded(latest));
-                }))
-                .addOnFailureListener(e -> mainHandler.post(() -> callback.onError(
-                        e.getMessage() == null ? "Failed to refresh expenses" : e.getMessage()
-                )));
+            @Override
+            public void onFailure(Call<List<ExpenseEntity>> call, Throwable t) {
+                mainHandler.post(() -> callback.onError(t.getMessage() == null ? "Network error" : t.getMessage()));
+            }
+        });
     }
 
     private void pushExpenseToRemote(@NonNull ExpenseEntity entity, @NonNull SaveExpenseCallback callback) {
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("userId", entity.userId);
-        payload.put("category", entity.category);
-        payload.put("amount", entity.amount);
-        payload.put("description", entity.description);
-        payload.put("date", entity.date);
-        payload.put("time", entity.time);
-        payload.put("categoryIcon", entity.categoryIcon);
-        payload.put("deleted", entity.deleted);
-        payload.put("syncState", SyncState.SYNCED);
-        payload.put("createdAt", entity.createdAt);
-        payload.put("updatedAt", System.currentTimeMillis());
+        apiService.createExpense(entity).enqueue(new Callback<ExpenseEntity>() {
+            @Override
+            public void onResponse(Call<ExpenseEntity> call, Response<ExpenseEntity> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    IO.execute(() -> {
+                        // ✅ CRITICAL: Save the real backend ID so edit/delete work correctly
+                        entity.remoteId = String.valueOf(response.body().localId);
+                        entity.syncState = SyncState.SYNCED;
+                        entity.updatedAt = System.currentTimeMillis();
+                        expenseDao.update(entity);
+                    });
+                } else {
+                    handleSyncFailure(entity, callback, "HTTP " + response.code());
+                }
+            }
 
-        firestore.collection("expenses")
-                .document(entity.remoteId)
-                .set(payload)
-                .addOnSuccessListener(unused -> IO.execute(() -> {
-                    entity.syncState = SyncState.SYNCED;
-                    entity.updatedAt = System.currentTimeMillis();
-                    expenseDao.update(entity);
-                }))
-                .addOnFailureListener(e -> IO.execute(() -> {
-                    entity.syncState = SyncState.FAILED;
-                    entity.updatedAt = System.currentTimeMillis();
-                    expenseDao.update(entity);
-                    mainHandler.post(() -> callback.onError(
-                            e.getMessage() == null ? "Saved locally but cloud sync failed" : e.getMessage()
-                    ));
-                }));
+            @Override
+            public void onFailure(Call<ExpenseEntity> call, Throwable t) {
+                handleSyncFailure(entity, callback, t.getMessage());
+            }
+        });
     }
 
-    private void pushExpenseToRemote(@NonNull ExpenseEntity entity, @NonNull ModifyExpenseCallback callback) {
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("userId", entity.userId);
-        payload.put("category", entity.category);
-        payload.put("amount", entity.amount);
-        payload.put("description", entity.description);
-        payload.put("date", entity.date);
-        payload.put("time", entity.time);
-        payload.put("categoryIcon", entity.categoryIcon);
-        payload.put("deleted", entity.deleted);
-        payload.put("syncState", SyncState.SYNCED);
-        payload.put("createdAt", entity.createdAt);
-        payload.put("updatedAt", System.currentTimeMillis());
+    private void updateExpenseInRemote(@NonNull ExpenseEntity entity, @NonNull ModifyExpenseCallback callback) {
+        // Extract the integer ID from remoteId if available, or just send the entity
+        int backendId = 0;
+        try {
+            backendId = Integer.parseInt(entity.remoteId);
+        } catch (NumberFormatException ignored) {}
 
-        firestore.collection("expenses")
-                .document(entity.remoteId)
-                .set(payload)
-                .addOnSuccessListener(unused -> IO.execute(() -> {
-                    entity.syncState = SyncState.SYNCED;
-                    entity.updatedAt = System.currentTimeMillis();
-                    expenseDao.update(entity);
-                }))
-                .addOnFailureListener(e -> IO.execute(() -> {
-                    entity.syncState = SyncState.FAILED;
-                    entity.updatedAt = System.currentTimeMillis();
-                    expenseDao.update(entity);
-                    mainHandler.post(() -> callback.onError(
-                            e.getMessage() == null ? "Saved locally but cloud sync failed" : e.getMessage()
-                    ));
-                }));
+        apiService.updateExpense(backendId, entity).enqueue(new Callback<ExpenseEntity>() {
+            @Override
+            public void onResponse(Call<ExpenseEntity> call, Response<ExpenseEntity> response) {
+                if (response.isSuccessful()) {
+                    IO.execute(() -> {
+                        entity.syncState = SyncState.SYNCED;
+                        entity.updatedAt = System.currentTimeMillis();
+                        expenseDao.update(entity);
+                    });
+                } else {
+                    handleSyncFailure(entity, callback, "HTTP " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ExpenseEntity> call, Throwable t) {
+                handleSyncFailure(entity, callback, t.getMessage());
+            }
+        });
+    }
+
+    private void deleteExpenseInRemote(@NonNull ExpenseEntity entity, @NonNull ModifyExpenseCallback callback) {
+        int backendId = 0;
+        try {
+            backendId = Integer.parseInt(entity.remoteId);
+        } catch (NumberFormatException ignored) {}
+
+        apiService.deleteExpense(backendId).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    IO.execute(() -> {
+                        entity.syncState = SyncState.SYNCED;
+                        entity.updatedAt = System.currentTimeMillis();
+                        expenseDao.update(entity);
+                    });
+                } else {
+                    handleSyncFailure(entity, callback, "HTTP " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                handleSyncFailure(entity, callback, t.getMessage());
+            }
+        });
+    }
+
+    private void handleSyncFailure(ExpenseEntity entity, Object callback, String errorMsg) {
+        IO.execute(() -> {
+            entity.syncState = SyncState.FAILED;
+            entity.updatedAt = System.currentTimeMillis();
+            expenseDao.update(entity);
+            
+            String msg = errorMsg == null ? "Cloud sync failed" : errorMsg;
+            if (callback instanceof SaveExpenseCallback) {
+                mainHandler.post(() -> ((SaveExpenseCallback) callback).onError(msg));
+            } else if (callback instanceof ModifyExpenseCallback) {
+                mainHandler.post(() -> ((ModifyExpenseCallback) callback).onError(msg));
+            }
+        });
     }
 
     private ExpenseEntity fromExpense(String userId, Expense expense) {
@@ -222,86 +273,19 @@ public class ExpenseRepository {
     private List<Expense> toExpenses(List<ExpenseEntity> entities) {
         List<Expense> expenses = new ArrayList<>();
         for (ExpenseEntity entity : entities) {
-            expenses.add(new Expense(
-                    (int) entity.localId,
-                    entity.category,
-                    entity.amount,
-                    entity.description,
-                    entity.date,
-                    entity.time,
-                    entity.categoryIcon
-            ));
+            // Only add non-deleted items to UI
+            if (!entity.deleted) {
+                expenses.add(new Expense(
+                        (int) entity.localId,
+                        entity.category,
+                        entity.amount,
+                        entity.description,
+                        entity.date,
+                        entity.time,
+                        entity.categoryIcon
+                ));
+            }
         }
         return expenses;
-    }
-
-    private ExpenseEntity fromDocument(DocumentSnapshot document) {
-        ExpenseEntity entity = new ExpenseEntity();
-        entity.remoteId = document.getId();
-        entity.userId = getString(document, "userId", "");
-        entity.category = getString(document, "category", "Other");
-        entity.amount = getDouble(document, "amount", 0.0d);
-        entity.description = getString(document, "description", "");
-        entity.date = getEpochMillis(document, "date", 0L);
-        entity.time = getString(document, "time", "00:00");
-        entity.categoryIcon = (int) getLong(document, "categoryIcon", R.drawable.ic_receipt);
-        entity.deleted = document.getBoolean("deleted") != null && Boolean.TRUE.equals(document.getBoolean("deleted"));
-        entity.syncState = SyncState.SYNCED;
-        entity.createdAt = getEpochMillis(document, "createdAt", System.currentTimeMillis());
-        entity.updatedAt = getEpochMillis(document, "updatedAt", System.currentTimeMillis());
-        return entity;
-    }
-
-    private static String getString(DocumentSnapshot doc, String key, String fallback) {
-        String value = doc.getString(key);
-        return value == null ? fallback : value;
-    }
-
-    private static long getLong(DocumentSnapshot doc, String key, long fallback) {
-        Long value = doc.getLong(key);
-        return value == null ? fallback : value;
-    }
-
-    private static long getEpochMillis(DocumentSnapshot doc, String key, long fallback) {
-        Object value = doc.get(key);
-        if (value == null) {
-            return fallback;
-        }
-        if (value instanceof Timestamp) {
-            return ((Timestamp) value).toDate().getTime();
-        }
-        if (value instanceof Number) {
-            return normalizeEpochMillis(((Number) value).longValue());
-        }
-        if (value instanceof String) {
-            try {
-                return normalizeEpochMillis(Long.parseLong((String) value));
-            } catch (NumberFormatException ignored) {
-                return fallback;
-            }
-        }
-        return fallback;
-    }
-
-    private static long normalizeEpochMillis(long raw) {
-        if (raw <= 0L) {
-            return raw;
-        }
-        return raw < 1_000_000_000_000L ? raw * 1000L : raw;
-    }
-
-    private static double getDouble(DocumentSnapshot doc, String key, double fallback) {
-        Object value = doc.get(key);
-        if (value instanceof Number) {
-            return ((Number) value).doubleValue();
-        }
-        if (value instanceof String) {
-            try {
-                return Double.parseDouble((String) value);
-            } catch (NumberFormatException ignored) {
-                return fallback;
-            }
-        }
-        return fallback;
     }
 }
