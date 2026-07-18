@@ -14,8 +14,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.UserProfileChangeRequest;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.SetOptions;
+import com.team.financeapp.data.remote.ApiClient;
+import com.team.financeapp.data.remote.UserApiService;
 import com.team.financeapp.AppLockManager;
 import com.team.financeapp.R;
 import com.team.financeapp.notifications.FinancialReminderScheduler;
@@ -29,11 +29,11 @@ public class AuthManager {
     }
 
     private final FirebaseAuth firebaseAuth;
-    private final FirebaseFirestore firestore;
+    private final UserApiService userApiService;
 
     public AuthManager() {
         firebaseAuth = FirebaseAuth.getInstance();
-        firestore = FirebaseFirestore.getInstance();
+        userApiService = ApiClient.getClient().create(UserApiService.class);
     }
 
     public boolean isUserLoggedIn() {
@@ -178,17 +178,18 @@ public class AuthManager {
         String resolvedName = !TextUtils.isEmpty(user.getDisplayName()) ? user.getDisplayName() : fallbackName;
         String photo = user.getPhotoUrl() == null ? "" : user.getPhotoUrl().toString();
 
-        UserProfile profile = new UserProfile(
-                user.getUid(),
-                TextUtils.isEmpty(resolvedName) ? "User" : resolvedName,
-                user.getEmail(),
-                photo,
-                System.currentTimeMillis()
-        );
+        UserProfile profile = new UserProfile();
+        profile.setId(user.getUid());
+        profile.setDisplayName(TextUtils.isEmpty(resolvedName) ? "User" : resolvedName);
+        profile.setEmail(user.getEmail());
+        profile.setPhotoUrl(photo);
 
-        firestore.collection("users")
-                .document(user.getUid())
-                .set(profile, SetOptions.merge());
+        userApiService.createOrUpdateUser(profile).enqueue(new retrofit2.Callback<UserProfile>() {
+            @Override
+            public void onResponse(retrofit2.Call<UserProfile> call, retrofit2.Response<UserProfile> response) {}
+            @Override
+            public void onFailure(retrofit2.Call<UserProfile> call, Throwable t) {}
+        });
     }
 
     private String resolveError(Exception exception) {

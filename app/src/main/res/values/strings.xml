@@ -121,8 +121,8 @@
     <string name="dashboard_welcome_back">Welcome back,</string>
     <string name="dashboard_identity_badge">DreamSaver Pulse</string>
     <string name="dashboard_total_balance_title">Portfolio Balance</string>
-    <string name="dashboard_income_label">Cash In</string>
-    <string name="dashboard_expense_label">Cash Out</string>
+    <string name="dashboard_income_label">Cash In (This Month)</string>
+    <string name="dashboard_expense_label">Cash Out (This Month)</string>
     <string name="dashboard_quick_actions_title">Quick Moves</string>
     <string name="dashboard_action_expense">Expense</string>
     <string name="dashboard_action_income">Income</string>

@@ -6,14 +6,13 @@ import android.os.Looper;
 
 import androidx.annotation.NonNull;
 
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.team.financeapp.Goal;
-import com.team.financeapp.R;
 import com.team.financeapp.data.local.AppDatabase;
 import com.team.financeapp.data.local.SyncState;
 import com.team.financeapp.data.local.dao.GoalDao;
 import com.team.financeapp.data.local.entity.GoalEntity;
+import com.team.financeapp.data.remote.ApiClient;
+import com.team.financeapp.data.remote.GoalApiService;
 import com.team.financeapp.notifications.FinancialReminderScheduler;
 
 import java.util.ArrayList;
@@ -24,33 +23,29 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-/**
- * Repository for managing Goals
- * Handles both local database operations and remote Firebase Firestore sync
- */
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class GoalRepository {
 
     public interface LoadGoalsCallback {
         void onGoalsLoaded(List<Goal> goals);
-
         void onError(String message);
     }
 
     public interface SaveGoalCallback {
         void onSuccess(Goal goal);
-
         void onError(String message);
     }
 
     public interface UpdateGoalCallback {
         void onSuccess();
-
         void onError(String message);
     }
 
     public interface DeleteGoalCallback {
         void onSuccess();
-
         void onError(String message);
     }
 
@@ -58,20 +53,16 @@ public class GoalRepository {
 
     private final Context appContext;
     private final GoalDao goalDao;
-    private final FirebaseFirestore firestore;
+    private final GoalApiService apiService;
     private final Handler mainHandler;
 
     public GoalRepository(@NonNull Context context) {
         this.appContext = context.getApplicationContext();
         this.goalDao = AppDatabase.getInstance(appContext).goalDao();
-        this.firestore = FirebaseFirestore.getInstance();
+        this.apiService = ApiClient.getClient().create(GoalApiService.class);
         this.mainHandler = new Handler(Looper.getMainLooper());
     }
 
-    /**
-     * Load all goals for a user from local database
-     * Also attempts to refresh from remote if connected
-     */
     public void loadGoals(@NonNull String userId, @NonNull LoadGoalsCallback callback) {
         IO.execute(() -> {
             List<GoalEntity> localEntities = goalDao.getByUser(userId);
@@ -82,10 +73,6 @@ public class GoalRepository {
         refreshFromRemote(userId, callback);
     }
 
-    /**
-     * Save a new goal
-     * Saves to local database first, then syncs to Firestore
-     */
     public void saveGoal(@NonNull String userId, @NonNull Goal goal, @NonNull SaveGoalCallback callback) {
         GoalEntity entity = fromGoal(userId, goal);
         entity.remoteId = UUID.randomUUID().toString();
@@ -100,13 +87,13 @@ public class GoalRepository {
             FinancialReminderScheduler.scheduleGoalReminder(appContext, entity);
             FinancialReminderScheduler.scheduleGoalAddedReminder(appContext, entity);
 
-            // Convert back to Goal with the new ID
             Goal savedGoal = new Goal(
                     (int) localId,
                     entity.name,
                     entity.description,
                     entity.targetAmount,
                     entity.currentAmount,
+                    entity.addedSavingsAmount,
                     entity.targetDate,
                     entity.category,
                     entity.categoryIcon,
@@ -114,33 +101,20 @@ public class GoalRepository {
             );
 
             mainHandler.post(() -> callback.onSuccess(savedGoal));
-
-            // Try to push to remote
             pushGoalToRemote(entity, new SaveGoalCallback() {
                 @Override
-                public void onSuccess(Goal goal) {
-                    // Remote sync successful
-                }
-
+                public void onSuccess(Goal goal) {}
                 @Override
-                public void onError(String message) {
-                    // Log error but don't propagate - goal is already saved locally
-                }
+                public void onError(String message) {}
             });
         });
     }
 
-    /**
-     * Update an existing goal
-     * Updates local database and syncs to Firestore
-     */
     public void updateGoal(@NonNull String userId, @NonNull Goal goal, @NonNull UpdateGoalCallback callback) {
         IO.execute(() -> {
-            // Retrieve existing entity to preserve remoteId
             GoalEntity existingEntity = goalDao.getById(goal.getId());
 
             if (existingEntity != null) {
-                // Update only the changed fields while preserving remoteId
                 existingEntity.userId = userId;
                 existingEntity.name = goal.getName();
                 existingEntity.description = goal.getDescription();
@@ -154,23 +128,11 @@ public class GoalRepository {
                 existingEntity.updatedAt = System.currentTimeMillis();
                 existingEntity.deleted = false;
 
-                // Update in local database
                 goalDao.update(existingEntity);
                 FinancialReminderScheduler.scheduleGoalReminder(appContext, existingEntity);
                 mainHandler.post(callback::onSuccess);
 
-                // Try to push to remote
-                pushGoalToRemote(existingEntity, new SaveGoalCallback() {
-                    @Override
-                    public void onSuccess(Goal goal) {
-                        // Remote sync successful
-                    }
-
-                    @Override
-                    public void onError(String message) {
-                        // Log error but don't propagate - goal is already updated locally
-                    }
-                });
+                updateGoalInRemote(existingEntity, callback);
             } else {
                 mainHandler.post(() -> callback.onError("Goal not found"));
             }
@@ -194,27 +156,34 @@ public class GoalRepository {
             FinancialReminderScheduler.scheduleGoalReminder(appContext, existingEntity);
             mainHandler.post(callback::onSuccess);
 
-            pushGoalToRemote(existingEntity, new SaveGoalCallback() {
-                @Override
-                public void onSuccess(Goal goal) {
-                    // Remote sync successful
-                }
+            // Use the PATCH endpoint for addSavings or just full update
+            int backendId = 0;
+            try {
+                backendId = Integer.parseInt(existingEntity.remoteId);
+            } catch (NumberFormatException ignored) {}
 
+            Map<String, Object> body = new HashMap<>();
+            body.put("amount", amountToAdd);
+            
+            apiService.addSavings(backendId, body).enqueue(new Callback<GoalEntity>() {
                 @Override
-                public void onError(String message) {
-                    // Goal already updated locally
+                public void onResponse(Call<GoalEntity> call, Response<GoalEntity> response) {
+                    if (response.isSuccessful()) {
+                        IO.execute(() -> {
+                            existingEntity.syncState = SyncState.SYNCED;
+                            existingEntity.updatedAt = System.currentTimeMillis();
+                            goalDao.update(existingEntity);
+                        });
+                    }
                 }
+                @Override
+                public void onFailure(Call<GoalEntity> call, Throwable t) {}
             });
         });
     }
 
-    /**
-     * Delete a goal (soft delete)
-     * Marks as deleted in local database and syncs to Firestore
-     */
     public void deleteGoal(@NonNull String userId, int goalLocalId, @NonNull DeleteGoalCallback callback) {
         IO.execute(() -> {
-            // For soft delete, fetch the entity, mark as deleted, and update
             GoalEntity entity = goalDao.getById(goalLocalId);
             if (entity != null) {
                 entity.deleted = true;
@@ -222,153 +191,170 @@ public class GoalRepository {
                 entity.updatedAt = System.currentTimeMillis();
                 goalDao.update(entity);
                 FinancialReminderScheduler.cancelGoalReminder(appContext, entity.remoteId);
-
                 mainHandler.post(callback::onSuccess);
 
-                // Try to sync deletion to remote
-                pushGoalDeletionToRemote(entity);
+                deleteGoalInRemote(entity, callback);
             } else {
                 mainHandler.post(() -> callback.onError("Goal not found"));
             }
         });
     }
 
-    /**
-     * Refresh goals from Firestore
-     */
     private void refreshFromRemote(@NonNull String userId, @NonNull LoadGoalsCallback callback) {
-        firestore.collection("goals")
-                .whereEqualTo("userId", userId)
-                .whereEqualTo("deleted", false)
-                .get()
-                .addOnSuccessListener(querySnapshot -> IO.execute(() -> {
-                    List<GoalEntity> remoteEntities = new ArrayList<>();
-                    for (DocumentSnapshot document : querySnapshot.getDocuments()) {
-                        remoteEntities.add(fromDocument(document));
-                    }
+        apiService.getGoals().enqueue(new Callback<List<GoalEntity>>() {
+            @Override
+            public void onResponse(Call<List<GoalEntity>> call, Response<List<GoalEntity>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<GoalEntity> remoteEntities = response.body();
+                    IO.execute(() -> {
+                        for (GoalEntity remoteEntity : remoteEntities) {
+                            remoteEntity.syncState = SyncState.SYNCED;
+                            remoteEntity.remoteId = String.valueOf(remoteEntity.localId);
+                            
+                            GoalEntity localEntity = goalDao.getByRemoteId(remoteEntity.remoteId);
+                            if (localEntity == null) {
+                                goalDao.insert(remoteEntity);
+                            } else {
+                                remoteEntity.localId = localEntity.localId;
+                                goalDao.update(remoteEntity);
+                            }
 
-                    // Merge with local data: update existing, add new
-                    for (GoalEntity remoteEntity : remoteEntities) {
-                        GoalEntity localEntity = goalDao.getByRemoteId(remoteEntity.remoteId);
-                        if (localEntity == null) {
-                            goalDao.insert(remoteEntity);
-                        } else {
-                            remoteEntity.localId = localEntity.localId;
-                            goalDao.update(remoteEntity);
+                            FinancialReminderScheduler.scheduleGoalReminder(appContext, remoteEntity);
                         }
 
-                        FinancialReminderScheduler.scheduleGoalReminder(appContext, remoteEntity);
-                    }
+                        List<Goal> latest = toGoals(goalDao.getByUser(userId));
+                        mainHandler.post(() -> callback.onGoalsLoaded(latest));
+                    });
+                } else {
+                    mainHandler.post(() -> callback.onError("Failed to refresh goals: HTTP " + response.code()));
+                }
+            }
 
-                    List<Goal> latest = toGoals(goalDao.getByUser(userId));
-                    mainHandler.post(() -> callback.onGoalsLoaded(latest));
-                }))
-                .addOnFailureListener(e -> mainHandler.post(() -> callback.onError(
-                        e.getMessage() == null ? "Failed to refresh goals" : e.getMessage()
-                )));
+            @Override
+            public void onFailure(Call<List<GoalEntity>> call, Throwable t) {
+                mainHandler.post(() -> callback.onError(t.getMessage() == null ? "Network error" : t.getMessage()));
+            }
+        });
     }
 
-    /**
-     * Push a goal to Firestore
-     */
     private void pushGoalToRemote(@NonNull GoalEntity entity, @NonNull SaveGoalCallback callback) {
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("userId", entity.userId);
-        payload.put("name", entity.name);
-        payload.put("description", entity.description);
-        payload.put("targetAmount", entity.targetAmount);
-        payload.put("currentAmount", entity.currentAmount);
-        payload.put("addedSavingsAmount", entity.addedSavingsAmount);
-        payload.put("targetDate", entity.targetDate);
-        payload.put("category", entity.category);
-        payload.put("categoryIcon", entity.categoryIcon);
-        payload.put("progressCircleBackground", entity.progressCircleBackground);
-        payload.put("deleted", entity.deleted);
-        payload.put("syncState", SyncState.SYNCED);
-        payload.put("createdAt", entity.createdAt);
-        payload.put("updatedAt", System.currentTimeMillis());
+        apiService.createGoal(entity).enqueue(new Callback<GoalEntity>() {
+            @Override
+            public void onResponse(Call<GoalEntity> call, Response<GoalEntity> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    IO.execute(() -> {
+                        // ✅ CRITICAL: Save the real backend ID so edit/delete/savings work correctly
+                        entity.remoteId = String.valueOf(response.body().localId);
+                        entity.syncState = SyncState.SYNCED;
+                        entity.updatedAt = System.currentTimeMillis();
+                        goalDao.update(entity);
+                        // Reschedule reminder with correct remoteId
+                        FinancialReminderScheduler.scheduleGoalReminder(appContext, entity);
+                    });
+                } else {
+                    handleSyncFailure(entity, callback, "HTTP " + response.code());
+                }
+            }
 
-        firestore.collection("goals")
-                .document(entity.remoteId)
-                .set(payload)
-                .addOnSuccessListener(unused -> IO.execute(() -> {
-                    entity.syncState = SyncState.SYNCED;
-                    entity.updatedAt = System.currentTimeMillis();
-                    goalDao.update(entity);
-
-                    Goal goal = new Goal(
-                            (int) entity.localId,
-                            entity.name,
-                            entity.description,
-                            entity.targetAmount,
-                            entity.currentAmount,
-                            entity.addedSavingsAmount,
-                            entity.targetDate,
-                            entity.category,
-                            entity.categoryIcon,
-                            entity.progressCircleBackground
-                    );
-                    mainHandler.post(() -> callback.onSuccess(goal));
-                }))
-                .addOnFailureListener(e -> IO.execute(() -> {
-                    entity.syncState = SyncState.FAILED;
-                    entity.updatedAt = System.currentTimeMillis();
-                    goalDao.update(entity);
-                    mainHandler.post(() -> callback.onError(
-                            e.getMessage() == null ? "Saved locally but cloud sync failed" : e.getMessage()
-                    ));
-                }));
+            @Override
+            public void onFailure(Call<GoalEntity> call, Throwable t) {
+                handleSyncFailure(entity, callback, t.getMessage());
+            }
+        });
     }
 
-    /**
-     * Push goal deletion to Firestore
-     */
-    private void pushGoalDeletionToRemote(@NonNull GoalEntity entity) {
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("deleted", true);
-        payload.put("syncState", SyncState.SYNCED);
-        payload.put("updatedAt", System.currentTimeMillis());
+    private void updateGoalInRemote(@NonNull GoalEntity entity, @NonNull UpdateGoalCallback callback) {
+        int backendId = 0;
+        try {
+            backendId = Integer.parseInt(entity.remoteId);
+        } catch (NumberFormatException ignored) {}
 
-        firestore.collection("goals")
-                .document(entity.remoteId)
-                .update(payload)
-                .addOnSuccessListener(unused -> IO.execute(() -> {
-                    entity.syncState = SyncState.SYNCED;
-                    entity.updatedAt = System.currentTimeMillis();
-                    goalDao.update(entity);
-                }))
-                .addOnFailureListener(e -> IO.execute(() -> {
-                    entity.syncState = SyncState.FAILED;
-                    entity.updatedAt = System.currentTimeMillis();
-                    goalDao.update(entity);
-                }));
+        apiService.updateGoal(backendId, entity).enqueue(new Callback<GoalEntity>() {
+            @Override
+            public void onResponse(Call<GoalEntity> call, Response<GoalEntity> response) {
+                if (response.isSuccessful()) {
+                    IO.execute(() -> {
+                        entity.syncState = SyncState.SYNCED;
+                        entity.updatedAt = System.currentTimeMillis();
+                        goalDao.update(entity);
+                    });
+                } else {
+                    handleSyncFailure(entity, callback, "HTTP " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<GoalEntity> call, Throwable t) {
+                handleSyncFailure(entity, callback, t.getMessage());
+            }
+        });
     }
 
-    /**
-     * Convert GoalEntity to Goal model
-     */
+    private void deleteGoalInRemote(@NonNull GoalEntity entity, @NonNull DeleteGoalCallback callback) {
+        int backendId = 0;
+        try {
+            backendId = Integer.parseInt(entity.remoteId);
+        } catch (NumberFormatException ignored) {}
+
+        apiService.deleteGoal(backendId).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    IO.execute(() -> {
+                        entity.syncState = SyncState.SYNCED;
+                        entity.updatedAt = System.currentTimeMillis();
+                        goalDao.update(entity);
+                    });
+                } else {
+                    handleSyncFailure(entity, callback, "HTTP " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                handleSyncFailure(entity, callback, t.getMessage());
+            }
+        });
+    }
+
+    private void handleSyncFailure(GoalEntity entity, Object callback, String errorMsg) {
+        IO.execute(() -> {
+            entity.syncState = SyncState.FAILED;
+            entity.updatedAt = System.currentTimeMillis();
+            goalDao.update(entity);
+            
+            String msg = errorMsg == null ? "Cloud sync failed" : errorMsg;
+            if (callback instanceof SaveGoalCallback) {
+                mainHandler.post(() -> ((SaveGoalCallback) callback).onError(msg));
+            } else if (callback instanceof UpdateGoalCallback) {
+                mainHandler.post(() -> ((UpdateGoalCallback) callback).onError(msg));
+            } else if (callback instanceof DeleteGoalCallback) {
+                mainHandler.post(() -> ((DeleteGoalCallback) callback).onError(msg));
+            }
+        });
+    }
+
     private List<Goal> toGoals(List<GoalEntity> entities) {
         List<Goal> goals = new ArrayList<>();
         for (GoalEntity entity : entities) {
-            goals.add(new Goal(
-                    (int) entity.localId,
-                    entity.name,
-                    entity.description,
-                    entity.targetAmount,
-                    entity.currentAmount,
+            if (!entity.deleted) {
+                goals.add(new Goal(
+                        (int) entity.localId,
+                        entity.name,
+                        entity.description,
+                        entity.targetAmount,
+                        entity.currentAmount,
                         entity.addedSavingsAmount,
-                    entity.targetDate,
-                    entity.category,
-                    entity.categoryIcon,
-                    entity.progressCircleBackground
-            ));
+                        entity.targetDate,
+                        entity.category,
+                        entity.categoryIcon,
+                        entity.progressCircleBackground
+                ));
+            }
         }
         return goals;
     }
 
-    /**
-     * Convert Goal model to GoalEntity
-     */
     private GoalEntity fromGoal(String userId, Goal goal) {
         GoalEntity entity = new GoalEntity();
         entity.userId = userId;
@@ -383,44 +369,4 @@ public class GoalRepository {
         entity.progressCircleBackground = goal.getProgressCircleBackground();
         return entity;
     }
-
-    /**
-     * Convert Firestore DocumentSnapshot to GoalEntity
-     */
-    private GoalEntity fromDocument(DocumentSnapshot document) {
-        GoalEntity entity = new GoalEntity();
-        entity.remoteId = document.getId();
-        entity.userId = getString(document, "userId", "");
-        entity.name = getString(document, "name", "");
-        entity.description = getString(document, "description", "");
-        entity.targetAmount = getDouble(document, "targetAmount", 0.0d);
-        entity.currentAmount = getDouble(document, "currentAmount", 0.0d);
-        entity.addedSavingsAmount = getDouble(document, "addedSavingsAmount", 0.0d);
-        entity.targetDate = getLong(document, "targetDate", 0L);
-        entity.category = getString(document, "category", "Other");
-        entity.categoryIcon = (int) getLong(document, "categoryIcon", R.drawable.ic_wallet);
-        entity.progressCircleBackground = (int) getLong(document, "progressCircleBackground", R.drawable.circle_primary_light);
-        entity.deleted = document.getBoolean("deleted") != null && Boolean.TRUE.equals(document.getBoolean("deleted"));
-        entity.syncState = SyncState.SYNCED;
-        entity.createdAt = getLong(document, "createdAt", System.currentTimeMillis());
-        entity.updatedAt = getLong(document, "updatedAt", System.currentTimeMillis());
-        return entity;
-    }
-
-    private static String getString(DocumentSnapshot doc, String key, String fallback) {
-        String value = doc.getString(key);
-        return value == null ? fallback : value;
-    }
-
-    private static long getLong(DocumentSnapshot doc, String key, long fallback) {
-        Long value = doc.getLong(key);
-        return value == null ? fallback : value;
-    }
-
-    private static double getDouble(DocumentSnapshot doc, String key, double fallback) {
-        Double value = doc.getDouble(key);
-        return value == null ? fallback : value;
-    }
 }
-
-
