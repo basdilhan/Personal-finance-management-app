@@ -40,12 +40,16 @@ gen/
 hs_err_pid*.log
 replay_pid*.log
 
+# Backend build outputs
+backend/build/
+backend/hs_err_pid*.log
+
 # VS Code
 .vscode/
 
-# gradle wrapper
-gradlew
-gradlew.bat
+# gradle wrapper — DO NOT ignore these, Render needs them for builds
+# gradlew
+# gradlew.bat
 # Ignore the raw datasets folder completely
 Ml datasets/
 

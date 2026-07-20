@@ -9,32 +9,12 @@ import com.google.firebase.messaging.Notification;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 @Service
 public class NotificationService {
 
-    @Value("classpath:${firebase.config.file:firebase-service-account.json}")
-    private Resource firebaseConfigFile;
-
-    @PostConstruct
-    public void init() {
-        try {
-            if (firebaseConfigFile.exists()) {
-                FirebaseOptions options = FirebaseOptions.builder()
-                        .setCredentials(GoogleCredentials.fromStream(firebaseConfigFile.getInputStream()))
-                        .build();
-
-                if (FirebaseApp.getApps().isEmpty()) {
-                    FirebaseApp.initializeApp(options);
-                }
-            } else {
-                System.out.println("Firebase config file not found, skipping initialization for now.");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+    public NotificationService() {}
 
     public void sendPushNotification(String userToken, String title, String body) {
         if (FirebaseApp.getApps().isEmpty()) {

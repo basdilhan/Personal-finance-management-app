@@ -100,16 +100,29 @@ async def chat_endpoint(req: ChatRequest):
 
 @app.post("/api/ml/forecast", dependencies=[Depends(verify_api_key)])
 async def forecast_endpoint(req: ForecastRequest):
-    if chronos_pipeline is None or len(req.historical_data) < 2:
+    # Filter out zero months to count real data points
+    non_zero_data = [x for x in req.historical_data if x > 0]
+    
+    # If no real data at all, return 0
+    if len(non_zero_data) == 0:
         return {"predicted_next_month_expense": 0.0, "confidence_score": 0.0}
     
-    # Run Chronos forecasting
+    # If only 1 month of real data or Chronos not loaded, use simple average as fallback
+    if chronos_pipeline is None or len(non_zero_data) < 2:
+        avg_expense = sum(non_zero_data) / len(non_zero_data)
+        return {"predicted_next_month_expense": round(avg_expense, 2), "confidence_score": 0.5}
+    
+    # Run Chronos forecasting with actual data
     context_tensor = torch.tensor(req.historical_data)
     forecast = chronos_pipeline.predict(context_tensor, prediction_length=1)
     predicted_value = float(forecast[0].median().item())
     
+    # If Chronos predicts near-zero but we have real expenses, fall back to average
+    if predicted_value < 1.0 and len(non_zero_data) > 0:
+        predicted_value = sum(non_zero_data) / len(non_zero_data)
+    
     return {
-        "predicted_next_month_expense": max(0.0, predicted_value),
+        "predicted_next_month_expense": max(0.0, round(predicted_value, 2)),
         "confidence_score": 0.85
     }
 
@@ -121,16 +134,31 @@ async def auto_categorize(req: CategorizeRequest):
     # Run the custom fine-tuned text classification model
     result = classifier(req.description)[0]
     
-    best_category = result["label"]
+    best_category = result["label"].lower()
     
     # If the model outputs LABEL_X, we can clean it, but normally id2label handles it
-    if "LABEL" in best_category:
+    if "label" in best_category:
         best_category = best_category.split('_')[-1]
         
     confidence = result["score"]
     
+    # Map raw model labels to exact frontend category names
+    category_mapping = {
+        "food": "Food & Dining",
+        "transport": "Transportation",
+        "utilities": "Mobile & Internet",
+        "health": "Healthcare",
+        "education": "Education",
+        "entertainment": "Entertainment",
+        "shopping": "Shopping",
+        "groceries": "Groceries",
+        "fuel": "Fuel"
+    }
+    
+    mapped_category = category_mapping.get(best_category, best_category.capitalize())
+    
     return {
-        "category": best_category.capitalize(),
+        "category": mapped_category,
         "confidence": float(confidence)
     }
 

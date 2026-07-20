@@ -15,6 +15,12 @@ android {
         versionName = "V2026"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        
+        buildConfigField("String", "BASE_URL", "\"http://192.168.8.197:8080/api/\"")
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 
     buildTypes {
@@ -39,7 +45,7 @@ dependencies {
     implementation(libs.constraintlayout)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
-    implementation(libs.firebase.firestore)
+    implementation("com.google.firebase:firebase-messaging")
     implementation(libs.play.services.auth)
     implementation(libs.room.runtime)
     annotationProcessor(libs.room.compiler)
@@ -48,6 +54,11 @@ dependencies {
     implementation(libs.guava)
     implementation(libs.biometric)
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    implementation(libs.okhttp)
+    implementation(libs.logging.interceptor)
+    implementation("com.google.android.gms:play-services-mlkit-text-recognition:19.0.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

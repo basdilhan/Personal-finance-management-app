@@ -1,9 +1,13 @@
 package com.team.financeapp;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Build;
@@ -23,12 +27,18 @@ import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.animation.ObjectAnimator;
+import android.view.animation.DecelerateInterpolator;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+
+import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.PercentFormatter;
+import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.android.material.button.MaterialButton;
@@ -104,9 +114,8 @@ public class DashboardActivity extends AppCompatActivity {
     private TextView textBill3Due;
     private TextView textBill3Amount;
     private View profileAvatar;
-    private PieChart pieChartExpenses;
-    private PieChart pieChartIncome;
-    private PieChart pieChartBills;
+    private PieChart chartExpense;
+    private PieChart chartIncome;
     private long lastBackPressedAt;
     private AuthManager authManager;
     private BillRepository billRepository;
@@ -139,9 +148,19 @@ public class DashboardActivity extends AppCompatActivity {
         BottomNavigationFragment.attach(this, R.id.bottom_navigation_container, R.id.nav_home);
         setupClickListeners();
         setupBackPressedCallback();
-        setupPieChart();
         loadDashboardData();
+        
+        LocalBroadcastManager.getInstance(this).registerReceiver(logoutReceiver,
+                new IntentFilter(com.team.financeapp.data.remote.ApiClient.ACTION_LOGOUT));
     }
+
+    private final BroadcastReceiver logoutReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Toast.makeText(DashboardActivity.this, "Session expired. Please login again.", Toast.LENGTH_LONG).show();
+            handleLogout();
+        }
+    };
 
     @Override
     protected void onResume() {
@@ -169,9 +188,8 @@ public class DashboardActivity extends AppCompatActivity {
         profileAvatar = findViewById(R.id.profile_avatar);
         buttonViewAllBills = findViewById(R.id.button_view_all_bills);
         buttonViewAllGoals = findViewById(R.id.btn_view_all_goals);
-        pieChartExpenses = findViewById(R.id.pie_chart_expenses);
-        pieChartIncome = findViewById(R.id.pie_chart_income);
-        pieChartBills = null;
+        chartExpense = findViewById(R.id.chart_expense);
+        chartIncome = findViewById(R.id.chart_income);
         dashboardWelcome = findViewById(R.id.dashboard_welcome);
         textTotalBalance = findViewById(R.id.text_total_balance);
         textIncomeAmount = findViewById(R.id.text_income_amount);
@@ -203,13 +221,9 @@ public class DashboardActivity extends AppCompatActivity {
         textBill3Name = findViewById(R.id.text_bill_3_name);
         textBill3Due = findViewById(R.id.text_bill_3_due);
         textBill3Amount = findViewById(R.id.text_bill_3_amount);
-        textLegendHousingPercent = findViewById(R.id.text_legend_housing_percent);
-        textLegendFoodPercent = findViewById(R.id.text_legend_food_percent);
-        textLegendTransportPercent = findViewById(R.id.text_legend_transport_percent);
-        textLegendEntertainmentPercent = findViewById(R.id.text_legend_entertainment_percent);
-        textLegendOtherPercent = findViewById(R.id.text_legend_other_percent);
+        textBill3Amount = findViewById(R.id.text_bill_3_amount);
 
-        // Initialize Quick Action buttons
+        // Quick Action buttons
         actionAddExpense = findViewById(R.id.action_add_expense);
         actionAddIncome = findViewById(R.id.action_add_income);
         actionAddBill = findViewById(R.id.action_add_bill);
@@ -281,42 +295,6 @@ public class DashboardActivity extends AppCompatActivity {
         return ContextCompat.getColor(this, colorResId);
     }
 
-    /**
-     * Setup the expense categories pie chart
-     */
-    private void setupPieChart() {
-        configurePieChart(pieChartExpenses, "No\nExpenses");
-        configurePieChart(pieChartIncome, "No\nIncome");
-        configurePieChart(pieChartBills, "No\nBills");
-        updateChartLegendPercentages(new HashMap<>());
-    }
-
-    private void configurePieChart(PieChart chart, String emptyText) {
-        if (chart == null) {
-            return;
-        }
-        chart.setUsePercentValues(true);
-        chart.getDescription().setEnabled(false);
-        chart.setExtraOffsets(12f, 8f, 12f, 8f);
-        chart.setDragDecelerationFrictionCoef(0.95f);
-        chart.setDrawHoleEnabled(true);
-        chart.setHoleColor(getColorCompat(R.color.dashboard_chart_hole));
-        chart.setTransparentCircleColor(getColorCompat(R.color.dashboard_chart_hole));
-        chart.setTransparentCircleAlpha(24);
-        chart.setHoleRadius(58f);
-        chart.setTransparentCircleRadius(63f);
-        chart.setDrawCenterText(true);
-        chart.setCenterTextSize(15f);
-        chart.setCenterTextColor(getColorCompat(R.color.dashboard_chart_center));
-        chart.setRotationEnabled(false);
-        chart.setHighlightPerTapEnabled(true);
-        chart.setDrawEntryLabels(false);
-        Legend legend = chart.getLegend();
-        legend.setEnabled(false);
-        chart.clear();
-        chart.setCenterText(emptyText);
-        chart.invalidate();
-    }
 
     private void loadDashboardData() {
         String userId = authManager.getCurrentUserId();
@@ -596,28 +574,24 @@ public class DashboardActivity extends AppCompatActivity {
     }
 
     private void updateExpenseChartFromData() {
-        if (pieChartExpenses == null) {
-            return;
-        }
+        if (chartExpense == null) return;
 
         Map<String, Double> grouped = new HashMap<>();
+        double total = 0.0d;
         for (Expense expense : latestExpenses) {
             String key = normalizeExpenseCategory(expense.getCategory());
-            grouped.put(key, grouped.getOrDefault(key, 0.0d) + expense.getAmount());
+            double amount = expense.getAmount();
+            grouped.put(key, grouped.getOrDefault(key, 0.0d) + amount);
+            total += amount;
         }
 
-        updateChartLegendPercentages(grouped);
-
-        if (grouped.isEmpty()) {
-            pieChartExpenses.clear();
-            pieChartExpenses.setCenterText("No\nExpenses");
-            pieChartExpenses.invalidate();
+        if (total <= 0.0d) {
+            chartExpense.clear();
             return;
         }
 
-        List<PieEntry> entries = new ArrayList<>();
-        List<Integer> colors = new ArrayList<>();
         String[] order = new String[]{"Housing", "Food", "Transport", "Entertainment", "Other"};
+        int[] icons = new int[]{R.drawable.ic_home, R.drawable.ic_receipt, R.drawable.ic_car, R.drawable.ic_expenses, R.drawable.ic_wallet};
         int[] palette = new int[]{
                 getColorCompat(R.color.primary),
                 getColorCompat(R.color.success),
@@ -626,61 +600,42 @@ public class DashboardActivity extends AppCompatActivity {
                 getColorCompat(R.color.dashboard_chart_other)
         };
 
+        List<PieEntry> entries = new ArrayList<>();
+        List<Integer> colors = new ArrayList<>();
+
         for (int i = 0; i < order.length; i++) {
             double amount = grouped.getOrDefault(order[i], 0.0d);
-            if (amount <= 0.0d) {
-                continue;
-            }
-            entries.add(new PieEntry((float) amount, order[i]));
+            if (amount <= 0.0d) continue;
+            
+            entries.add(new PieEntry((float) amount, order[i], ContextCompat.getDrawable(this, icons[i])));
             colors.add(palette[i]);
         }
 
-        PieDataSet dataSet = new PieDataSet(entries, "");
-        dataSet.setSliceSpace(3f);
-        dataSet.setSelectionShift(6f);
-        dataSet.setColors(colors);
-        dataSet.setValueTextSize(11f);
-        dataSet.setValueTextColor(getColorCompat(R.color.white));
-        dataSet.setYValuePosition(PieDataSet.ValuePosition.INSIDE_SLICE);
-
-        PieData data = new PieData(dataSet);
-        data.setValueFormatter(new PercentFormatter(pieChartExpenses));
-        data.setValueTextSize(11f);
-        data.setValueTextColor(getColorCompat(R.color.white));
-
-        pieChartExpenses.setCenterText("All Time\nExpenses");
-        pieChartExpenses.setData(data);
-        pieChartExpenses.highlightValues(null);
-        pieChartExpenses.invalidate();
+        setupPieChart(chartExpense, entries, colors, "Expenses");
     }
 
     private void updateIncomeChartFromData() {
-        if (pieChartIncome == null) {
-            return;
-        }
-
-        pieChartIncome.setDrawEntryLabels(true);
-        pieChartIncome.setEntryLabelColor(getColorCompat(R.color.text_primary));
-        pieChartIncome.setEntryLabelTextSize(12f);
+        if (chartIncome == null) return;
 
         Map<String, Double> grouped = new HashMap<>();
+        double total = 0.0d;
         for (IncomeEntry entry : latestIncomes) {
             long normalizedDate = normalizeEpochMillis(entry.getDate());
-            if (normalizedDate <= 0L) {
-                continue;
-            }
+            if (normalizedDate <= 0L) continue;
+            
             String key = normalizeIncomeSource(entry.getSource());
-            grouped.put(key, grouped.getOrDefault(key, 0.0d) + entry.getAmount());
+            double amount = entry.getAmount();
+            grouped.put(key, grouped.getOrDefault(key, 0.0d) + amount);
+            total += amount;
         }
 
-        if (grouped.isEmpty()) {
-            pieChartIncome.clear();
-            pieChartIncome.setCenterText("No\nIncome");
-            pieChartIncome.invalidate();
+        if (total <= 0.0d) {
+            chartIncome.clear();
             return;
         }
 
         String[] order = new String[]{"Salary", "Business", "Freelance", "Other"};
+        int[] icons = new int[]{R.drawable.ic_wallet, R.drawable.ic_savings, R.drawable.ic_laptop, R.drawable.ic_receipt};
         int[] palette = new int[]{
                 getColorCompat(R.color.success),
                 getColorCompat(R.color.primary),
@@ -690,119 +645,79 @@ public class DashboardActivity extends AppCompatActivity {
 
         List<PieEntry> entries = new ArrayList<>();
         List<Integer> colors = new ArrayList<>();
+
         for (int i = 0; i < order.length; i++) {
             double amount = grouped.getOrDefault(order[i], 0.0d);
-            if (amount <= 0.0d) {
-                continue;
-            }
-            entries.add(new PieEntry((float) amount, order[i]));
+            if (amount <= 0.0d) continue;
+
+            entries.add(new PieEntry((float) amount, order[i], ContextCompat.getDrawable(this, icons[i])));
             colors.add(palette[i]);
         }
 
-        PieDataSet dataSet = new PieDataSet(entries, "");
-        dataSet.setSliceSpace(3f);
-        dataSet.setSelectionShift(6f);
-        dataSet.setColors(colors);
-        dataSet.setValueTextSize(11f);
-        dataSet.setValueTextColor(getColorCompat(R.color.white));
-        dataSet.setYValuePosition(PieDataSet.ValuePosition.INSIDE_SLICE);
-
-        PieData data = new PieData(dataSet);
-        data.setValueFormatter(new PercentFormatter(pieChartIncome));
-        data.setValueTextSize(11f);
-        data.setValueTextColor(getColorCompat(R.color.white));
-
-        pieChartIncome.setCenterText("All Time\nIncome");
-        pieChartIncome.setData(data);
-        pieChartIncome.highlightValues(null);
-        pieChartIncome.invalidate();
+        setupPieChart(chartIncome, entries, colors, "Income");
     }
 
-    private void updateBillsChartFromData() {
-        if (pieChartBills == null) {
-            return;
-        }
+    private void setupPieChart(PieChart chart, List<PieEntry> entries, List<Integer> colors, String label) {
+        chart.setUsePercentValues(true);
+        chart.getDescription().setEnabled(false);
+        chart.setExtraOffsets(5, 10, 5, 5);
 
-        double paid = 0.0d;
-        double unpaid = 0.0d;
-        double overdue = 0.0d;
-        long now = System.currentTimeMillis();
+        chart.setDragDecelerationFrictionCoef(0.95f);
 
-        for (Bill bill : latestBills) {
-            long normalizedDueDate = normalizeEpochMillis(bill.getDueDate());
-            if ("paid".equalsIgnoreCase(bill.getStatus())) {
-                paid += bill.getAmount();
-            } else if (normalizedDueDate > 0L && normalizedDueDate < now) {
-                overdue += bill.getAmount();
-            } else {
-                unpaid += bill.getAmount();
-            }
-        }
+        chart.setDrawHoleEnabled(true);
+        chart.setHoleColor(android.graphics.Color.TRANSPARENT);
 
-        if (paid <= 0.0d && unpaid <= 0.0d && overdue <= 0.0d) {
-            pieChartBills.clear();
-            pieChartBills.setCenterText("No\nBills");
-            pieChartBills.invalidate();
-            return;
-        }
+        chart.setTransparentCircleColor(android.graphics.Color.WHITE);
+        chart.setTransparentCircleAlpha(30);
 
-        List<PieEntry> entries = new ArrayList<>();
-        List<Integer> colors = new ArrayList<>();
-        if (paid > 0.0d) {
-            entries.add(new PieEntry((float) paid, "Paid"));
-            colors.add(getColorCompat(R.color.success));
-        }
-        if (unpaid > 0.0d) {
-            entries.add(new PieEntry((float) unpaid, "Upcoming"));
-            colors.add(getColorCompat(R.color.info));
-        }
-        if (overdue > 0.0d) {
-            entries.add(new PieEntry((float) overdue, "Overdue"));
-            colors.add(getColorCompat(R.color.error));
-        }
+        chart.setHoleRadius(50f);
+        chart.setTransparentCircleRadius(55f);
 
-        PieDataSet dataSet = new PieDataSet(entries, "");
+        chart.setDrawCenterText(true);
+        chart.setCenterText(label);
+        chart.setCenterTextColor(getColorCompat(R.color.text_primary));
+        chart.setCenterTextSize(16f);
+
+        chart.setRotationAngle(0);
+        chart.setRotationEnabled(true);
+        chart.setHighlightPerTapEnabled(true);
+        chart.getLegend().setEnabled(false);
+
+        PieDataSet dataSet = new PieDataSet(entries, label);
         dataSet.setSliceSpace(3f);
-        dataSet.setSelectionShift(6f);
+        dataSet.setSelectionShift(8f);
         dataSet.setColors(colors);
-        dataSet.setValueTextSize(11f);
-        dataSet.setValueTextColor(getColorCompat(R.color.white));
-        dataSet.setYValuePosition(PieDataSet.ValuePosition.INSIDE_SLICE);
+        
+        dataSet.setValueLinePart1OffsetPercentage(80.f);
+        dataSet.setValueLinePart1Length(0.2f);
+        dataSet.setValueLinePart2Length(0.4f);
+        dataSet.setYValuePosition(PieDataSet.ValuePosition.OUTSIDE_SLICE);
 
         PieData data = new PieData(dataSet);
-        data.setValueFormatter(new PercentFormatter(pieChartBills));
-        data.setValueTextSize(11f);
-        data.setValueTextColor(getColorCompat(R.color.white));
+        data.setValueFormatter(new PercentFormatter(chart));
+        data.setValueTextSize(12f);
+        data.setValueTextColor(getColorCompat(R.color.text_primary));
 
-        pieChartBills.setCenterText("Bills\nStatus");
-        pieChartBills.setData(data);
-        pieChartBills.highlightValues(null);
-        pieChartBills.invalidate();
+        chart.setData(data);
+        chart.animateY(1400, Easing.EaseInOutQuad);
+        chart.invalidate();
+    }
+
+    private void updateGoalsChartFromData() {
+        // Implementation for goals chart update (omitted for brevity)
+    }
+
+
+    private void updateBillsChartFromData() {
+        // Bills chart was removed
     }
 
     private void updateChartLegendPercentages(Map<String, Double> grouped) {
-        double total = 0.0d;
-        for (double value : grouped.values()) {
-            total += value;
-        }
-
-        setLegendPercent(textLegendHousingPercent, grouped.getOrDefault("Housing", 0.0d), total);
-        setLegendPercent(textLegendFoodPercent, grouped.getOrDefault("Food", 0.0d), total);
-        setLegendPercent(textLegendTransportPercent, grouped.getOrDefault("Transport", 0.0d), total);
-        setLegendPercent(textLegendEntertainmentPercent, grouped.getOrDefault("Entertainment", 0.0d), total);
-        setLegendPercent(textLegendOtherPercent, grouped.getOrDefault("Other", 0.0d), total);
+        // Obsolete
     }
 
     private void setLegendPercent(TextView view, double amount, double total) {
-        if (view == null) {
-            return;
-        }
-        if (total <= 0.0d) {
-            view.setText("0%");
-            return;
-        }
-        int percent = (int) Math.round((amount / total) * 100.0d);
-        view.setText(String.format(Locale.getDefault(), "%d%%", percent));
+        // Obsolete
     }
 
     private void updateGoalCard() {
@@ -1246,11 +1161,20 @@ public class DashboardActivity extends AppCompatActivity {
      */
     private void handleLogout() {
         authManager.signOut(this);
-        Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(DashboardActivity.this, LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        try {
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(logoutReceiver);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**

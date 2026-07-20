@@ -54,6 +54,7 @@ public class ExpenseEntity {
     }
 
     // Getters and Setters
+    @com.fasterxml.jackson.annotation.JsonProperty("localId")
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
 
@@ -81,6 +82,19 @@ public class ExpenseEntity {
     public Boolean getIsDeleted() { return isDeleted; }
     public void setIsDeleted(Boolean isDeleted) { this.isDeleted = isDeleted; }
 
+    @com.fasterxml.jackson.annotation.JsonIgnore
     public LocalDateTime getCreatedAt() { return createdAt; }
+    
+    @com.fasterxml.jackson.annotation.JsonGetter("createdAt")
+    public Long getCreatedAtEpoch() { 
+        return createdAt != null ? createdAt.atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli() : 0L; 
+    }
+
+    @com.fasterxml.jackson.annotation.JsonIgnore
     public LocalDateTime getUpdatedAt() { return updatedAt; }
+    
+    @com.fasterxml.jackson.annotation.JsonGetter("updatedAt")
+    public Long getUpdatedAtEpoch() { 
+        return updatedAt != null ? updatedAt.atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli() : 0L; 
+    }
 }
