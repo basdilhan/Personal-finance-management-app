@@ -14,11 +14,11 @@ import java.util.List;
 public class ExpenseController {
 
     private final ExpenseRepository expenseRepository;
-    private final com.example.backend.service.MLServiceClient mlServiceClient;
+    private final com.example.backend.service.GeminiService geminiService;
 
-    public ExpenseController(ExpenseRepository expenseRepository, com.example.backend.service.MLServiceClient mlServiceClient) {
+    public ExpenseController(ExpenseRepository expenseRepository, com.example.backend.service.GeminiService geminiService) {
         this.expenseRepository = expenseRepository;
-        this.mlServiceClient = mlServiceClient;
+        this.geminiService = geminiService;
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -95,7 +95,7 @@ public class ExpenseController {
             return ResponseEntity.badRequest().build();
         }
         
-        String category = mlServiceClient.autoCategorize(description);
+        String category = geminiService.autoCategorize(description);
         java.util.Map<String, String> response = new java.util.HashMap<>();
         response.put("category", category);
         return ResponseEntity.ok(response);

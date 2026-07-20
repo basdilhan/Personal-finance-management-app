@@ -61,4 +61,18 @@ public class GeminiService {
         
         return "Sorry, I couldn't understand that.";
     }
+
+    public String autoCategorize(String description) {
+        String prompt = "Categorize this transaction description into exactly ONE of the following categories: " +
+                        "'Food & Dining', 'Transportation', 'Mobile & Internet', 'Healthcare', 'Education', " +
+                        "'Entertainment', 'Shopping', 'Groceries', 'Fuel', 'Other'.\n\n" +
+                        "Description: " + description + "\n\n" +
+                        "Return ONLY the exact category name with no other text.";
+        
+        String response = generateChatResponse(prompt);
+        if (response.startsWith("Debug Error:") || response.startsWith("Sorry,")) {
+            return "Other";
+        }
+        return response.trim();
+    }
 }
