@@ -3,6 +3,8 @@ package com.team.financeapp;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.text.InputType;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,6 +24,7 @@ public class AppLockSettingsActivity extends AppCompatActivity {
 
     private SwitchMaterial switchLockEnabled;
     private SwitchMaterial switchBiometricEnabled;
+    private AutoCompleteTextView spinnerLockTimeout;
     private TextInputEditText inputPin;
     private TextInputEditText inputConfirmPin;
     private TextView textLockStatus;
@@ -59,6 +62,7 @@ public class AppLockSettingsActivity extends AppCompatActivity {
         suppressToggleEvents = false;
 
         switchBiometricEnabled.setEnabled(AppLockManager.isBiometricAvailable(this));
+        setupTimeoutDropdown();
         refreshStatusTexts();
     }
 
@@ -296,6 +300,36 @@ public class AppLockSettingsActivity extends AppCompatActivity {
                 ? R.string.app_lock_biometric_off
                 : R.string.app_lock_biometric_not_available));
 
-        textTimeoutInfo.setText(getString(R.string.app_lock_timeout_info, AppLockManager.timeoutLabel()));
+        textTimeoutInfo.setText(getString(R.string.app_lock_timeout_info, AppLockManager.timeoutLabel(this)));
+    }
+
+    private void setupTimeoutDropdown() {
+        spinnerLockTimeout = findViewById(R.id.spinner_lock_timeout);
+        String[] timeoutOptions = {"Immediately", "1 minute", "2 minutes", "5 minutes", "10 minutes"};
+        long[] timeoutValues = {
+            AppLockManager.TIMEOUT_IMMEDIATELY,
+            AppLockManager.TIMEOUT_1_MIN,
+            AppLockManager.TIMEOUT_2_MIN,
+            AppLockManager.TIMEOUT_5_MIN,
+            AppLockManager.TIMEOUT_10_MIN
+        };
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, timeoutOptions);
+        spinnerLockTimeout.setAdapter(adapter);
+
+        // Set current value
+        long currentTimeout = AppLockManager.getLockTimeout(this);
+        for (int i = 0; i < timeoutValues.length; i++) {
+            if (timeoutValues[i] == currentTimeout) {
+                spinnerLockTimeout.setText(timeoutOptions[i], false);
+                break;
+            }
+        }
+
+        spinnerLockTimeout.setOnItemClickListener((parent, view, position, id) -> {
+            AppLockManager.setLockTimeout(this, timeoutValues[position]);
+            refreshStatusTexts();
+            Toast.makeText(this, "Lock timeout set to " + timeoutOptions[position], Toast.LENGTH_SHORT).show();
+        });
     }
 }

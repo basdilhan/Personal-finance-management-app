@@ -14,17 +14,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.team.financeapp.R;
 import com.team.financeapp.data.remote.ChatApiService;
+import com.team.financeapp.data.remote.ApiClient;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
-import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ChatbotActivity extends AppCompatActivity {
 
@@ -34,9 +31,6 @@ public class ChatbotActivity extends AppCompatActivity {
     private ChatAdapter chatAdapter;
     private ChatApiService chatApiService;
 
-    // Use 192.168.8.197 for physical device on the same WiFi network
-    // We'll assume the Spring Boot backend is on standard 8080 port.
-    private static final String BASE_URL = "http://192.168.8.197:8080/";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -70,18 +64,7 @@ public class ChatbotActivity extends AppCompatActivity {
     }
 
     private void initRetrofit() {
-        OkHttpClient client = new OkHttpClient.Builder()
-                .readTimeout(60, TimeUnit.SECONDS)
-                .connectTimeout(60, TimeUnit.SECONDS)
-                .build();
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .client(client)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        chatApiService = retrofit.create(ChatApiService.class);
+        chatApiService = ApiClient.getClient().create(ChatApiService.class);
     }
 
     private void sendMessage() {

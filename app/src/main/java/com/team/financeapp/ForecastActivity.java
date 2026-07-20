@@ -97,8 +97,8 @@ public class ForecastActivity extends AppCompatActivity {
         tvDataMonths.setText(String.format("Based on %d month%s of data", result.monthsOfData, result.monthsOfData > 1 ? "s" : ""));
 
         // Net cash flow
-        String sign = result.netCashFlow >= 0 ? "+$" : "-$";
-        tvNetCashflow.setText(String.format("%s%.2f", sign, Math.abs(result.netCashFlow)));
+        String sign = result.netCashFlow >= 0 ? "+LKR " : "-LKR ";
+        tvNetCashflow.setText(String.format("%s%,.2f", sign, Math.abs(result.netCashFlow)));
         if (result.netCashFlow >= 0) {
             tvNetCashflow.setTextColor(Color.parseColor("#10B981"));
             tvCashflowLabel.setText("You're projected to save money next month 🎉");
@@ -108,9 +108,9 @@ public class ForecastActivity extends AppCompatActivity {
         }
 
         // Summary cards
-        tvPredictedIncome.setText(String.format("$%.2f", result.predictedIncome));
-        tvPredictedExpense.setText(String.format("$%.2f", result.predictedExpense));
-        tvPredictedBills.setText(String.format("$%.2f", result.predictedBills));
+        tvPredictedIncome.setText(String.format("LKR %,.2f", result.predictedIncome));
+        tvPredictedExpense.setText(String.format("LKR %,.2f", result.predictedExpense));
+        tvPredictedBills.setText(String.format("LKR %,.2f", result.predictedBills));
 
         // Category breakdown
         llCategoryBreakdown.removeAllViews();
@@ -152,7 +152,7 @@ public class ForecastActivity extends AppCompatActivity {
 
         TextView tvAmount = new TextView(this);
         double percentage = totalExpense > 0 ? (amount / totalExpense) * 100 : 0;
-        tvAmount.setText(String.format("$%.2f (%.0f%%)", amount, percentage));
+        tvAmount.setText(String.format("LKR %,.2f (%.0f%%)", amount, percentage));
         tvAmount.setTextColor(Color.parseColor("#64748B"));
         tvAmount.setTextSize(13);
 

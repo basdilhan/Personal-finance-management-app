@@ -427,70 +427,58 @@ public class AddExpenseActivity extends AppCompatActivity {
                 byte[] byteArray = byteArrayOutputStream.toByteArray();
                 String base64Image = android.util.Base64.encodeToString(byteArray, android.util.Base64.NO_WRAP);
                 
-                String urlString = "http://192.168.8.197:8080/api/ai/scan-receipt";
-                java.net.URL url = new java.net.URL(urlString);
-                java.net.HttpURLConnection conn = (java.net.HttpURLConnection) url.openConnection();
-                conn.setRequestMethod("POST");
-                conn.setRequestProperty("Content-Type", "application/json");
-                conn.setDoOutput(true);
+                java.util.Map<String, String> request = new java.util.HashMap<>();
+                request.put("image", base64Image);
+
+                com.team.financeapp.data.remote.AIApiService aiService = 
+                        com.team.financeapp.data.remote.ApiClient.getClient().create(com.team.financeapp.data.remote.AIApiService.class);
                 
-                String jsonInputString = "{\"image\": \"" + base64Image + "\"}";
-                
-                try(java.io.OutputStream os = conn.getOutputStream()) {
-                    byte[] input = jsonInputString.getBytes("utf-8");
-                    os.write(input, 0, input.length);			
-                }
-                
-                int code = conn.getResponseCode();
-                if (code == 200) {
-                    java.io.BufferedReader br = new java.io.BufferedReader(new java.io.InputStreamReader(conn.getInputStream(), "utf-8"));
-                    StringBuilder response = new StringBuilder();
-                    String responseLine = null;
-                    while ((responseLine = br.readLine()) != null) {
-                        response.append(responseLine.trim());
-                    }
-                    
-                    String jsonResponse = response.toString();
-                    
-                    runOnUiThread(() -> {
-                        Toast.makeText(this, "AI Scan Complete!", Toast.LENGTH_SHORT).show();
-                        // Assuming response contains {"amount": 12.34, "category": "Food & Dining"}
-                        try {
-                            org.json.JSONObject jsonObj = new org.json.JSONObject(jsonResponse);
-                            if (jsonObj.has("error")) {
-                                String errorMsg = jsonObj.getString("error");
-                                Toast.makeText(this, errorMsg, Toast.LENGTH_LONG).show();
-                            } else if (jsonObj.has("amount")) {
-                                double amt = jsonObj.getDouble("amount");
-                                etAmount.setText(String.valueOf(amt));
-                                etDescription.setText("AI Scanned Receipt");
-                                
-                                if (jsonObj.has("category")) {
-                                    String cat = jsonObj.getString("category");
-                                    spinnerCategory.setText(cat, false);
-                                }
-                                
-                                if (jsonObj.has("date")) {
-                                    String dateStr = jsonObj.getString("date");
-                                    // Make sure it's not empty
-                                    if (!dateStr.isEmpty() && !dateStr.equals("null")) {
-                                        etDate.setText(dateStr);
+                aiService.scanReceipt(request).enqueue(new retrofit2.Callback<java.util.Map<String, Object>>() {
+                    @Override
+                    public void onResponse(retrofit2.Call<java.util.Map<String, Object>> call, retrofit2.Response<java.util.Map<String, Object>> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            Toast.makeText(AddExpenseActivity.this, "AI Scan Complete!", Toast.LENGTH_SHORT).show();
+                            
+                            java.util.Map<String, Object> respMap = response.body();
+                            if (respMap.containsKey("error")) {
+                                Toast.makeText(AddExpenseActivity.this, String.valueOf(respMap.get("error")), Toast.LENGTH_LONG).show();
+                            } else if (respMap.containsKey("amount")) {
+                                try {
+                                    double amt = Double.parseDouble(String.valueOf(respMap.get("amount")));
+                                    etAmount.setText(String.valueOf(amt));
+                                    etDescription.setText("AI Scanned Receipt");
+                                    
+                                    if (respMap.containsKey("category")) {
+                                        String cat = String.valueOf(respMap.get("category"));
+                                        spinnerCategory.setText(cat, false);
                                     }
+                                    
+                                    if (respMap.containsKey("date")) {
+                                        String dateStr = String.valueOf(respMap.get("date"));
+                                        if (!dateStr.isEmpty() && !dateStr.equals("null")) {
+                                            etDate.setText(dateStr);
+                                        }
+                                    }
+                                } catch (NumberFormatException e) {
+                                    Toast.makeText(AddExpenseActivity.this, "Invalid amount format from AI.", Toast.LENGTH_SHORT).show();
                                 }
                             } else {
-                                Toast.makeText(this, "AI response missing amount data.", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(AddExpenseActivity.this, "AI response missing amount data.", Toast.LENGTH_SHORT).show();
                             }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            Toast.makeText(this, "Error reading AI response.", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(AddExpenseActivity.this, "AI Scan Failed", Toast.LENGTH_SHORT).show();
                         }
-                    });
-                } else {
-                    runOnUiThread(() -> Toast.makeText(this, "AI Scan Failed", Toast.LENGTH_SHORT).show());
-                }
+                    }
+
+                    @Override
+                    public void onFailure(retrofit2.Call<java.util.Map<String, Object>> call, Throwable t) {
+                        Toast.makeText(AddExpenseActivity.this, "Error connecting to AI: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+
             } catch (Exception e) {
                 e.printStackTrace();
-                runOnUiThread(() -> Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(this, "Error processing image: " + e.getMessage(), Toast.LENGTH_SHORT).show());
             }
         }).start();
     }

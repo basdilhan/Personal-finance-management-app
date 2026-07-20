@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import com.google.gson.annotations.SerializedName;
+
 @Entity(tableName = "goals")
 public class GoalEntity {
 
@@ -35,6 +37,7 @@ public class GoalEntity {
 
     public int categoryIcon;
 
+    @SerializedName("progressCircleBg")
     public int progressCircleBackground;
 
     public long createdAt;
@@ -44,5 +47,6 @@ public class GoalEntity {
     @NonNull
     public String syncState = "PENDING";
 
+    @SerializedName("isDeleted")
     public boolean deleted;
 }

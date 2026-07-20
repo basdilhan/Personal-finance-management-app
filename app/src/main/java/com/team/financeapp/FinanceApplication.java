@@ -20,6 +20,7 @@ public class FinanceApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        com.team.financeapp.data.remote.ApiClient.init(this);
         ThemePreferenceManager.applySavedTheme(this);
         PendingSyncWorker.schedule(this);
         FinancialReminderScheduler.rescheduleForCurrentUser(this);
@@ -32,6 +33,9 @@ public class FinanceApplication extends Application {
 
             @Override
             public void onActivityStarted(Activity activity) {
+                if (startedActivityCount == 0) {
+                    AppLockManager.onAppForegrounded(activity);
+                }
                 startedActivityCount++;
             }
 

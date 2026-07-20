@@ -68,7 +68,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:padding="12dp"
-            android:background="@android:color/white"
+            android:background="@color/surface_card"
             android:elevation="12dp"
             android:gravity="center_vertical">
 

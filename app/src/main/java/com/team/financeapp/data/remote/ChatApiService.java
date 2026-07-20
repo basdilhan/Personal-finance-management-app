@@ -9,7 +9,7 @@ import retrofit2.http.POST;
 
 public interface ChatApiService {
 
-    @POST("/api/chat")
+    @POST("chat")
     Call<Map<String, String>> sendMessage(
             @Header("X-User-Id") String userId,
             @Body Map<String, String> request
