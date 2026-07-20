@@ -29,25 +29,17 @@ async def health_check():
 # --- Global Model Initialization ---
 import joblib
 
-# 1. NLP Categorization Model (Fine-Tuned)
-try:
-    # IMPORTANT: Once you run `colab_finetune_classifier.py` and push to HuggingFace, 
-    # replace "cross-encoder/nli-distilroberta-base" with your model name!
-    # Load the user's custom fine-tuned model for Sri Lankan transactions
-    classifier = pipeline("text-classification", model="samudu123/srilanka-transaction-classifier")
-    print("Loaded Custom NLP Categorization model.")
-except Exception as e:
-    print(f"Failed to load NLP model: {e}")
-    classifier = None
+# 1. NLP Categorization Model (Offloaded to API to save RAM)
+# We will use HuggingFace Inference API in the endpoint instead of loading it into RAM.
 
-# 2. Time-Series Forecasting Model (Chronos T5-Mini)
+# 2. Time-Series Forecasting Model (Chronos T5-Tiny to save RAM)
 try:
     chronos_pipeline = ChronosPipeline.from_pretrained(
-        "amazon/chronos-t5-mini",
-        device_map="cpu",  # Use CPU for compatibility
+        "amazon/chronos-t5-tiny", # Switched to tiny version (fits in 512MB)
+        device_map="cpu",
         torch_dtype=torch.float32,
     )
-    print("Loaded Chronos Time-Series model.")
+    print("Loaded Chronos Time-Series model (Tiny).")
 except Exception as e:
     print(f"Failed to load Chronos model: {e}")
     chronos_pipeline = None
@@ -91,8 +83,6 @@ class ColdStartRequest(BaseModel):
 
 @app.post("/api/ml/chat", dependencies=[Depends(verify_api_key)])
 async def chat_endpoint(req: ChatRequest):
-    # For the chatbot, we'll keep it simple for now, mocking a smart LLM response.
-    # In production, this would use a generative model like LLaMA-2 or OpenAI API.
     return {
         "reply": f"Based on your query '{req.message}', and your context: {req.context}. I recommend reviewing your Food budget and transferring $50 to savings.",
         "model_used": "mock-llm-v1"
@@ -100,24 +90,19 @@ async def chat_endpoint(req: ChatRequest):
 
 @app.post("/api/ml/forecast", dependencies=[Depends(verify_api_key)])
 async def forecast_endpoint(req: ForecastRequest):
-    # Filter out zero months to count real data points
     non_zero_data = [x for x in req.historical_data if x > 0]
     
-    # If no real data at all, return 0
     if len(non_zero_data) == 0:
         return {"predicted_next_month_expense": 0.0, "confidence_score": 0.0}
     
-    # If only 1 month of real data or Chronos not loaded, use simple average as fallback
     if chronos_pipeline is None or len(non_zero_data) < 2:
         avg_expense = sum(non_zero_data) / len(non_zero_data)
         return {"predicted_next_month_expense": round(avg_expense, 2), "confidence_score": 0.5}
     
-    # Run Chronos forecasting with actual data
     context_tensor = torch.tensor(req.historical_data)
     forecast = chronos_pipeline.predict(context_tensor, prediction_length=1)
     predicted_value = float(forecast[0].median().item())
     
-    # If Chronos predicts near-zero but we have real expenses, fall back to average
     if predicted_value < 1.0 and len(non_zero_data) > 0:
         predicted_value = sum(non_zero_data) / len(non_zero_data)
     
@@ -126,23 +111,37 @@ async def forecast_endpoint(req: ForecastRequest):
         "confidence_score": 0.85
     }
 
+import requests
+
 @app.post("/api/ml/categorize", dependencies=[Depends(verify_api_key)])
 async def auto_categorize(req: CategorizeRequest):
-    if classifier is None:
-        return {"category": "Other", "confidence": 0.0}
+    API_URL = "https://api-inference.huggingface.co/models/samudu123/srilanka-transaction-classifier"
     
-    # Run the custom fine-tuned text classification model
-    result = classifier(req.description)[0]
+    try:
+        response = requests.post(API_URL, json={"inputs": req.description})
+        result = response.json()
+        
+        # Parse inference API response
+        if isinstance(result, list) and len(result) > 0:
+            if isinstance(result[0], list):
+                best_pred = result[0][0]
+            else:
+                best_pred = result[0]
+                
+            best_category = best_pred.get("label", "other").lower()
+            confidence = best_pred.get("score", 0.5)
+        else:
+            best_category = "other"
+            confidence = 0.0
+            
+    except Exception as e:
+        print("HF API Error:", e)
+        best_category = "other"
+        confidence = 0.0
     
-    best_category = result["label"].lower()
-    
-    # If the model outputs LABEL_X, we can clean it, but normally id2label handles it
     if "label" in best_category:
         best_category = best_category.split('_')[-1]
         
-    confidence = result["score"]
-    
-    # Map raw model labels to exact frontend category names
     category_mapping = {
         "food": "Food & Dining",
         "transport": "Transportation",
