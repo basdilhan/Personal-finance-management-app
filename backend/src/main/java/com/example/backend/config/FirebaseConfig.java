@@ -25,8 +25,8 @@ public class FirebaseConfig {
                     try {
                         // Check if it's base64 encoded (doesn't start with '{')
                         if (!firebaseCreds.trim().startsWith("{")) {
-                            decodedCreds = java.util.Base64.getDecoder().decode(firebaseCreds.trim());
-                            System.out.println("FirebaseConfig: Decoded Base64 credentials");
+                            decodedCreds = java.util.Base64.getMimeDecoder().decode(firebaseCreds.trim());
+                            System.out.println("FirebaseConfig: Decoded Base64 credentials using MimeDecoder");
                         } else {
                             decodedCreds = firebaseCreds.getBytes(java.nio.charset.StandardCharsets.UTF_8);
                         }
