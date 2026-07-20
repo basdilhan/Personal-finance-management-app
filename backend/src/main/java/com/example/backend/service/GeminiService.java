@@ -23,10 +23,16 @@ public class GeminiService {
     }
 
     public String generateChatResponse(String prompt) {
-        String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + geminiApiKey;
-
+        String url;
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+
+        if (geminiApiKey != null && geminiApiKey.startsWith("AIza")) {
+            url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + geminiApiKey;
+        } else {
+            url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
+            headers.setBearerAuth(geminiApiKey);
+        }
 
         // Build Gemini request body
         Map<String, Object> part = new HashMap<>();
