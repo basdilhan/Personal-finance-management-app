@@ -56,7 +56,7 @@ public class GeminiService {
             }
         } catch (Exception e) {
             System.err.println("Gemini API Error: " + e.getMessage());
-            return "I am currently unable to process your request. Please try again later.";
+            return "Debug Error: " + e.getMessage();
         }
         
         return "Sorry, I couldn't understand that.";
