@@ -21,7 +21,19 @@ public class FirebaseConfig {
                 String firebaseCreds = System.getenv("FIREBASE_CREDENTIALS");
                 if (firebaseCreds != null && !firebaseCreds.trim().isEmpty()) {
                     System.out.println("FirebaseConfig: Using FIREBASE_CREDENTIALS environment variable");
-                    serviceAccount = new java.io.ByteArrayInputStream(firebaseCreds.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                    byte[] decodedCreds;
+                    try {
+                        // Check if it's base64 encoded (doesn't start with '{')
+                        if (!firebaseCreds.trim().startsWith("{")) {
+                            decodedCreds = java.util.Base64.getDecoder().decode(firebaseCreds.trim());
+                            System.out.println("FirebaseConfig: Decoded Base64 credentials");
+                        } else {
+                            decodedCreds = firebaseCreds.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+                        }
+                    } catch (Exception e) {
+                        decodedCreds = firebaseCreds.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+                    }
+                    serviceAccount = new java.io.ByteArrayInputStream(decodedCreds);
                 } else {
                     System.out.println("FirebaseConfig: Using local firebase-service-account.json file");
                     serviceAccount = getClass().getClassLoader().getResourceAsStream("firebase-service-account.json");
