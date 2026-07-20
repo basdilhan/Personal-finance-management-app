@@ -36,4 +36,13 @@ public interface ExpenseDao {
 
     @Query("DELETE FROM expenses WHERE localId = :localId")
     void deleteByLocalId(long localId);
+
+    @Query("SELECT SUM(amount) FROM expenses WHERE userId = :userId AND category = :category AND date >= :startOfMonth AND date <= :endOfMonth AND deleted = 0")
+    Double getCategoryTotalForMonth(String userId, String category, long startOfMonth, long endOfMonth);
+
+    @Query("SELECT SUM(amount) FROM expenses WHERE userId = :userId AND date >= :start AND date <= :end AND deleted = 0")
+    Double getTotalForRange(String userId, long start, long end);
+
+    @Query("SELECT category, SUM(amount) as total FROM expenses WHERE userId = :userId AND date >= :start AND date <= :end AND deleted = 0 GROUP BY category")
+    List<CategoryTotal> getCategoryTotalsForRange(String userId, long start, long end);
 }

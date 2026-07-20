@@ -18,6 +18,24 @@ import com.team.financeapp.data.repository.ExpenseRepository;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import android.Manifest;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.provider.MediaStore;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.core.content.ContextCompat;
+
+import com.google.mlkit.vision.common.InputImage;
+import com.google.mlkit.vision.text.Text;
+import com.google.mlkit.vision.text.TextRecognition;
+import com.google.mlkit.vision.text.TextRecognizer;
+import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
 
 /**
  * Activity for adding new expense transactions
@@ -34,7 +52,9 @@ public class AddExpenseActivity extends AppCompatActivity {
 
     private TextInputEditText etAmount, etDescription, etDate;
     private AutoCompleteTextView spinnerCategory;
-    private MaterialButton btnSave, btnCancel;
+    private MaterialButton btnSave, btnCancel, btnScanReceipt, btnAutoCategorize;
+    private ActivityResultLauncher<Intent> cameraLauncher;
+    private ActivityResultLauncher<String> cameraPermissionLauncher;
     private Calendar calendar;
     private SimpleDateFormat dateFormat;
     private SimpleDateFormat timeFormat;
@@ -47,7 +67,6 @@ public class AddExpenseActivity extends AppCompatActivity {
     private String[] expenseCategories = {
             "Food & Dining",
             "Transportation",
-            "Utilities (Electricity, Water)",
             "Mobile & Internet",
             "Healthcare",
             "Education",
@@ -73,6 +92,7 @@ public class AddExpenseActivity extends AppCompatActivity {
         }
 
         initializeViews();
+        setupCameraLaunchers();
         authManager = new AuthManager();
         expenseRepository = new ExpenseRepository(this);
         setupCategoryDropdown();
@@ -87,6 +107,8 @@ public class AddExpenseActivity extends AppCompatActivity {
         spinnerCategory = findViewById(R.id.spinner_category);
         btnSave = findViewById(R.id.btn_save);
         btnCancel = findViewById(R.id.btn_cancel);
+        btnScanReceipt = findViewById(R.id.btn_scan_receipt);
+        btnAutoCategorize = findViewById(R.id.btn_auto_categorize);
 
         // Initialize calendar and date format
         calendar = Calendar.getInstance();
@@ -116,6 +138,15 @@ public class AddExpenseActivity extends AppCompatActivity {
         etDate.setFocusable(false);
         etDate.setClickable(true);
 
+        if (btnAutoCategorize != null) {
+            btnAutoCategorize.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    autoCategorizeWithAI();
+                }
+            });
+        }
+
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -129,6 +160,20 @@ public class AddExpenseActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+        if (btnScanReceipt != null) {
+            btnScanReceipt.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (ContextCompat.checkSelfPermission(AddExpenseActivity.this, Manifest.permission.CAMERA)
+                            == PackageManager.PERMISSION_GRANTED) {
+                        launchCamera();
+                    } else {
+                        cameraPermissionLauncher.launch(Manifest.permission.CAMERA);
+                    }
+                }
+            });
+        }
     }
 
     /**
@@ -180,6 +225,55 @@ public class AddExpenseActivity extends AppCompatActivity {
         });
 
         builder.create().show();
+    }
+
+    private void autoCategorizeWithAI() {
+        String description = etDescription.getText().toString().trim();
+        if (description.isEmpty()) {
+            Toast.makeText(this, "Please enter a description first.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        btnAutoCategorize.setEnabled(false);
+        btnAutoCategorize.setText("Thinking...");
+
+        java.util.Map<String, String> request = new java.util.HashMap<>();
+        request.put("description", description);
+
+        com.team.financeapp.data.remote.ApiClient.getClient().create(com.team.financeapp.data.remote.ExpenseApiService.class).categorizeExpense(request)
+            .enqueue(new retrofit2.Callback<java.util.Map<String, String>>() {
+                @Override
+                public void onResponse(retrofit2.Call<java.util.Map<String, String>> call, retrofit2.Response<java.util.Map<String, String>> response) {
+                    btnAutoCategorize.setEnabled(true);
+                    btnAutoCategorize.setText("🪄 Auto-Categorize");
+
+                    if (response.isSuccessful() && response.body() != null) {
+                        String category = response.body().get("category");
+                        if (category != null && !category.isEmpty()) {
+                            // Find matching category in our list (case insensitive)
+                            for (String c : expenseCategories) {
+                                if (c.equalsIgnoreCase(category)) {
+                                    spinnerCategory.setText(c, false);
+                                    Toast.makeText(AddExpenseActivity.this, "AI Suggested: " + c, Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
+                            }
+                            // If exact match not found but we got one, try assigning the closest or just setting text
+                            spinnerCategory.setText("Other", false);
+                            Toast.makeText(AddExpenseActivity.this, "AI Suggested: " + category + " (Set to Other)", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Toast.makeText(AddExpenseActivity.this, "Failed to get category from AI", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(retrofit2.Call<java.util.Map<String, String>> call, Throwable t) {
+                    btnAutoCategorize.setEnabled(true);
+                    btnAutoCategorize.setText("🪄 Auto-Categorize");
+                    Toast.makeText(AddExpenseActivity.this, "Error connecting to AI: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
     }
 
     private void saveExpense() {
@@ -261,6 +355,134 @@ public class AddExpenseActivity extends AppCompatActivity {
             }
         });
     }
+
+    private Uri currentPhotoUri;
+
+    private void setupCameraLaunchers() {
+        cameraLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK && currentPhotoUri != null) {
+                        try {
+                            Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), currentPhotoUri);
+                            // Scale down to prevent OOM / large payload, but keep readable for AI
+                            int maxDim = 1024;
+                            float scale = Math.min(((float)maxDim) / bitmap.getWidth(), ((float)maxDim) / bitmap.getHeight());
+                            if (scale < 1) {
+                                bitmap = Bitmap.createScaledBitmap(bitmap, Math.round(bitmap.getWidth() * scale), Math.round(bitmap.getHeight() * scale), true);
+                            }
+                            processReceiptImage(bitmap);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            Toast.makeText(this, "Failed to read image", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }
+        );
+
+        cameraPermissionLauncher = registerForActivityResult(
+                new ActivityResultContracts.RequestPermission(),
+                isGranted -> {
+                    if (isGranted) {
+                        launchCamera();
+                    } else {
+                        Toast.makeText(this, "Camera permission required to scan receipts", Toast.LENGTH_SHORT).show();
+                    }
+                }
+        );
+    }
+
+    private void launchCamera() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            try {
+                java.io.File photoFile = java.io.File.createTempFile(
+                        "receipt_" + System.currentTimeMillis(),
+                        ".jpg",
+                        getExternalFilesDir(android.os.Environment.DIRECTORY_PICTURES)
+                );
+                currentPhotoUri = androidx.core.content.FileProvider.getUriForFile(
+                        this, 
+                        getPackageName() + ".fileprovider", 
+                        photoFile
+                );
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, currentPhotoUri);
+                cameraLauncher.launch(takePictureIntent);
+            } catch (java.io.IOException e) {
+                e.printStackTrace();
+                Toast.makeText(this, "Error creating temp file", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            Toast.makeText(this, "No camera app found", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void processReceiptImage(Bitmap bitmap) {
+        Toast.makeText(this, "Scanning receipt with AI...", Toast.LENGTH_SHORT).show();
+        
+        new Thread(() -> {
+            try {
+                java.io.ByteArrayOutputStream byteArrayOutputStream = new java.io.ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 80, byteArrayOutputStream);
+                byte[] byteArray = byteArrayOutputStream.toByteArray();
+                String base64Image = android.util.Base64.encodeToString(byteArray, android.util.Base64.NO_WRAP);
+                
+                java.util.Map<String, String> request = new java.util.HashMap<>();
+                request.put("image", base64Image);
+
+                com.team.financeapp.data.remote.AIApiService aiService = 
+                        com.team.financeapp.data.remote.ApiClient.getClient().create(com.team.financeapp.data.remote.AIApiService.class);
+                
+                aiService.scanReceipt(request).enqueue(new retrofit2.Callback<java.util.Map<String, Object>>() {
+                    @Override
+                    public void onResponse(retrofit2.Call<java.util.Map<String, Object>> call, retrofit2.Response<java.util.Map<String, Object>> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            Toast.makeText(AddExpenseActivity.this, "AI Scan Complete!", Toast.LENGTH_SHORT).show();
+                            
+                            java.util.Map<String, Object> respMap = response.body();
+                            if (respMap.containsKey("error")) {
+                                Toast.makeText(AddExpenseActivity.this, String.valueOf(respMap.get("error")), Toast.LENGTH_LONG).show();
+                            } else if (respMap.containsKey("amount")) {
+                                try {
+                                    double amt = Double.parseDouble(String.valueOf(respMap.get("amount")));
+                                    etAmount.setText(String.valueOf(amt));
+                                    etDescription.setText("AI Scanned Receipt");
+                                    
+                                    if (respMap.containsKey("category")) {
+                                        String cat = String.valueOf(respMap.get("category"));
+                                        spinnerCategory.setText(cat, false);
+                                    }
+                                    
+                                    if (respMap.containsKey("date")) {
+                                        String dateStr = String.valueOf(respMap.get("date"));
+                                        if (!dateStr.isEmpty() && !dateStr.equals("null")) {
+                                            etDate.setText(dateStr);
+                                        }
+                                    }
+                                } catch (NumberFormatException e) {
+                                    Toast.makeText(AddExpenseActivity.this, "Invalid amount format from AI.", Toast.LENGTH_SHORT).show();
+                                }
+                            } else {
+                                Toast.makeText(AddExpenseActivity.this, "AI response missing amount data.", Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            Toast.makeText(AddExpenseActivity.this, "AI Scan Failed", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(retrofit2.Call<java.util.Map<String, Object>> call, Throwable t) {
+                        Toast.makeText(AddExpenseActivity.this, "Error connecting to AI: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                runOnUiThread(() -> Toast.makeText(this, "Error processing image: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+            }
+        }).start();
+    }
+
 
     private void populateIfEditing() {
         if (!isEditMode) {

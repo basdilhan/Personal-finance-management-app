@@ -46,7 +46,17 @@
             android:textColor="@color/text_secondary"
             android:textSize="14sp"
             android:layout_marginTop="4dp"
-            android:layout_marginBottom="32dp" />
+            android:layout_marginBottom="16dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_scan_receipt"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="24dp"
+            android:text="Scan Receipt"
+            app:icon="@drawable/ic_receipt" />
 
         <!-- Form Card -->
         <com.google.android.material.card.MaterialCardView
@@ -111,6 +121,19 @@
                         android:minLines="2"
                         android:maxLines="3" />
                 </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- AI Auto-Categorize Button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_auto_categorize"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:layout_marginTop="8dp"
+                    android:text="🪄 Auto-Categorize"
+                    app:backgroundTint="#F0F9FF"
+                    android:textColor="#0369A1"
+                    app:rippleColor="#BAE6FD" />
 
                 <!-- Date Input -->
                 <com.google.android.material.textfield.TextInputLayout

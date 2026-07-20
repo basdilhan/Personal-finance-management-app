@@ -133,6 +133,37 @@
                         android:textColorHint="#94A3B8" />
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <!-- Recurring Bill Checkbox -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp">
+
+                    <com.google.android.material.checkbox.MaterialCheckBox
+                        android:id="@+id/cb_recurring"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Recurring bill"
+                        android:textColor="@color/text_primary"
+                        android:textSize="14sp"
+                        app:useMaterialThemeColors="true" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:text="Tick this if the bill repeats regularly. It will be marked clearly in the bills list and saved to Firestore."
+                    android:textColor="@color/text_secondary"
+                    android:textSize="12sp" />
+
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 

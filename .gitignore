@@ -1,12 +1,18 @@
 # Gradle files
 .gradle/
 build/
+app/build/
 *.apk
 *.ap_
 *.dex
 
 # Local properties
 local.properties
+
+# Firebase credentials (never commit these!)
+**/firebase-service-account.json
+**/*.keystore
+**/*.jks
 
 # IDE files
 .idea/
@@ -34,9 +40,34 @@ gen/
 hs_err_pid*.log
 replay_pid*.log
 
+# Backend build outputs
+backend/build/
+backend/hs_err_pid*.log
+
 # VS Code
 .vscode/
 
-# gradle wrapper
-gradlew
-gradlew.bat
+# gradle wrapper — DO NOT ignore these, Render needs them for builds
+# gradlew
+# gradlew.bat
+# Ignore the raw datasets folder completely
+Ml datasets/
+
+# ML Environment and caches
+ml/__pycache__/
+ml/.pytest_cache/
+ml/.venv/
+ml/venv/
+ml/env/
+ml/.env
+
+# Ignore heavy data files but KEEP the trained models
+ml/artifacts/*.parquet
+ml/artifacts/*.csv
+
+# React / Vite Web App
+web/node_modules/
+web/dist/
+web/.env
+web/.env.local
+web/.DS_Store

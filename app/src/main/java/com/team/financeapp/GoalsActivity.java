@@ -412,8 +412,9 @@ public class GoalsActivity extends AppCompatActivity implements GoalAdapter.OnGo
         String userId = authManager.getCurrentUserId();
         if (userId == null) {
             Toast.makeText(this, "User not authenticated", Toast.LENGTH_SHORT).show();
-            // Show sample goals for testing if not authenticated
-            loadSampleGoals();
+            goalsList.clear();
+            allGoalsList.clear();
+            filterGoals(currentFilterId);
             return;
         }
 
@@ -431,8 +432,10 @@ public class GoalsActivity extends AppCompatActivity implements GoalAdapter.OnGo
             @Override
             public void onError(String message) {
                 Toast.makeText(GoalsActivity.this, "Error loading goals: " + message, Toast.LENGTH_SHORT).show();
-                // Fall back to sample goals
-                loadSampleGoals();
+                // Clear list instead of showing mock data
+                goalsList.clear();
+                allGoalsList.clear();
+                filterGoals(currentFilterId);
             }
         });
     }

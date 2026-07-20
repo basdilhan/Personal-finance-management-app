@@ -20,7 +20,15 @@ public final class AppLockManager {
     private static final String KEY_PIN_HASH = "pin_hash";
     private static final String KEY_PIN_SALT = "pin_salt";
     private static final String KEY_BIOMETRIC_ENABLED = "biometric_enabled";
-    private static final long LOCK_TIMEOUT_MS = 2 * 60 * 1000L;
+    private static final String KEY_LOCK_TIMEOUT = "lock_timeout_ms";
+    private static final long DEFAULT_LOCK_TIMEOUT_MS = 2 * 60 * 1000L;
+
+    // Timeout options in milliseconds
+    public static final long TIMEOUT_IMMEDIATELY = 0L;
+    public static final long TIMEOUT_1_MIN = 60 * 1000L;
+    public static final long TIMEOUT_2_MIN = 2 * 60 * 1000L;
+    public static final long TIMEOUT_5_MIN = 5 * 60 * 1000L;
+    public static final long TIMEOUT_10_MIN = 10 * 60 * 1000L;
 
     private static boolean sessionUnlocked;
     private static boolean unlockScreenVisible;
@@ -93,6 +101,14 @@ public final class AppLockManager {
         preferences(context).edit().putBoolean(KEY_BIOMETRIC_ENABLED, enabled).apply();
     }
 
+    public static long getLockTimeout(Context context) {
+        return preferences(context).getLong(KEY_LOCK_TIMEOUT, DEFAULT_LOCK_TIMEOUT_MS);
+    }
+
+    public static void setLockTimeout(Context context, long timeoutMs) {
+        preferences(context).edit().putLong(KEY_LOCK_TIMEOUT, timeoutMs).apply();
+    }
+
     public static void markSessionUnlocked() {
         sessionUnlocked = true;
         backgroundTimestamp = 0L;
@@ -114,6 +130,12 @@ public final class AppLockManager {
         backgroundTimestamp = System.currentTimeMillis();
     }
 
+    public static void onAppForegrounded(Context context) {
+        if (!shouldRequireLock(context)) {
+            backgroundTimestamp = 0L;
+        }
+    }
+
     public static boolean shouldRequireLock(Context context) {
         if (FirebaseAuth.getInstance().getCurrentUser() == null) {
             return false;
@@ -128,14 +150,21 @@ public final class AppLockManager {
             return false;
         }
         long elapsed = System.currentTimeMillis() - backgroundTimestamp;
-        if (elapsed >= LOCK_TIMEOUT_MS) {
+        long timeout = getLockTimeout(context);
+        if (elapsed >= timeout) {
             sessionUnlocked = false;
             return true;
         }
         return false;
     }
 
-    public static String timeoutLabel() {
+    public static String timeoutLabel(Context context) {
+        long timeout = getLockTimeout(context);
+        if (timeout == TIMEOUT_IMMEDIATELY) return "Immediately";
+        if (timeout == TIMEOUT_1_MIN) return "1 minute";
+        if (timeout == TIMEOUT_2_MIN) return "2 minutes";
+        if (timeout == TIMEOUT_5_MIN) return "5 minutes";
+        if (timeout == TIMEOUT_10_MIN) return "10 minutes";
         return "2 minutes";
     }
 

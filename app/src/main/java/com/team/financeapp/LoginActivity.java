@@ -18,6 +18,8 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.team.financeapp.auth.AuthManager;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.team.financeapp.notifications.FcmTokenUploader;
 
 /**
  * Login screen with Firebase email/password and Google authentication.
@@ -151,6 +153,9 @@ public class LoginActivity extends AppCompatActivity {
             public void onSuccess() {
                 setAuthInProgress(false);
                 Toast.makeText(LoginActivity.this, R.string.success_login, Toast.LENGTH_SHORT).show();
+                // Fetch and upload FCM token to backend after login
+                FirebaseMessaging.getInstance().getToken()
+                        .addOnSuccessListener(token -> FcmTokenUploader.uploadToken(LoginActivity.this, token));
                 navigateToDashboard();
             }
 

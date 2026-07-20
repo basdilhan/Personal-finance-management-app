@@ -36,4 +36,7 @@ public interface IncomeDao {
 
     @Query("DELETE FROM incomes WHERE localId = :localId")
     void deleteByLocalId(long localId);
+
+    @Query("SELECT SUM(amount) FROM incomes WHERE userId = :userId AND date >= :start AND date <= :end AND deleted = 0")
+    Double getTotalForRange(String userId, long start, long end);
 }

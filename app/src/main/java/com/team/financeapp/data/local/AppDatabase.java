@@ -14,10 +14,12 @@ import com.team.financeapp.data.local.entity.BillEntity;
 import com.team.financeapp.data.local.entity.ExpenseEntity;
 import com.team.financeapp.data.local.entity.GoalEntity;
 import com.team.financeapp.data.local.entity.IncomeEntity;
+import com.team.financeapp.data.local.entity.BudgetLimitEntity;
+import com.team.financeapp.data.local.dao.BudgetDao;
 
 @Database(
-        entities = {BillEntity.class, ExpenseEntity.class, GoalEntity.class, IncomeEntity.class},
-    version = 3,
+        entities = {BillEntity.class, ExpenseEntity.class, GoalEntity.class, IncomeEntity.class, BudgetLimitEntity.class},
+    version = 5,
         exportSchema = false
 )
 public abstract class AppDatabase extends RoomDatabase {
@@ -32,6 +34,8 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract GoalDao goalDao();
 
     public abstract IncomeDao incomeDao();
+
+    public abstract BudgetDao budgetDao();
 
     public static AppDatabase getInstance(Context context) {
         if (INSTANCE == null) {
