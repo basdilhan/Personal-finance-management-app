@@ -205,12 +205,12 @@ public class BillsActivity extends AppCompatActivity {
         billAdapter = new BillAdapter(billsList, new BillAdapter.OnBillItemClickListener() {
             @Override
             public void onBillClick(Bill bill) {
-                // Keep single tap as no-op.
+                openEditBill(bill);
             }
 
             @Override
             public void onBillLongClick(Bill bill) {
-                showBillActions(bill);
+                openEditBill(bill);
             }
         });
 
@@ -385,6 +385,7 @@ public class BillsActivity extends AppCompatActivity {
         intent.putExtra(AddBillActivity.EXTRA_BILL_AMOUNT, bill.getAmount());
         intent.putExtra(AddBillActivity.EXTRA_BILL_DUE_DATE, bill.getDueDate());
         intent.putExtra(AddBillActivity.EXTRA_BILL_TYPE, bill.getCategory());
+        intent.putExtra(AddBillActivity.EXTRA_BILL_STATUS, bill.getStatus());
         startActivity(intent);
     }
 

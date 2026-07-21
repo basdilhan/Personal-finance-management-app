@@ -1,6 +1,7 @@
 package com.team.financeapp;
 
 import android.app.DatePickerDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -8,9 +9,11 @@ import android.widget.AutoCompleteTextView;
 import android.widget.DatePicker;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.android.material.textfield.TextInputEditText;
 import com.team.financeapp.auth.AuthManager;
 import com.team.financeapp.data.repository.BillRepository;
@@ -20,7 +23,7 @@ import java.util.Calendar;
 import java.util.Locale;
 
 /**
- * Activity for adding new recurring bills
+ * Activity for adding or editing recurring bills
  */
 public class AddBillActivity extends AppCompatActivity {
 
@@ -30,16 +33,20 @@ public class AddBillActivity extends AppCompatActivity {
     public static final String EXTRA_BILL_AMOUNT = "extra_bill_amount";
     public static final String EXTRA_BILL_DUE_DATE = "extra_bill_due_date";
     public static final String EXTRA_BILL_TYPE = "extra_bill_type";
+    public static final String EXTRA_BILL_STATUS = "extra_bill_status";
 
     private TextInputEditText etAmount, etBillName, etDueDate;
     private AutoCompleteTextView spinnerBillType;
-    private MaterialButton btnSave, btnCancel;
+    private MaterialCheckBox cbRecurring;
+    private View editActionsContainer;
+    private MaterialButton btnSave, btnCancel, btnMarkPaid, btnDelete;
     private Calendar calendar;
     private SimpleDateFormat dateFormat;
     private AuthManager authManager;
     private BillRepository billRepository;
     private boolean isEditMode;
     private int editingBillId;
+    private String billStatus;
 
     // Common bill types in Sri Lanka
     private String[] billTypes = {
@@ -83,6 +90,10 @@ public class AddBillActivity extends AppCompatActivity {
         etBillName = findViewById(R.id.et_bill_name);
         etDueDate = findViewById(R.id.et_due_date);
         spinnerBillType = findViewById(R.id.spinner_bill_type);
+        cbRecurring = findViewById(R.id.cb_recurring);
+        editActionsContainer = findViewById(R.id.edit_actions_container);
+        btnMarkPaid = findViewById(R.id.btn_mark_paid);
+        btnDelete = findViewById(R.id.btn_delete);
         btnSave = findViewById(R.id.btn_save);
         btnCancel = findViewById(R.id.btn_cancel);
 
@@ -102,9 +113,8 @@ public class AddBillActivity extends AppCompatActivity {
 
     private void setupClickListeners() {
         // Date picker for bill due date
-        etDueDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        etDueDate.setOnClickListener(v -> {
+            if (!"paid".equalsIgnoreCase(billStatus)) {
                 showDatePickerDialog();
             }
         });
@@ -113,24 +123,24 @@ public class AddBillActivity extends AppCompatActivity {
         etDueDate.setFocusable(false);
         etDueDate.setClickable(true);
 
-        btnSave.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                saveBill();
-            }
-        });
+        btnSave.setOnClickListener(v -> saveBill());
+        btnCancel.setOnClickListener(v -> finish());
 
-        btnCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        if (btnMarkPaid != null) {
+            btnMarkPaid.setOnClickListener(v -> {
+                if ("paid".equalsIgnoreCase(billStatus)) {
+                    Toast.makeText(AddBillActivity.this, "This bill is already marked as paid.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                confirmMarkAsPaid();
+            });
+        }
+
+        if (btnDelete != null) {
+            btnDelete.setOnClickListener(v -> confirmDeleteBill());
+        }
     }
 
-    /**
-     * Show date picker dialog for selecting bill due date
-     */
     private android.widget.DatePicker billDatePicker;
 
     private void showDatePickerDialog() {
@@ -138,54 +148,43 @@ public class AddBillActivity extends AppCompatActivity {
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
 
-        // Create AlertDialog with DatePicker and buttons
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(AddBillActivity.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(AddBillActivity.this);
         builder.setTitle("Select Due Date");
 
-        // Create a DatePicker
         billDatePicker = new android.widget.DatePicker(AddBillActivity.this);
         billDatePicker.init(year, month, day, null);
         billDatePicker.setMinDate(System.currentTimeMillis());
 
         builder.setView(billDatePicker);
 
-        // Add Select Date button
-        builder.setPositiveButton("Select Date", new android.content.DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(android.content.DialogInterface dialog, int which) {
-                // Get selected date from DatePicker
-                int selectedYear = billDatePicker.getYear();
-                int selectedMonth = billDatePicker.getMonth();
-                int selectedDay = billDatePicker.getDayOfMonth();
+        builder.setPositiveButton("Select Date", (dialog, which) -> {
+            int selectedYear = billDatePicker.getYear();
+            int selectedMonth = billDatePicker.getMonth();
+            int selectedDay = billDatePicker.getDayOfMonth();
 
-                // Update calendar with selected date
-                calendar.set(Calendar.YEAR, selectedYear);
-                calendar.set(Calendar.MONTH, selectedMonth);
-                calendar.set(Calendar.DAY_OF_MONTH, selectedDay);
+            calendar.set(Calendar.YEAR, selectedYear);
+            calendar.set(Calendar.MONTH, selectedMonth);
+            calendar.set(Calendar.DAY_OF_MONTH, selectedDay);
 
-                // Format and display the date
-                String formattedDate = dateFormat.format(calendar.getTime());
-                etDueDate.setText(formattedDate);
-            }
+            String formattedDate = dateFormat.format(calendar.getTime());
+            etDueDate.setText(formattedDate);
         });
 
-        builder.setNegativeButton("Cancel", new android.content.DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(android.content.DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
         builder.create().show();
     }
 
     private void saveBill() {
+        if ("paid".equalsIgnoreCase(billStatus)) {
+            Toast.makeText(this, "Paid bills cannot be edited.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         String amount = etAmount.getText().toString().trim();
         String billName = etBillName.getText().toString().trim();
         String billType = spinnerBillType.getText().toString().trim();
         String dueDate = etDueDate.getText().toString().trim();
 
-        // Validation
         if (amount.isEmpty()) {
             etAmount.setError("Please enter amount");
             etAmount.requestFocus();
@@ -270,9 +269,96 @@ public class AddBillActivity extends AppCompatActivity {
         });
     }
 
+    private void confirmMarkAsPaid() {
+        new AlertDialog.Builder(this)
+                .setTitle("Mark as Paid")
+                .setMessage("Mark this bill as paid?")
+                .setPositiveButton("Mark Paid", (dialog, which) -> markBillAsPaid())
+                .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
+                .show();
+    }
+
+    private void markBillAsPaid() {
+        String userId = authManager.getCurrentUserId();
+        if (userId == null || userId.isEmpty()) {
+            Toast.makeText(this, "Please login again", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String billName = etBillName.getText().toString().trim();
+        String billType = spinnerBillType.getText().toString().trim();
+        double amountValue = 0.0d;
+        try {
+            amountValue = Double.parseDouble(etAmount.getText().toString().trim());
+        } catch (Exception ignored) {}
+
+        Bill bill = new Bill(
+                editingBillId,
+                billName,
+                billType,
+                amountValue,
+                calendar.getTimeInMillis(),
+                billType,
+                resolveCategoryIcon(billType),
+                "paid",
+                R.drawable.circle_success_light
+        );
+
+        billRepository.updateBill(userId, bill, new BillRepository.ModifyBillCallback() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(AddBillActivity.this, "Bill marked as paid!", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+
+            @Override
+            public void onError(String message) {
+                Toast.makeText(AddBillActivity.this, message, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void confirmDeleteBill() {
+        new AlertDialog.Builder(this)
+                .setTitle("Delete Bill")
+                .setMessage("Are you sure you want to delete this bill?")
+                .setPositiveButton("Delete", (dialog, which) -> deleteBill())
+                .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
+                .show();
+    }
+
+    private void deleteBill() {
+        String userId = authManager.getCurrentUserId();
+        if (userId == null || userId.isEmpty()) {
+            Toast.makeText(this, "Please login again", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        billRepository.deleteBill(userId, editingBillId, new BillRepository.ModifyBillCallback() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(AddBillActivity.this, "Bill deleted", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+
+            @Override
+            public void onError(String message) {
+                Toast.makeText(AddBillActivity.this, message, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     private void populateIfEditing() {
         if (!isEditMode) {
             return;
+        }
+
+        if (editActionsContainer != null) {
+            editActionsContainer.setVisibility(View.VISIBLE);
+        }
+
+        if (btnSave != null) {
+            btnSave.setText("Save Changes");
         }
 
         etBillName.setText(getIntent().getStringExtra(EXTRA_BILL_NAME));
@@ -282,6 +368,30 @@ public class AddBillActivity extends AppCompatActivity {
         long dueDate = getIntent().getLongExtra(EXTRA_BILL_DUE_DATE, System.currentTimeMillis());
         calendar.setTimeInMillis(dueDate);
         etDueDate.setText(dateFormat.format(calendar.getTime()));
+
+        billStatus = getIntent().getStringExtra(EXTRA_BILL_STATUS);
+        if ("paid".equalsIgnoreCase(billStatus)) {
+            // Disable input fields for paid bills
+            etBillName.setEnabled(false);
+            spinnerBillType.setEnabled(false);
+            etAmount.setEnabled(false);
+            etDueDate.setEnabled(false);
+            etDueDate.setClickable(false);
+            if (cbRecurring != null) {
+                cbRecurring.setEnabled(false);
+            }
+
+            btnSave.setEnabled(false);
+            btnSave.setAlpha(0.5f);
+            btnSave.setText("Paid Bill (Locked)");
+
+            if (btnMarkPaid != null) {
+                btnMarkPaid.setText("Paid ✓");
+                btnMarkPaid.setAlpha(0.7f);
+            }
+
+            Toast.makeText(this, "Paid bills cannot be edited.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private String resolveStatus(long dueDateMillis) {

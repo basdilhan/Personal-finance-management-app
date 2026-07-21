@@ -156,15 +156,23 @@ public class GoalRepository {
             FinancialReminderScheduler.scheduleGoalReminder(appContext, existingEntity);
             mainHandler.post(callback::onSuccess);
 
-            // Use the PATCH endpoint for addSavings or just full update
+            // Use the PATCH endpoint for addSavings or fallback to updateGoal
             int backendId = 0;
             try {
                 backendId = Integer.parseInt(existingEntity.remoteId);
             } catch (NumberFormatException ignored) {}
 
+            if (backendId <= 0) {
+                pushGoalToRemote(existingEntity, new SaveGoalCallback() {
+                    @Override public void onSuccess(Goal goal) {}
+                    @Override public void onError(String message) {}
+                });
+                return;
+            }
+
             Map<String, Object> body = new HashMap<>();
             body.put("amount", amountToAdd);
-            
+
             apiService.addSavings(backendId, body).enqueue(new Callback<GoalEntity>() {
                 @Override
                 public void onResponse(Call<GoalEntity> call, Response<GoalEntity> response) {
@@ -174,10 +182,14 @@ public class GoalRepository {
                             existingEntity.updatedAt = System.currentTimeMillis();
                             goalDao.update(existingEntity);
                         });
+                    } else {
+                        updateGoalInRemote(existingEntity, callback);
                     }
                 }
                 @Override
-                public void onFailure(Call<GoalEntity> call, Throwable t) {}
+                public void onFailure(Call<GoalEntity> call, Throwable t) {
+                    updateGoalInRemote(existingEntity, callback);
+                }
             });
         });
     }
@@ -210,12 +222,23 @@ public class GoalRepository {
                         for (GoalEntity remoteEntity : remoteEntities) {
                             remoteEntity.syncState = SyncState.SYNCED;
                             remoteEntity.remoteId = String.valueOf(remoteEntity.localId);
-                            
+
                             GoalEntity localEntity = goalDao.getByRemoteId(remoteEntity.remoteId);
+                            if (localEntity == null) {
+                                localEntity = goalDao.getById(remoteEntity.localId);
+                            }
+
                             if (localEntity == null) {
                                 goalDao.insert(remoteEntity);
                             } else {
                                 remoteEntity.localId = localEntity.localId;
+                                if (SyncState.PENDING.equals(localEntity.syncState)) {
+                                    if (localEntity.currentAmount > remoteEntity.currentAmount) {
+                                        remoteEntity.currentAmount = localEntity.currentAmount;
+                                        remoteEntity.addedSavingsAmount = localEntity.addedSavingsAmount;
+                                        remoteEntity.syncState = SyncState.PENDING;
+                                    }
+                                }
                                 goalDao.update(remoteEntity);
                             }
 

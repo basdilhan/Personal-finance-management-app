@@ -13,7 +13,11 @@ from sklearn.cluster import KMeans
 from transformers import pipeline
 import torch
 torch.set_num_threads(1)
-from chronos import ChronosPipeline
+try:
+    from chronos import ChronosPipeline
+except ImportError:
+    ChronosPipeline = None
+    print("WARNING: chronos package not installed. Forecasting will use fallback.")
 
 # --- Security Setup ---
 INTERNAL_API_KEY = os.getenv("ML_SERVICE_API_KEY", "dev_secret_key_123")
@@ -40,12 +44,16 @@ import joblib
 
 # 2. Time-Series Forecasting Model (Chronos T5-Tiny to save RAM)
 try:
-    chronos_pipeline = ChronosPipeline.from_pretrained(
-        "amazon/chronos-t5-tiny", # Switched to tiny version (fits in 512MB)
-        device_map="cpu",
-        torch_dtype=torch.float32,
-    )
-    print("Loaded Chronos Time-Series model (Tiny).")
+    if ChronosPipeline is not None:
+        chronos_pipeline = ChronosPipeline.from_pretrained(
+            "amazon/chronos-t5-tiny", # Switched to tiny version (fits in 512MB)
+            device_map="cpu",
+            torch_dtype=torch.float32,
+        )
+        print("Loaded Chronos Time-Series model (Tiny).")
+    else:
+        chronos_pipeline = None
+        print("Chronos not available, forecasting will use simple average fallback.")
 except Exception as e:
     print(f"Failed to load Chronos model: {e}")
     chronos_pipeline = None

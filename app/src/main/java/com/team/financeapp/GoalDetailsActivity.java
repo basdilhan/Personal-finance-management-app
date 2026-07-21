@@ -166,6 +166,13 @@ public class GoalDetailsActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public boolean onSupportNavigateUp() {
+        sendUpdatedGoalResultIfNeeded();
+        finish();
+        return true;
+    }
+
     /**
      * Setup click listeners for buttons
      */
