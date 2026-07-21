@@ -2,17 +2,17 @@
 
 :root {
   /* Premium Light Theme (Green/Blue Gradient Aesthetic) */
-  --bg-primary: #f0fdf4; /* Very light green tint */
-  --bg-secondary: #ffffff;
+  --bg-primary: #e8f5e9; /* Light green tint */
+  --bg-secondary: #f4fbf7; /* Slightly tinted white for cards */
   --bg-tertiary: #e0f2fe; /* Light blue tint */
   
-  --bg-gradient: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%);
+  --bg-gradient: linear-gradient(135deg, #e8f5e9 0%, #e0f2fe 100%);
   
   --text-primary: #0f172a;
   --text-secondary: #475569;
   --text-inverse: #ffffff;
   
-  --border-light: #cbd5e1;
+  --border-light: #bbf7d0; /* Soft green border */
   
   --accent-blue: #0ea5e9; /* Sky blue */
   --accent-blue-hover: #0284c7;

@@ -62,18 +62,18 @@ export default function Login() {
         <div style={{ position: 'absolute', top: '-10%', left: '-10%', width: '500px', height: '500px', background: 'var(--accent-blue)', opacity: 0.15, filter: 'blur(100px)', borderRadius: '50%' }}></div>
         <div style={{ position: 'absolute', bottom: '-10%', right: '-10%', width: '400px', height: '400px', background: '#3291ff', opacity: 0.1, filter: 'blur(80px)', borderRadius: '50%' }}></div>
 
-        <div style={{ position: 'relative', zIndex: 1, maxWidth: '500px' }}>
+        <div style={{ position: 'relative', zIndex: 1, maxWidth: '500px', color: 'white' }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '12px', marginBottom: '40px', background: 'rgba(255,255,255,0.05)', padding: '12px 24px', borderRadius: '100px', border: '1px solid rgba(255,255,255,0.1)' }}>
             <img src="/logo.webp" alt="Dream Saver" style={{ width: '24px', height: '24px', borderRadius: '4px' }} />
             <span style={{ fontWeight: 600, letterSpacing: '0.05em', color: 'white' }}>DREAM SAVER</span>
           </div>
 
-          <h1 style={{ fontSize: '48px', lineHeight: 1.1, marginBottom: '24px', fontWeight: 700 }}>
+          <h1 style={{ fontSize: '48px', lineHeight: 1.1, marginBottom: '24px', fontWeight: 700, color: 'white' }}>
             Master your money,<br/>
             <span className="text-gradient">secure your future.</span>
           </h1>
 
-          <p style={{ fontSize: '18px', color: 'var(--text-secondary)', marginBottom: '48px', lineHeight: 1.6 }}>
+          <p style={{ fontSize: '18px', color: 'rgba(255,255,255,0.7)', marginBottom: '48px', lineHeight: 1.6 }}>
             The all-in-one financial dashboard designed to help you track expenses, manage budgets, and chat with an AI assistant for personalized financial advice.
           </p>
 
@@ -83,18 +83,18 @@ export default function Login() {
                 <TrendingUp size={24} color="var(--accent-blue)" />
               </div>
               <div>
-                <h3 style={{ fontSize: '16px', marginBottom: '4px' }}>Advanced Analytics</h3>
-                <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Get a bird's eye view of your spending patterns.</p>
+                <h3 style={{ fontSize: '16px', marginBottom: '4px', color: 'white' }}>Advanced Analytics</h3>
+                <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.7)' }}>Get a bird's eye view of your spending patterns.</p>
               </div>
             </div>
 
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
               <div style={{ background: 'rgba(255, 255, 255, 0.05)', padding: '12px', borderRadius: '12px' }}>
-                <ShieldCheck size={24} color="var(--text-primary)" />
+                <ShieldCheck size={24} color="white" />
               </div>
               <div>
-                <h3 style={{ fontSize: '16px', marginBottom: '4px' }}>Bank-grade Security</h3>
-                <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Your financial data is encrypted and securely stored.</p>
+                <h3 style={{ fontSize: '16px', marginBottom: '4px', color: 'white' }}>Bank-grade Security</h3>
+                <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.7)' }}>Your financial data is encrypted and securely stored.</p>
               </div>
             </div>
           </div>
