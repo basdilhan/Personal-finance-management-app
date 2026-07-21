@@ -52,7 +52,7 @@ public class AddExpenseActivity extends AppCompatActivity {
 
     private TextInputEditText etAmount, etDescription, etDate;
     private AutoCompleteTextView spinnerCategory;
-    private MaterialButton btnSave, btnCancel, btnScanReceipt, btnAutoCategorize;
+    private MaterialButton btnSave, btnCancel, btnScanReceipt;
     private ActivityResultLauncher<Intent> cameraLauncher;
     private ActivityResultLauncher<String> cameraPermissionLauncher;
     private Calendar calendar;
@@ -108,7 +108,6 @@ public class AddExpenseActivity extends AppCompatActivity {
         btnSave = findViewById(R.id.btn_save);
         btnCancel = findViewById(R.id.btn_cancel);
         btnScanReceipt = findViewById(R.id.btn_scan_receipt);
-        btnAutoCategorize = findViewById(R.id.btn_auto_categorize);
 
         // Initialize calendar and date format
         calendar = Calendar.getInstance();
@@ -138,14 +137,33 @@ public class AddExpenseActivity extends AppCompatActivity {
         etDate.setFocusable(false);
         etDate.setClickable(true);
 
-        if (btnAutoCategorize != null) {
-            btnAutoCategorize.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    autoCategorizeWithAI();
+        // Magical real-time AI auto-categorization when user stops typing
+        final android.os.Handler typingHandler = new android.os.Handler();
+        final Runnable typingRunnable = new Runnable() {
+            @Override
+            public void run() {
+                autoCategorizeWithAI();
+            }
+        };
+
+        etDescription.addTextChangedListener(new android.text.TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            
+            @Override
+            public void afterTextChanged(android.text.Editable s) {
+                typingHandler.removeCallbacks(typingRunnable);
+                String text = s.toString().trim();
+                if (text.length() >= 3) {
+                    typingHandler.postDelayed(typingRunnable, 1500); // 1.5 seconds after typing stops
                 }
-            });
-        }
+            }
+        });
+
+
 
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -230,12 +248,12 @@ public class AddExpenseActivity extends AppCompatActivity {
     private void autoCategorizeWithAI() {
         String description = etDescription.getText().toString().trim();
         if (description.isEmpty()) {
-            Toast.makeText(this, "Please enter a description first.", Toast.LENGTH_SHORT).show();
-            return;
+            return; // Don't show toast for auto-typing
         }
 
-        btnAutoCategorize.setEnabled(false);
-        btnAutoCategorize.setText("Thinking...");
+        // Show loading state in spinner instead of button
+        String originalText = spinnerCategory.getText().toString();
+        spinnerCategory.setText("Auto-detecting...", false);
 
         java.util.Map<String, String> request = new java.util.HashMap<>();
         request.put("description", description);
@@ -244,34 +262,31 @@ public class AddExpenseActivity extends AppCompatActivity {
             .enqueue(new retrofit2.Callback<java.util.Map<String, String>>() {
                 @Override
                 public void onResponse(retrofit2.Call<java.util.Map<String, String>> call, retrofit2.Response<java.util.Map<String, String>> response) {
-                    btnAutoCategorize.setEnabled(true);
-                    btnAutoCategorize.setText("🪄 Auto-Categorize");
 
                     if (response.isSuccessful() && response.body() != null) {
                         String category = response.body().get("category");
                         if (category != null && !category.isEmpty()) {
+                            // Clean AI response (remove quotes, asterisks, "Category:" prefixes)
+                            String cleanCategory = category.replaceAll("[\"'\\*]", "").replace("Category:", "").trim();
+                            
                             // Find matching category in our list (case insensitive)
                             for (String c : expenseCategories) {
-                                if (c.equalsIgnoreCase(category)) {
+                                if (c.equalsIgnoreCase(cleanCategory) || cleanCategory.toLowerCase().contains(c.toLowerCase())) {
                                     spinnerCategory.setText(c, false);
-                                    Toast.makeText(AddExpenseActivity.this, "AI Suggested: " + c, Toast.LENGTH_SHORT).show();
-                                    return;
+                                    return; // Silently update, it's magical
                                 }
                             }
                             // If exact match not found but we got one, try assigning the closest or just setting text
-                            spinnerCategory.setText("Other", false);
-                            Toast.makeText(AddExpenseActivity.this, "AI Suggested: " + category + " (Set to Other)", Toast.LENGTH_SHORT).show();
+                            spinnerCategory.setText(originalText, false); // Revert to what it was
                         }
                     } else {
-                        Toast.makeText(AddExpenseActivity.this, "Failed to get category from AI", Toast.LENGTH_SHORT).show();
+                        spinnerCategory.setText(originalText, false);
                     }
                 }
 
                 @Override
                 public void onFailure(retrofit2.Call<java.util.Map<String, String>> call, Throwable t) {
-                    btnAutoCategorize.setEnabled(true);
-                    btnAutoCategorize.setText("🪄 Auto-Categorize");
-                    Toast.makeText(AddExpenseActivity.this, "Error connecting to AI: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                    spinnerCategory.setText(originalText, false);
                 }
             });
     }
