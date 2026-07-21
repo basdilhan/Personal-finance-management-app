@@ -3,6 +3,7 @@ uvicorn
 pydantic
 python-dotenv
 requests
+--extra-index-url https://download.pytorch.org/whl/cpu
 transformers
 torch
 scikit-learn
