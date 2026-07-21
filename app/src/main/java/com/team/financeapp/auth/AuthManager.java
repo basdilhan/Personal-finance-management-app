@@ -180,7 +180,7 @@ public class AuthManager {
 
         UserProfile profile = new UserProfile();
         profile.setId(user.getUid());
-        profile.setDisplayName(TextUtils.isEmpty(resolvedName) ? "User" : resolvedName);
+        profile.setDisplayName(resolvedName);
         profile.setEmail(user.getEmail());
         profile.setPhotoUrl(photo);
 

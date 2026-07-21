@@ -9,7 +9,8 @@ export default function Blogs() {
       excerpt: "Learn how to divide your income between needs, wants, and savings to achieve financial freedom faster.",
       category: "Budgeting",
       readTime: "5 min read",
-      image: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&q=80&w=600"
+      image: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&q=80&w=600",
+      url: "https://www.investopedia.com/ask/answers/022916/what-502030-budget-rule.asp"
     },
     {
       id: 2,
@@ -17,7 +18,8 @@ export default function Blogs() {
       excerpt: "Why you need 6 months of living expenses saved up, and exactly how to build it without feeling broke.",
       category: "Savings",
       readTime: "4 min read",
-      image: "https://images.unsplash.com/photo-1633158829585-23ba8f7c8caf?auto=format&fit=crop&q=80&w=600"
+      image: "https://images.unsplash.com/photo-1633158829585-23ba8f7c8caf?auto=format&fit=crop&q=80&w=600",
+      url: "https://www.nerdwallet.com/article/banking/emergency-fund-why-it-matters"
     },
     {
       id: 3,
@@ -25,7 +27,8 @@ export default function Blogs() {
       excerpt: "Two proven strategies for paying off debt. Find out which psychological approach works best for you.",
       category: "Debt",
       readTime: "6 min read",
-      image: "https://images.unsplash.com/photo-1579621970588-a35d0e7ab9b6?auto=format&fit=crop&q=80&w=600"
+      image: "https://images.unsplash.com/photo-1579621970588-a35d0e7ab9b6?auto=format&fit=crop&q=80&w=600",
+      url: "https://www.forbes.com/advisor/debt-relief/debt-snowball-vs-debt-avalanche/"
     }
   ];
 
@@ -71,9 +74,11 @@ export default function Blogs() {
               <h3 style={{ fontSize: '20px', marginBottom: '12px', lineHeight: 1.3 }}>{blog.title}</h3>
               <p className="text-muted" style={{ fontSize: '14px', marginBottom: '24px', flex: 1 }}>{blog.excerpt}</p>
               
-              <button className="btn-secondary" style={{ width: '100%', display: 'flex', justifyContent: 'center', gap: '8px' }}>
-                Read Article <ArrowRight size={16} />
-              </button>
+              <a href={blog.url} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
+                <button className="btn-secondary" style={{ width: '100%', display: 'flex', justifyContent: 'center', gap: '8px' }}>
+                  Read Article <ArrowRight size={16} />
+                </button>
+              </a>
             </div>
           </div>
         ))}
