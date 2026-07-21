@@ -167,12 +167,62 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Edit Mode Extra Buttons (Mark Paid / Delete) -->
+        <LinearLayout
+            android:id="@+id/edit_actions_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="16dp"
+            android:visibility="gone">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_mark_paid"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:includeFontPadding="true"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:text="Mark as Paid Bill"
+                android:textSize="16sp"
+                android:textAllCaps="false"
+                app:icon="@drawable/ic_check"
+                app:iconGravity="textStart"
+                app:iconPadding="8dp"
+                app:backgroundTint="@color/success"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                app:cornerRadius="12dp"
+                android:layout_marginBottom="12dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_delete"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:includeFontPadding="true"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:text="Delete Bill"
+                android:textAllCaps="false"
+                android:textColor="@color/error"
+                app:strokeColor="@color/error"
+                app:icon="@drawable/ic_delete"
+                app:iconTint="@color/error"
+                app:iconGravity="textStart"
+                app:iconPadding="8dp"
+                android:textSize="16sp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                app:cornerRadius="12dp" />
+        </LinearLayout>
+
         <!-- Action Buttons -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="16dp"
             android:weightSum="2">
 
             <com.google.android.material.button.MaterialButton

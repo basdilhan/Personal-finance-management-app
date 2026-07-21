@@ -245,16 +245,8 @@ public class GoalsActivity extends AppCompatActivity implements GoalAdapter.OnGo
             }
         }
 
-        for (Goal goal : goalsList) {
-            if (goal.getId() == goalId) {
-                goal.setCurrentAmount(updatedCurrentAmount);
-                break;
-            }
-        }
-
-        goalAdapter.notifyDataSetChanged();
+        filterGoals(currentFilterId);
         calculateTotalSaved();
-        updateEmptyState();
     }
 
     /**

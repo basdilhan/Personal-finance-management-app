@@ -7,7 +7,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.button.MaterialButton;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -97,7 +100,14 @@ public class BillAdapter extends RecyclerView.Adapter<BillAdapter.BillViewHolder
             String formattedDate = dateFormat.format(new Date(bill.getDueDate()));
             tvDueDate.setText("Due: " + formattedDate);
             
-            tvAmount.setText(String.format("LKR %.2f", bill.getAmount()));
+            tvAmount.setText(String.format(Locale.getDefault(), "LKR %.2f", bill.getAmount()));
+
+            boolean isPaid = "paid".equalsIgnoreCase(bill.getStatus());
+            if (isPaid) {
+                tvAmount.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.success));
+            } else {
+                tvAmount.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.error));
+            }
 
             itemView.setOnClickListener(v -> {
                 if (listener != null) {

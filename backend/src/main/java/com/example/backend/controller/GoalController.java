@@ -82,6 +82,33 @@ public class GoalController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @PatchMapping("/{id}/savings")
+    public ResponseEntity<GoalEntity> addSavings(@RequestHeader("X-User-Id") String userId,
+                                                 @PathVariable Integer id,
+                                                 @RequestBody java.util.Map<String, Object> body) {
+        Object amountObj = body.get("amount");
+        if (amountObj == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        BigDecimal amountToAdd;
+        try {
+            amountToAdd = new BigDecimal(amountObj.toString());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        return goalRepository.findById(id)
+                .filter(g -> g.getUserId().equals(userId))
+                .map(existing -> {
+                    BigDecimal newCurrent = (existing.getCurrentAmount() != null ? existing.getCurrentAmount() : BigDecimal.ZERO).add(amountToAdd);
+                    BigDecimal newAdded = (existing.getAddedSavingsAmount() != null ? existing.getAddedSavingsAmount() : BigDecimal.ZERO).add(amountToAdd);
+                    existing.setCurrentAmount(newCurrent);
+                    existing.setAddedSavingsAmount(newAdded);
+                    return ResponseEntity.ok(goalRepository.save(existing));
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteGoal(@RequestHeader("X-User-Id") String userId,
                                             @PathVariable Integer id) {

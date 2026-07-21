@@ -491,16 +491,18 @@ public class DashboardActivity extends AppCompatActivity {
         
         double monthlyPaidBills = 0.0d;
         for (Bill bill : latestBills) {
-            if ("paid".equalsIgnoreCase(bill.getStatus()) && isInCurrentMonth(bill.getDueDate())) {
+            if ("paid".equalsIgnoreCase(bill.getStatus())) {
                 monthlyPaidBills += bill.getAmount();
             }
         }
 
-        double totalCashOut = monthlyExpenses + monthlyPaidBills;
+        double totalGoalSavings = sumGoalAddedSavings();
+
+        double totalCashOut = monthlyExpenses + monthlyPaidBills + totalGoalSavings;
         currentTotalExpenses = totalCashOut;
         currentMonthIncome = monthlyIncome;
 
-        // Portfolio balance follows: cash in - cash out for the month.
+        // Portfolio balance follows: income - (expenses + paid bills + goal savings)
         double totalBalance = currentMonthIncome - currentTotalExpenses;
         currentTotalBalance = totalBalance;
         applyBalancePrivacyState();
@@ -942,8 +944,10 @@ public class DashboardActivity extends AppCompatActivity {
 
     private double sumGoalAddedSavings() {
         double sum = 0.0d;
-        for (GoalSummary goal : latestGoals) {
-            sum += goal.addedSavingsAmount;
+        if (latestGoals != null) {
+            for (GoalSummary goal : latestGoals) {
+                sum += goal.currentAmount;
+            }
         }
         return sum;
     }
