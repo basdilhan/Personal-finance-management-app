@@ -122,23 +122,5 @@ public class GoalController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PatchMapping("/{id}/savings")
-    public ResponseEntity<GoalEntity> addSavings(@RequestHeader("X-User-Id") String userId,
-                                                  @PathVariable Integer id,
-                                                  @RequestBody java.util.Map<String, Object> body) {
-        if (!body.containsKey("amount")) {
-            return ResponseEntity.badRequest().build();
-        }
-        
-        BigDecimal amountToAdd = new BigDecimal(body.get("amount").toString());
-        
-        return goalRepository.findById(id)
-                .filter(g -> g.getUserId().equals(userId) && !g.getIsDeleted())
-                .map(existing -> {
-                    existing.setCurrentAmount(existing.getCurrentAmount().add(amountToAdd));
-                    existing.setAddedSavingsAmount(existing.getAddedSavingsAmount().add(amountToAdd));
-                    return ResponseEntity.ok(goalRepository.save(existing));
-                })
-                .orElse(ResponseEntity.notFound().build());
-    }
+
 }
