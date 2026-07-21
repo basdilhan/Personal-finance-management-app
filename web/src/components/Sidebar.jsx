@@ -1,11 +1,12 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, MessageSquare, BookOpen, LogOut, BrainCircuit } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { LayoutDashboard, MessageSquare, BookOpen, LogOut, BrainCircuit, Moon, Sun } from 'lucide-react';
 
 export default function Sidebar() {
   const { currentUser, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
   async function handleLogout() {
@@ -35,13 +36,14 @@ export default function Sidebar() {
       borderRight: '1px solid var(--border-light)',
       display: 'flex',
       flexDirection: 'column',
-      padding: '24px 0'
+      padding: '24px 0',
+      zIndex: 100
     }}>
       
       {/* Brand & Logo */}
       <div style={{ padding: '0 24px', marginBottom: '40px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <img src="/logo.webp" alt="Dream Saver Logo" style={{ width: '40px', height: '40px', borderRadius: '8px' }} />
-        <span style={{ fontSize: '20px', fontWeight: 700, letterSpacing: '-0.02em' }}>DreamSaver</span>
+        <img src="/logo.webp" alt="Dream Saver Logo" style={{ width: '40px', height: '40px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }} />
+        <span style={{ fontSize: '20px', fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>DreamSaver</span>
       </div>
 
       {/* Navigation */}
@@ -57,7 +59,7 @@ export default function Sidebar() {
               padding: '12px 16px',
               borderRadius: '8px',
               color: isActive ? 'var(--accent-blue)' : 'var(--text-secondary)',
-              background: isActive ? 'var(--bg-primary)' : 'transparent',
+              background: isActive ? 'var(--bg-tertiary)' : 'transparent',
               textDecoration: 'none',
               fontWeight: 500,
               transition: 'all 0.2s'
@@ -69,14 +71,27 @@ export default function Sidebar() {
         ))}
       </div>
 
-      {/* User Profile Footer */}
+      {/* Theme Toggle & User Profile Footer */}
       <div style={{ padding: '0 24px', marginTop: 'auto' }}>
+        <button 
+          onClick={toggleTheme}
+          style={{ 
+            display: 'flex', alignItems: 'center', gap: '12px', width: '100%', 
+            padding: '12px', marginBottom: '16px', borderRadius: '8px', 
+            background: 'var(--bg-tertiary)', border: '1px solid var(--border-light)', 
+            color: 'var(--text-primary)', cursor: 'pointer', fontWeight: 500 
+          }}
+        >
+          {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
+          {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
+        </button>
+
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '16px 0', borderTop: '1px solid var(--border-light)' }}>
           <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--accent-blue)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600 }}>
             {currentUser?.email?.charAt(0).toUpperCase()}
           </div>
           <div style={{ flex: 1, overflow: 'hidden' }}>
-            <div style={{ fontSize: '14px', fontWeight: 600, textOverflow: 'ellipsis', overflow: 'hidden' }}>
+            <div style={{ fontSize: '14px', fontWeight: 600, textOverflow: 'ellipsis', overflow: 'hidden', color: 'var(--text-primary)' }}>
               {currentUser?.displayName || 'User'}
             </div>
             <div style={{ fontSize: '12px', color: 'var(--text-secondary)', textOverflow: 'ellipsis', overflow: 'hidden' }}>
@@ -85,7 +100,9 @@ export default function Sidebar() {
           </div>
           <button 
             onClick={handleLogout}
-            style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}
+            style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', transition: 'color 0.2s' }}
+            onMouseOver={(e) => e.currentTarget.style.color = 'var(--danger)'}
+            onMouseOut={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
             title="Sign Out"
           >
             <LogOut size={20} />
