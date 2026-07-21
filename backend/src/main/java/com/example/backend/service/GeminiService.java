@@ -28,9 +28,9 @@ public class GeminiService {
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         if (geminiApiKey == null || geminiApiKey.trim().isEmpty() || geminiApiKey.equals("PLACEHOLDER_KEY")) {
-            url = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent";
+            url = "https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent";
         } else {
-            url = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=" + geminiApiKey;
+            url = "https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=" + geminiApiKey;
         }
 
         // Build Gemini request body
