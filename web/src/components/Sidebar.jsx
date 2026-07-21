@@ -42,7 +42,7 @@ export default function Sidebar() {
       
       {/* Brand & Logo */}
       <div style={{ padding: '0 24px', marginBottom: '40px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <img src="/logo.webp" alt="Dream Saver Logo" style={{ width: '40px', height: '40px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }} />
+        <img src="/logo.svg" alt="Dream Saver Logo" style={{ width: '40px', height: '40px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }} />
         <span style={{ fontSize: '20px', fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>DreamSaver</span>
       </div>
 

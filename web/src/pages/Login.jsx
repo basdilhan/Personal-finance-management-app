@@ -64,7 +64,7 @@ export default function Login() {
 
         <div style={{ position: 'relative', zIndex: 1, maxWidth: '500px', color: 'white' }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '12px', marginBottom: '40px', background: 'rgba(255,255,255,0.05)', padding: '12px 24px', borderRadius: '100px', border: '1px solid rgba(255,255,255,0.1)' }}>
-            <img src="/logo.webp" alt="Dream Saver" style={{ width: '24px', height: '24px', borderRadius: '4px' }} />
+            <img src="/logo.svg" alt="Dream Saver" style={{ width: '24px', height: '24px', borderRadius: '4px' }} />
             <span style={{ fontWeight: 600, letterSpacing: '0.05em', color: 'white' }}>DREAM SAVER</span>
           </div>
 
