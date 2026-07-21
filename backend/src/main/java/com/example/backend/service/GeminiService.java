@@ -23,10 +23,15 @@ public class GeminiService {
     }
 
     public String generateChatResponse(String prompt) {
-        String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=" + geminiApiKey;
-
+        String url;
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+
+        if (geminiApiKey == null || geminiApiKey.trim().isEmpty() || geminiApiKey.equals("PLACEHOLDER_KEY")) {
+            url = "https://generativelanguage.googleapis.com/v1/models/gemini-3.5-flash:generateContent";
+        } else {
+            url = "https://generativelanguage.googleapis.com/v1/models/gemini-3.5-flash:generateContent?key=" + geminiApiKey;
+        }
 
         // Build Gemini request body
         Map<String, Object> part = new HashMap<>();
@@ -56,9 +61,23 @@ public class GeminiService {
             }
         } catch (Exception e) {
             System.err.println("Gemini API Error: " + e.getMessage());
-            return "I am currently unable to process your request. Please try again later.";
+            return "Debug Error: " + e.getMessage();
         }
         
         return "Sorry, I couldn't understand that.";
+    }
+
+    public String autoCategorize(String description) {
+        String prompt = "Categorize this transaction description into exactly ONE of the following categories: " +
+                        "'Food & Dining', 'Transportation', 'Mobile & Internet', 'Healthcare', 'Education', " +
+                        "'Entertainment', 'Shopping', 'Groceries', 'Fuel', 'Other'.\n\n" +
+                        "Description: " + description + "\n\n" +
+                        "Return ONLY the exact category name with no other text.";
+        
+        String response = generateChatResponse(prompt);
+        if (response.startsWith("Debug Error:") || response.startsWith("Sorry,")) {
+            return "Other";
+        }
+        return response.trim();
     }
 }

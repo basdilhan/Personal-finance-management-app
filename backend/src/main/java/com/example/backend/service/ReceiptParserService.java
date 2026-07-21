@@ -21,10 +21,15 @@ public class ReceiptParserService {
     private final RestTemplate restTemplate = new RestTemplate();
 
     public Map<String, Object> parseReceipt(String base64Image) {
-        String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=" + apiKey;
-
+        String url;
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", "application/json");
+
+        if (apiKey == null || apiKey.trim().isEmpty() || apiKey.equals("PLACEHOLDER_KEY")) {
+            url = "https://generativelanguage.googleapis.com/v1/models/gemini-3.5-flash:generateContent";
+        } else {
+            url = "https://generativelanguage.googleapis.com/v1/models/gemini-3.5-flash:generateContent?key=" + apiKey;
+        }
 
         Map<String, Object> requestBody = new HashMap<>();
         List<Map<String, Object>> contents = new ArrayList<>();

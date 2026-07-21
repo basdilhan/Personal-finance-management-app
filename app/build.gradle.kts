@@ -16,7 +16,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         
-        buildConfigField("String", "BASE_URL", "\"http://192.168.8.197:8080/api/\"")
+        buildConfigField("String", "BASE_URL", "\"https://personal-finance-management-app-backend.onrender.com/api/\"")
     }
 
     buildFeatures {
