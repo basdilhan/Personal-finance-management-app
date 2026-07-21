@@ -38,6 +38,9 @@ public class ApiClient {
                     .addInterceptor(logging)
                     .addInterceptor(new AuthInterceptor())
                     .authenticator(new TokenAuthenticator())
+                    .connectTimeout(120, java.util.concurrent.TimeUnit.SECONDS)
+                    .readTimeout(120, java.util.concurrent.TimeUnit.SECONDS)
+                    .writeTimeout(120, java.util.concurrent.TimeUnit.SECONDS)
                     .build();
 
             retrofit = new Retrofit.Builder()

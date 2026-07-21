@@ -27,11 +27,10 @@ public class GeminiService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        if (geminiApiKey != null && geminiApiKey.startsWith("AIza")) {
-            url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + geminiApiKey;
-        } else {
+        if (geminiApiKey == null || geminiApiKey.trim().isEmpty() || geminiApiKey.equals("PLACEHOLDER_KEY")) {
             url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
-            headers.setBearerAuth(geminiApiKey);
+        } else {
+            url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + geminiApiKey;
         }
 
         // Build Gemini request body

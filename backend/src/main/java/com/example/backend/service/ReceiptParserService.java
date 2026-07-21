@@ -25,11 +25,10 @@ public class ReceiptParserService {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", "application/json");
 
-        if (apiKey != null && apiKey.startsWith("AIza")) {
-            url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + apiKey;
-        } else {
+        if (apiKey == null || apiKey.trim().isEmpty() || apiKey.equals("PLACEHOLDER_KEY")) {
             url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
-            headers.setBearerAuth(apiKey);
+        } else {
+            url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + apiKey;
         }
 
         Map<String, Object> requestBody = new HashMap<>();

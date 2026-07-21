@@ -129,21 +129,32 @@ async def auto_categorize(req: CategorizeRequest):
         headers["Authorization"] = f"Bearer {HF_TOKEN}"
         
     try:
-        response = requests.post(API_URL, headers=headers, json={"inputs": req.description})
-        result = response.json()
+        import time
+        max_retries = 3
+        best_category = "other"
+        confidence = 0.0
         
-        # Parse inference API response
-        if isinstance(result, list) and len(result) > 0:
-            if isinstance(result[0], list):
-                best_pred = result[0][0]
-            else:
-                best_pred = result[0]
-                
-            best_category = best_pred.get("label", "other").lower()
-            confidence = best_pred.get("score", 0.5)
-        else:
-            best_category = "other"
-            confidence = 0.0
+        for attempt in range(max_retries):
+            response = requests.post(API_URL, headers=headers, json={"inputs": req.description})
+            result = response.json()
+            
+            # Check if model is loading
+            if isinstance(result, dict) and "estimated_time" in result:
+                wait_time = min(result["estimated_time"], 20.0) # Wait up to 20s per attempt
+                print(f"HF Model loading, waiting {wait_time}s... (Attempt {attempt+1}/{max_retries})")
+                time.sleep(wait_time)
+                continue
+            
+            # Parse successful inference API response
+            if isinstance(result, list) and len(result) > 0:
+                if isinstance(result[0], list):
+                    best_pred = result[0][0]
+                else:
+                    best_pred = result[0]
+                    
+                best_category = best_pred.get("label", "other").lower()
+                confidence = best_pred.get("score", 0.5)
+            break
             
     except Exception as e:
         print("HF API Error:", e)
