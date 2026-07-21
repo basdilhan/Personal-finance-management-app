@@ -1,105 +1,134 @@
-import React, { useState } from 'react';
-import { Send, Bot, User } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Send, Bot, User, Loader2 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import apiClient from '../api/apiClient';
 
 export default function Chatbot() {
+  const { currentUser } = useAuth();
   const [messages, setMessages] = useState([
-    { id: 1, sender: 'bot', text: 'Hello! I am your AI Financial Assistant. Ask me anything about budgeting, saving, or investing.' }
+    { id: 1, text: 'Hello! I am DreamSaver AI. I can analyze your income, expenses, and budgets to give you personalized financial advice. How can I help you today?', sender: 'bot' }
   ]);
   const [input, setInput] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const messagesEndRef = useRef(null);
 
-  const handleSend = async (e) => {
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  async function handleSend(e) {
     e.preventDefault();
     if (!input.trim()) return;
 
-    const userMsg = { id: Date.now(), sender: 'user', text: input };
-    setMessages(prev => [...prev, userMsg]);
+    const userMessage = { id: Date.now(), text: input, sender: 'user' };
+    setMessages(prev => [...prev, userMessage]);
     setInput('');
-    setLoading(true);
+    setIsLoading(true);
 
     try {
-      // Connect to the Render Java Backend Gemini API
-      const response = await fetch('https://personal-finance-management-app-backend.onrender.com/api/ai/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: userMsg.text })
+      // Use our secure apiClient that automatically attaches Firebase Tokens and X-User-Id
+      const res = await apiClient.post('/chat', {
+        message: userMessage.text
       });
-      const data = await response.json();
-      
-      const botMsg = { id: Date.now(), sender: 'bot', text: data.response || "I couldn't process that." };
-      setMessages(prev => [...prev, botMsg]);
+
+      const botMessage = {
+        id: Date.now() + 1,
+        text: res.data.reply || "I'm sorry, I couldn't process that request.",
+        sender: 'bot'
+      };
+      setMessages(prev => [...prev, botMessage]);
     } catch (error) {
-      setMessages(prev => [...prev, { id: Date.now(), sender: 'bot', text: "Network error. Please try again later." }]);
+      const errorMessage = {
+        id: Date.now() + 1,
+        text: "Sorry, I am having trouble connecting to the backend. Please try again.",
+        sender: 'bot'
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
     }
-    
-    setLoading(false);
-  };
+  }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 80px)' }}>
+    <div style={{ height: 'calc(100vh - 80px)', display: 'flex', flexDirection: 'column' }}>
+      
       <div style={{ marginBottom: '24px' }}>
-        <h1 style={{ fontSize: '28px', marginBottom: '8px' }}>AI Financial Assistant</h1>
-        <p className="text-muted">Powered by Google Gemini 3.5 Flash</p>
+        <h1 style={{ fontSize: '32px', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <Bot color="var(--accent-blue)" /> DreamSaver AI
+        </h1>
+        <p className="text-muted">Chat with your personalized financial assistant, trained on your real budget data.</p>
       </div>
 
-      <div className="dashboard-panel" style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: 0, overflow: 'hidden' }}>
+      <div className="dashboard-panel" style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', padding: 0 }}>
         
-        {/* Chat History */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          {messages.map(msg => (
-            <div key={msg.id} style={{ display: 'flex', gap: '16px', alignItems: 'flex-start', flexDirection: msg.sender === 'user' ? 'row-reverse' : 'row' }}>
-              
+        {/* Messages Area */}
+        <div style={{ flex: 1, overflowY: 'auto', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {messages.map((msg) => (
+            <div key={msg.id} style={{ display: 'flex', gap: '16px', flexDirection: msg.sender === 'user' ? 'row-reverse' : 'row' }}>
               <div style={{ 
-                width: '36px', height: '36px', borderRadius: '50%', flexShrink: 0,
-                background: msg.sender === 'bot' ? 'var(--surface-2)' : 'var(--accent-blue)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center'
+                width: '36px', height: '36px', borderRadius: '50%', 
+                background: msg.sender === 'user' ? 'var(--accent-blue)' : 'var(--bg-tertiary)',
+                color: msg.sender === 'user' ? 'white' : 'var(--text-primary)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
               }}>
-                {msg.sender === 'bot' ? <Bot size={18} /> : <User size={18} color="white" />}
+                {msg.sender === 'user' ? <User size={18} /> : <Bot size={18} />}
               </div>
-
-              <div style={{ 
-                background: msg.sender === 'bot' ? 'var(--surface-1)' : 'var(--accent-blue-hover)',
-                color: msg.sender === 'bot' ? 'var(--text-primary)' : 'white',
-                padding: '12px 16px', 
-                borderRadius: '12px',
-                borderTopLeftRadius: msg.sender === 'bot' ? 0 : '12px',
-                borderTopRightRadius: msg.sender === 'user' ? 0 : '12px',
-                maxWidth: '75%',
+              
+              <div style={{
+                background: msg.sender === 'user' ? 'var(--accent-blue)' : 'var(--bg-tertiary)',
+                color: msg.sender === 'user' ? 'white' : 'var(--text-primary)',
+                padding: '12px 16px',
+                borderRadius: '16px',
+                borderTopRightRadius: msg.sender === 'user' ? '4px' : '16px',
+                borderTopLeftRadius: msg.sender === 'bot' ? '4px' : '16px',
+                maxWidth: '70%',
                 lineHeight: 1.5,
-                fontSize: '14px'
+                boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
               }}>
                 {msg.text}
               </div>
             </div>
           ))}
-          {loading && (
-            <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
-               <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'var(--surface-2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          {isLoading && (
+            <div style={{ display: 'flex', gap: '16px' }}>
+              <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'var(--bg-tertiary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Bot size={18} />
               </div>
-              <div style={{ background: 'var(--surface-1)', padding: '12px 16px', borderRadius: '12px', borderTopLeftRadius: 0, fontSize: '14px', color: 'var(--text-secondary)' }}>
-                Thinking...
+              <div style={{ background: 'var(--bg-tertiary)', padding: '12px 16px', borderRadius: '16px', borderTopLeftRadius: '4px' }}>
+                <Loader2 className="lucide-spin" size={18} color="var(--text-secondary)" />
               </div>
             </div>
           )}
+          <div ref={messagesEndRef} />
         </div>
 
         {/* Input Area */}
-        <form onSubmit={handleSend} style={{ borderTop: '1px solid var(--border-light)', padding: '20px', display: 'flex', gap: '12px', background: 'var(--bg-secondary)' }}>
-          <input 
-            type="text" 
-            className="input-field" 
-            placeholder="Ask about saving for a house..." 
-            value={input}
-            onChange={e => setInput(e.target.value)}
-            disabled={loading}
-            style={{ flex: 1, border: '1px solid var(--border-focus)' }}
-          />
-          <button type="submit" disabled={loading || !input.trim()} className="btn-primary" style={{ padding: '0 20px' }}>
-            <Send size={18} />
-          </button>
-        </form>
-
+        <div style={{ padding: '24px', borderTop: '1px solid var(--border-light)', background: 'var(--bg-secondary)' }}>
+          <form onSubmit={handleSend} style={{ display: 'flex', gap: '12px' }}>
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Ask about your expenses, budgets, or get financial advice..."
+              className="input-field"
+              style={{ flex: 1, padding: '16px', borderRadius: '100px' }}
+              disabled={isLoading}
+            />
+            <button 
+              type="submit" 
+              className="btn-primary" 
+              disabled={isLoading || !input.trim()}
+              style={{ borderRadius: '100px', width: '52px', height: '52px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            >
+              <Send size={20} />
+            </button>
+          </form>
+        </div>
+        
       </div>
     </div>
   );

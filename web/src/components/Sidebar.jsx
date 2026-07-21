@@ -1,68 +1,98 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LayoutDashboard, MessageSquare, BookOpen, LogOut, Wallet } from 'lucide-react';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { LayoutDashboard, MessageSquare, BookOpen, LogOut, BrainCircuit } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function Sidebar() {
-  const { logout, currentUser } = useAuth();
+  const { currentUser, logout } = useAuth();
+  const navigate = useNavigate();
+
+  async function handleLogout() {
+    try {
+      await logout();
+      navigate('/login');
+    } catch (error) {
+      console.error('Failed to log out', error);
+    }
+  }
+
+  const navItems = [
+    { name: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard size={20} /> },
+    { name: 'AI Insights', path: '/ai-insights', icon: <BrainCircuit size={20} /> },
+    { name: 'DreamSaver AI', path: '/chatbot', icon: <MessageSquare size={20} /> },
+    { name: 'Financial Hub', path: '/blogs', icon: <BookOpen size={20} /> },
+  ];
 
   return (
-    <div className="sidebar">
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '40px' }}>
-        <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'var(--accent-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Wallet size={18} color="var(--bg-primary)" />
-        </div>
-        <h2 style={{ fontSize: '18px', fontWeight: 600 }}>Dream Saver</h2>
+    <div style={{
+      width: '260px',
+      height: '100vh',
+      position: 'fixed',
+      left: 0,
+      top: 0,
+      background: 'var(--bg-secondary)',
+      borderRight: '1px solid var(--border-light)',
+      display: 'flex',
+      flexDirection: 'column',
+      padding: '24px 0'
+    }}>
+      
+      {/* Brand & Logo */}
+      <div style={{ padding: '0 24px', marginBottom: '40px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <img src="/logo.webp" alt="Dream Saver Logo" style={{ width: '40px', height: '40px', borderRadius: '8px' }} />
+        <span style={{ fontSize: '20px', fontWeight: 700, letterSpacing: '-0.02em' }}>DreamSaver</span>
       </div>
 
-      <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
-        <NavLink 
-          to="/dashboard" 
-          className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
-        >
-          <LayoutDashboard size={18} />
-          Overview
-        </NavLink>
-        
-        <NavLink 
-          to="/chatbot" 
-          className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
-        >
-          <MessageSquare size={18} />
-          AI Assistant
-        </NavLink>
-        
-        <NavLink 
-          to="/blogs" 
-          className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
-        >
-          <BookOpen size={18} />
-          Financial Blogs
-        </NavLink>
-      </nav>
+      {/* Navigation */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1, padding: '0 16px' }}>
+        {navItems.map((item) => (
+          <NavLink 
+            key={item.path} 
+            to={item.path}
+            style={({ isActive }) => ({
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              padding: '12px 16px',
+              borderRadius: '8px',
+              color: isActive ? 'var(--accent-blue)' : 'var(--text-secondary)',
+              background: isActive ? 'var(--bg-primary)' : 'transparent',
+              textDecoration: 'none',
+              fontWeight: 500,
+              transition: 'all 0.2s'
+            })}
+          >
+            {item.icon}
+            {item.name}
+          </NavLink>
+        ))}
+      </div>
 
-      <div style={{ marginTop: 'auto', borderTop: '1px solid var(--border-light)', paddingTop: '24px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-          <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--surface-2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>
-              {currentUser?.email?.charAt(0).toUpperCase() || 'U'}
-            </span>
+      {/* User Profile Footer */}
+      <div style={{ padding: '0 24px', marginTop: 'auto' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '16px 0', borderTop: '1px solid var(--border-light)' }}>
+          <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--accent-blue)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600 }}>
+            {currentUser?.email?.charAt(0).toUpperCase()}
           </div>
-          <div style={{ overflow: 'hidden' }}>
-            <p style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-primary)', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
+          <div style={{ flex: 1, overflow: 'hidden' }}>
+            <div style={{ fontSize: '14px', fontWeight: 600, textOverflow: 'ellipsis', overflow: 'hidden' }}>
+              {currentUser?.displayName || 'User'}
+            </div>
+            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', textOverflow: 'ellipsis', overflow: 'hidden' }}>
               {currentUser?.email}
-            </p>
+            </div>
           </div>
+          <button 
+            onClick={handleLogout}
+            style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}
+            title="Sign Out"
+          >
+            <LogOut size={20} />
+          </button>
         </div>
-        <button 
-          onClick={logout}
-          className="nav-item" 
-          style={{ width: '100%', background: 'transparent', border: 'none', color: 'var(--danger)', cursor: 'pointer' }}
-        >
-          <LogOut size={18} />
-          Sign Out
-        </button>
       </div>
+
     </div>
   );
 }

@@ -1,88 +1,221 @@
-import React from 'react';
-import { ArrowUpRight, ArrowDownRight, DollarSign, CreditCard } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
+import apiClient from '../api/apiClient';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { Download, TrendingUp, TrendingDown, Wallet, Loader2 } from 'lucide-react';
+import { jsPDF } from 'jspdf';
+import 'jspdf-autotable';
 
 export default function Dashboard() {
+  const { currentUser } = useAuth();
+  
+  const [expenses, setExpenses] = useState([]);
+  const [incomes, setIncomes] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const [expenseRes, incomeRes] = await Promise.all([
+          apiClient.get('/expenses'),
+          apiClient.get('/incomes')
+        ]);
+        setExpenses(expenseRes.data || []);
+        setIncomes(incomeRes.data || []);
+      } catch (error) {
+        console.error("Error fetching financial data:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
+
+  // Calculate KPIs
+  const totalExpenses = expenses.reduce((acc, curr) => acc + curr.amount, 0);
+  const totalIncome = incomes.reduce((acc, curr) => acc + curr.amount, 0);
+  const balance = totalIncome - totalExpenses;
+
+  // Process data for charts
+  const getMonthlyData = () => {
+    const data = {};
+    expenses.forEach(e => {
+      const date = new Date(e.date);
+      const month = date.toLocaleString('default', { month: 'short' });
+      if (!data[month]) data[month] = { name: month, Expenses: 0, Income: 0 };
+      data[month].Expenses += e.amount;
+    });
+    incomes.forEach(i => {
+      const date = new Date(i.date);
+      const month = date.toLocaleString('default', { month: 'short' });
+      if (!data[month]) data[month] = { name: month, Expenses: 0, Income: 0 };
+      data[month].Income += i.amount;
+    });
+    return Object.values(data);
+  };
+
+  const chartData = getMonthlyData();
+
+  const exportPDF = () => {
+    const doc = new jsPDF();
+    doc.setFontSize(20);
+    doc.text('DreamSaver Financial Report', 14, 22);
+    
+    doc.setFontSize(12);
+    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 32);
+    doc.text(`Total Income: LKR ${totalIncome.toLocaleString()}`, 14, 42);
+    doc.text(`Total Expenses: LKR ${totalExpenses.toLocaleString()}`, 14, 48);
+    doc.text(`Net Balance: LKR ${balance.toLocaleString()}`, 14, 54);
+
+    const tableData = expenses.map(e => [
+      new Date(e.date).toLocaleDateString(),
+      e.category,
+      e.description || 'N/A',
+      `LKR ${e.amount.toLocaleString()}`
+    ]);
+
+    doc.autoTable({
+      startY: 65,
+      head: [['Date', 'Category', 'Description', 'Amount']],
+      body: tableData,
+    });
+
+    doc.save('DreamSaver_Financial_Report.pdf');
+  };
+
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
+        <Loader2 className="lucide-spin" size={48} color="var(--accent-blue)" />
+      </div>
+    );
+  }
+
   return (
     <div>
-      <div style={{ marginBottom: '32px' }}>
-        <h1 style={{ fontSize: '28px', marginBottom: '8px' }}>Financial Overview</h1>
-        <p className="text-muted">Welcome back! Here's what's happening with your finances today.</p>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+        <div>
+          <h1 style={{ fontSize: '32px', marginBottom: '8px' }}>Dashboard Overview</h1>
+          <p className="text-muted">Welcome back, {currentUser?.displayName || currentUser?.email}</p>
+        </div>
+        <button className="btn-primary" onClick={exportPDF} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Download size={18} /> Export PDF Report
+        </button>
       </div>
 
       {/* KPI Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '24px', marginBottom: '40px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px', marginBottom: '32px' }}>
         
         <div className="dashboard-panel">
-          <div className="flex-between" style={{ marginBottom: '16px' }}>
-            <span className="text-muted" style={{ fontSize: '14px', fontWeight: 500 }}>Total Balance</span>
-            <DollarSign size={18} className="text-muted" />
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
+            <span className="text-muted" style={{ fontWeight: 500 }}>Total Balance</span>
+            <div style={{ background: 'rgba(37, 99, 235, 0.1)', padding: '8px', borderRadius: '8px' }}>
+              <Wallet size={20} color="var(--accent-blue)" />
+            </div>
           </div>
-          <h2 style={{ fontSize: '32px', marginBottom: '8px' }}>Rs. 124,500.00</h2>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--success)', fontSize: '14px', fontWeight: 500 }}>
-            <ArrowUpRight size={16} />
-            <span>+12.5% from last month</span>
+          <h2 style={{ fontSize: '36px', marginBottom: '8px' }}>LKR {balance.toLocaleString()}</h2>
+        </div>
+
+        <div className="dashboard-panel">
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
+            <span className="text-muted" style={{ fontWeight: 500 }}>Total Income</span>
+            <div style={{ background: 'rgba(16, 185, 129, 0.1)', padding: '8px', borderRadius: '8px' }}>
+              <TrendingUp size={20} color="var(--success)" />
+            </div>
+          </div>
+          <h2 style={{ fontSize: '36px', marginBottom: '8px' }}>LKR {totalIncome.toLocaleString()}</h2>
+        </div>
+
+        <div className="dashboard-panel">
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
+            <span className="text-muted" style={{ fontWeight: 500 }}>Total Expenses</span>
+            <div style={{ background: 'rgba(239, 68, 68, 0.1)', padding: '8px', borderRadius: '8px' }}>
+              <TrendingDown size={20} color="var(--danger)" />
+            </div>
+          </div>
+          <h2 style={{ fontSize: '36px', marginBottom: '8px' }}>LKR {totalExpenses.toLocaleString()}</h2>
+        </div>
+      </div>
+
+      {/* Charts Section */}
+      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px', marginBottom: '32px' }}>
+        <div className="dashboard-panel">
+          <h3 style={{ marginBottom: '24px' }}>Cash Flow Trend</h3>
+          <div style={{ height: '300px' }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={chartData}>
+                <defs>
+                  <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="var(--success)" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="var(--success)" stopOpacity={0}/>
+                  </linearGradient>
+                  <linearGradient id="colorExpense" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="var(--danger)" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="var(--danger)" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-light)" />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: 'var(--text-secondary)'}} />
+                <YAxis axisLine={false} tickLine={false} tick={{fill: 'var(--text-secondary)'}} />
+                <Tooltip contentStyle={{ borderRadius: '8px', border: '1px solid var(--border-light)', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }} />
+                <Area type="monotone" dataKey="Income" stroke="var(--success)" fillOpacity={1} fill="url(#colorIncome)" />
+                <Area type="monotone" dataKey="Expenses" stroke="var(--danger)" fillOpacity={1} fill="url(#colorExpense)" />
+              </AreaChart>
+            </ResponsiveContainer>
           </div>
         </div>
 
         <div className="dashboard-panel">
-          <div className="flex-between" style={{ marginBottom: '16px' }}>
-            <span className="text-muted" style={{ fontSize: '14px', fontWeight: 500 }}>Monthly Expenses</span>
-            <CreditCard size={18} className="text-muted" />
-          </div>
-          <h2 style={{ fontSize: '32px', marginBottom: '8px' }}>Rs. 42,300.00</h2>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--danger)', fontSize: '14px', fontWeight: 500 }}>
-            <ArrowDownRight size={16} />
-            <span>+4.2% from last month</span>
-          </div>
-        </div>
-
-        <div className="dashboard-panel">
-          <div className="flex-between" style={{ marginBottom: '16px' }}>
-            <span className="text-muted" style={{ fontSize: '14px', fontWeight: 500 }}>Savings Goal</span>
-            <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--success)' }}></div>
-          </div>
-          <h2 style={{ fontSize: '32px', marginBottom: '8px' }}>68%</h2>
-          <div style={{ width: '100%', height: '6px', background: 'var(--surface-2)', borderRadius: '4px', overflow: 'hidden', marginTop: '12px' }}>
-            <div style={{ width: '68%', height: '100%', background: 'var(--text-primary)' }}></div>
+          <h3 style={{ marginBottom: '24px' }}>Monthly Comparison</h3>
+          <div style={{ height: '300px' }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-light)" />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: 'var(--text-secondary)'}} />
+                <Tooltip cursor={{fill: 'rgba(0,0,0,0.02)'}} />
+                <Bar dataKey="Income" fill="var(--success)" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="Expenses" fill="var(--danger)" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
         </div>
       </div>
 
-      {/* Transactions Table */}
-      <h2 style={{ fontSize: '20px', marginBottom: '16px' }}>Recent Transactions</h2>
-      <div className="dashboard-panel" style={{ padding: 0, overflow: 'hidden' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-          <thead>
-            <tr style={{ borderBottom: '1px solid var(--border-light)', background: 'var(--surface-1)' }}>
-              <th style={{ padding: '16px 24px', fontWeight: 500, fontSize: '13px', color: 'var(--text-secondary)' }}>Transaction</th>
-              <th style={{ padding: '16px 24px', fontWeight: 500, fontSize: '13px', color: 'var(--text-secondary)' }}>Category</th>
-              <th style={{ padding: '16px 24px', fontWeight: 500, fontSize: '13px', color: 'var(--text-secondary)' }}>Date</th>
-              <th style={{ padding: '16px 24px', fontWeight: 500, fontSize: '13px', color: 'var(--text-secondary)', textAlign: 'right' }}>Amount</th>
-            </tr>
-          </thead>
-          <tbody>
-            {[
-              { id: 1, name: 'Keells Supermarket', category: 'Groceries', date: 'Oct 24, 2026', amount: -4500 },
-              { id: 2, name: 'Salary Deposit', category: 'Income', date: 'Oct 23, 2026', amount: 150000 },
-              { id: 3, name: 'Uber Rides', category: 'Transport', date: 'Oct 21, 2026', amount: -1250 },
-              { id: 4, name: 'Dialog Broadband', category: 'Bills', date: 'Oct 19, 2026', amount: -3900 },
-            ].map((tx) => (
-              <tr key={tx.id} style={{ borderBottom: '1px solid var(--border-light)' }}>
-                <td style={{ padding: '16px 24px', fontSize: '14px', fontWeight: 500 }}>{tx.name}</td>
-                <td style={{ padding: '16px 24px' }}>
-                  <span style={{ padding: '4px 8px', background: 'var(--surface-2)', borderRadius: '4px', fontSize: '12px', fontWeight: 500 }}>
-                    {tx.category}
-                  </span>
-                </td>
-                <td style={{ padding: '16px 24px', fontSize: '14px', color: 'var(--text-secondary)' }}>{tx.date}</td>
-                <td style={{ padding: '16px 24px', fontSize: '14px', fontWeight: 600, textAlign: 'right', color: tx.amount > 0 ? 'var(--success)' : 'var(--text-primary)' }}>
-                  {tx.amount > 0 ? '+' : ''}Rs. {Math.abs(tx.amount).toLocaleString()}
-                </td>
+      {/* Recent Transactions List */}
+      <div className="dashboard-panel">
+        <h3 style={{ marginBottom: '24px' }}>Recent Transactions</h3>
+        {expenses.length === 0 ? (
+          <p className="text-muted">No transactions found. Start using the mobile app to sync data!</p>
+        ) : (
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr style={{ borderBottom: '2px solid var(--border-light)', textAlign: 'left' }}>
+                <th style={{ padding: '12px', color: 'var(--text-secondary)', fontWeight: 500 }}>Date</th>
+                <th style={{ padding: '12px', color: 'var(--text-secondary)', fontWeight: 500 }}>Category</th>
+                <th style={{ padding: '12px', color: 'var(--text-secondary)', fontWeight: 500 }}>Description</th>
+                <th style={{ padding: '12px', color: 'var(--text-secondary)', fontWeight: 500, textAlign: 'right' }}>Amount</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {expenses.slice(0, 5).map((tx, idx) => (
+                <tr key={idx} style={{ borderBottom: '1px solid var(--border-light)' }}>
+                  <td style={{ padding: '16px 12px' }}>{new Date(tx.date).toLocaleDateString()}</td>
+                  <td style={{ padding: '16px 12px' }}>
+                    <span style={{ background: 'var(--bg-tertiary)', padding: '4px 12px', borderRadius: '100px', fontSize: '12px', fontWeight: 500 }}>
+                      {tx.category}
+                    </span>
+                  </td>
+                  <td style={{ padding: '16px 12px' }}>{tx.description || 'N/A'}</td>
+                  <td style={{ padding: '16px 12px', textAlign: 'right', fontWeight: 600, color: 'var(--danger)' }}>
+                    - LKR {tx.amount.toLocaleString()}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
+
     </div>
   );
 }

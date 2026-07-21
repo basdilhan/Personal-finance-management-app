@@ -1,65 +1,89 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { AnimatePresence, motion } from 'framer-motion';
 
+// Components
 import Sidebar from './components/Sidebar';
+
+// Pages
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Chatbot from './pages/Chatbot';
 import Blogs from './pages/Blogs';
+import MLInsights from './pages/MLInsights';
 
 // Protected Route Wrapper
 const PrivateRoute = ({ children }) => {
-  const { currentUser } = useAuth();
-  return currentUser ? children : <Navigate to="/login" />;
-};
-
-// Layout Wrapper with Sidebar
-const DashboardLayout = ({ children }) => {
+  const { currentUser, loading } = useAuth();
+  
+  if (loading) return <div style={{ padding: '40px' }}>Loading DreamSaver...</div>;
+  if (!currentUser) return <Navigate to="/login" />;
+  
   return (
     <div className="layout-container">
       <Sidebar />
       <div className="main-content">
-        {children}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.3 }}
+        >
+          {children}
+        </motion.div>
       </div>
     </div>
   );
 };
 
-export default function App() {
+// Animated Routes
+const AnimatedRoutes = () => {
+  const location = useLocation();
+
+  return (
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/login" element={<Login />} />
+        
+        <Route path="/dashboard" element={
+          <PrivateRoute>
+            <Dashboard />
+          </PrivateRoute>
+        } />
+        
+        <Route path="/ai-insights" element={
+          <PrivateRoute>
+            <MLInsights />
+          </PrivateRoute>
+        } />
+
+        <Route path="/chatbot" element={
+          <PrivateRoute>
+            <Chatbot />
+          </PrivateRoute>
+        } />
+        
+        <Route path="/blogs" element={
+          <PrivateRoute>
+            <Blogs />
+          </PrivateRoute>
+        } />
+
+        <Route path="/" element={<Navigate to="/dashboard" />} />
+      </Routes>
+    </AnimatePresence>
+  );
+};
+
+function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          
-          <Route path="/" element={<Navigate to="/dashboard" />} />
-          
-          <Route path="/dashboard" element={
-            <PrivateRoute>
-              <DashboardLayout>
-                <Dashboard />
-              </DashboardLayout>
-            </PrivateRoute>
-          } />
-          
-          <Route path="/chatbot" element={
-            <PrivateRoute>
-              <DashboardLayout>
-                <Chatbot />
-              </DashboardLayout>
-            </PrivateRoute>
-          } />
-
-          <Route path="/blogs" element={
-            <PrivateRoute>
-              <DashboardLayout>
-                <Blogs />
-              </DashboardLayout>
-            </PrivateRoute>
-          } />
-        </Routes>
-      </BrowserRouter>
+      <Router>
+        <AnimatedRoutes />
+      </Router>
     </AuthProvider>
   );
 }
+
+export default App;

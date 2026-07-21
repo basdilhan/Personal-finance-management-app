@@ -1,70 +1,79 @@
 import React from 'react';
-import { ArrowRight, BookOpen } from 'lucide-react';
+import { BookOpen, Clock, ArrowRight } from 'lucide-react';
 
 export default function Blogs() {
-  const articles = [
+  const blogs = [
     {
       id: 1,
-      category: 'Investing',
-      title: 'The 50/30/20 Rule: A Simple Guide to Budgeting',
-      excerpt: 'Learn how to split your income between needs, wants, and savings to build long-term financial stability without feeling restricted.',
-      readTime: '5 min read',
-      date: 'Oct 20, 2026',
-      image: 'https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?auto=format&fit=crop&q=80&w=800'
+      title: "Mastering the 50/30/20 Budgeting Rule",
+      excerpt: "Learn how to divide your income between needs, wants, and savings to achieve financial freedom faster.",
+      category: "Budgeting",
+      readTime: "5 min read",
+      image: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&q=80&w=600"
     },
     {
       id: 2,
-      category: 'Saving',
-      title: 'How to Build an Emergency Fund in 6 Months',
-      excerpt: 'Unexpected expenses happen. Discover actionable strategies to build a 3-month emergency safety net even on a tight budget.',
-      readTime: '8 min read',
-      date: 'Oct 15, 2026',
-      image: 'https://images.unsplash.com/photo-1601597111158-2fceff292cdc?auto=format&fit=crop&q=80&w=800'
+      title: "Emergency Funds: Your Financial Safety Net",
+      excerpt: "Why you need 6 months of living expenses saved up, and exactly how to build it without feeling broke.",
+      category: "Savings",
+      readTime: "4 min read",
+      image: "https://images.unsplash.com/photo-1633158829585-23ba8f7c8caf?auto=format&fit=crop&q=80&w=600"
     },
     {
       id: 3,
-      category: 'Debt',
-      title: 'Snowball vs. Avalanche: Paying Off Debt Fast',
-      excerpt: 'Compare the two most popular debt payoff strategies and find out which psychological approach works best for your personal situation.',
-      readTime: '6 min read',
-      date: 'Oct 10, 2026',
-      image: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&q=80&w=800'
+      title: "The Avalanche vs. Snowball Method",
+      excerpt: "Two proven strategies for paying off debt. Find out which psychological approach works best for you.",
+      category: "Debt",
+      readTime: "6 min read",
+      image: "https://images.unsplash.com/photo-1579621970588-a35d0e7ab9b6?auto=format&fit=crop&q=80&w=600"
     }
   ];
 
   return (
     <div>
       <div style={{ marginBottom: '32px' }}>
-        <h1 style={{ fontSize: '28px', marginBottom: '8px' }}>Financial Education</h1>
-        <p className="text-muted">Master your money with our curated guides and articles.</p>
+        <h1 style={{ fontSize: '32px', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <BookOpen color="var(--accent-blue)" /> Financial Hub
+        </h1>
+        <p className="text-muted">Expert articles to help you make smarter financial decisions.</p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
-        {articles.map(article => (
-          <div key={article.id} className="dashboard-panel" style={{ padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ width: '100%', height: '200px', backgroundImage: `url(${article.image})`, backgroundSize: 'cover', backgroundPosition: 'center' }}></div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '24px' }}>
+        {blogs.map(blog => (
+          <div key={blog.id} className="dashboard-panel" style={{ padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ height: '200px', width: '100%', overflow: 'hidden' }}>
+              <img 
+                src={blog.image} 
+                alt={blog.title} 
+                style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s ease' }}
+                onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+              />
+            </div>
             
-            <div style={{ padding: '24px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+            <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', flex: 1 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                <span style={{ color: 'var(--accent-blue)', fontSize: '13px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                  {article.category}
+                <span style={{ 
+                  background: 'rgba(37, 99, 235, 0.1)', 
+                  color: 'var(--accent-blue)', 
+                  padding: '4px 12px', 
+                  borderRadius: '100px', 
+                  fontSize: '12px', 
+                  fontWeight: 600 
+                }}>
+                  {blog.category}
                 </span>
-                <span className="text-muted" style={{ fontSize: '13px' }}>
-                  {article.readTime}
+                <span className="text-muted" style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px' }}>
+                  <Clock size={14} /> {blog.readTime}
                 </span>
               </div>
               
-              <h2 style={{ fontSize: '20px', marginBottom: '12px' }}>{article.title}</h2>
-              <p className="text-muted" style={{ fontSize: '14px', marginBottom: '24px', flex: 1 }}>
-                {article.excerpt}
-              </p>
+              <h3 style={{ fontSize: '20px', marginBottom: '12px', lineHeight: 1.3 }}>{blog.title}</h3>
+              <p className="text-muted" style={{ fontSize: '14px', marginBottom: '24px', flex: 1 }}>{blog.excerpt}</p>
               
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid var(--border-light)', paddingTop: '16px', marginTop: 'auto' }}>
-                <span className="text-muted" style={{ fontSize: '13px' }}>{article.date}</span>
-                <button style={{ background: 'none', border: 'none', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: 500, cursor: 'pointer' }}>
-                  Read More <ArrowRight size={16} />
-                </button>
-              </div>
+              <button className="btn-secondary" style={{ width: '100%', display: 'flex', justifyContent: 'center', gap: '8px' }}>
+                Read Article <ArrowRight size={16} />
+              </button>
             </div>
           </div>
         ))}
