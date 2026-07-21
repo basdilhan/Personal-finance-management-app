@@ -2,7 +2,7 @@ import React from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, MessageSquare, BookOpen, LogOut, BrainCircuit, Moon, Sun } from 'lucide-react';
+import { LayoutDashboard, MessageSquare, BookOpen, LogOut, BrainCircuit, Moon, Sun, User } from 'lucide-react';
 
 export default function Sidebar() {
   const { currentUser, logout } = useAuth();
@@ -20,6 +20,7 @@ export default function Sidebar() {
 
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard size={20} /> },
+    { name: 'My Profile', path: '/profile', icon: <User size={20} /> },
     { name: 'AI Insights', path: '/ai-insights', icon: <BrainCircuit size={20} /> },
     { name: 'DreamSaver AI', path: '/chatbot', icon: <MessageSquare size={20} /> },
     { name: 'Financial Hub', path: '/blogs', icon: <BookOpen size={20} /> },
