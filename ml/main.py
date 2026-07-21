@@ -1,4 +1,9 @@
 import os
+# Limit threads to reduce memory usage (Fixes OOM Status 137 on Render 512MB)
+os.environ["OMP_NUM_THREADS"] = "1"
+os.environ["MKL_NUM_THREADS"] = "1"
+os.environ["OPENBLAS_NUM_THREADS"] = "1"
+
 from fastapi import FastAPI, Depends, HTTPException, Header
 from pydantic import BaseModel
 from typing import List
@@ -6,8 +11,9 @@ import pandas as pd
 import numpy as np
 from sklearn.cluster import KMeans
 from transformers import pipeline
-from chronos import ChronosPipeline
 import torch
+torch.set_num_threads(1)
+from chronos import ChronosPipeline
 
 # --- Security Setup ---
 INTERNAL_API_KEY = os.getenv("ML_SERVICE_API_KEY", "dev_secret_key_123")
