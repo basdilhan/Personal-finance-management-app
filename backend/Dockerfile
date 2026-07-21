@@ -2,7 +2,8 @@ FROM gradle:8.4-jdk17 AS builder
 WORKDIR /app
 COPY . /app
 RUN chmod +x ./gradlew
-RUN ./gradlew build -x test
+ENV GRADLE_OPTS="-Xmx256m -Dorg.gradle.daemon=false"
+RUN ./gradlew build -x test --no-daemon
 
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
