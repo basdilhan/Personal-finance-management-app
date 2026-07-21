@@ -117,8 +117,13 @@ import requests
 async def auto_categorize(req: CategorizeRequest):
     API_URL = "https://api-inference.huggingface.co/models/samudu123/srilanka-transaction-classifier"
     
+    HF_TOKEN = os.getenv("HF_API_TOKEN", "")
+    headers = {}
+    if HF_TOKEN:
+        headers["Authorization"] = f"Bearer {HF_TOKEN}"
+        
     try:
-        response = requests.post(API_URL, json={"inputs": req.description})
+        response = requests.post(API_URL, headers=headers, json={"inputs": req.description})
         result = response.json()
         
         # Parse inference API response
