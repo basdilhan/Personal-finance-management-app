@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import apiClient from '../api/apiClient';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
-import { Download, TrendingUp, TrendingDown, Wallet, Loader2 } from 'lucide-react';
+import { Download, TrendingUp, TrendingDown, Wallet, Loader2, Calendar } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 
@@ -11,17 +11,20 @@ export default function Dashboard() {
   
   const [expenses, setExpenses] = useState([]);
   const [incomes, setIncomes] = useState([]);
+  const [bills, setBills] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const [expenseRes, incomeRes] = await Promise.all([
+        const [expenseRes, incomeRes, billRes] = await Promise.all([
           apiClient.get('/expenses'),
-          apiClient.get('/incomes')
+          apiClient.get('/incomes'),
+          apiClient.get('/bills').catch(() => ({ data: [] }))
         ]);
         setExpenses(expenseRes.data || []);
         setIncomes(incomeRes.data || []);
+        setBills(billRes.data || []);
       } catch (error) {
         console.error("Error fetching financial data:", error);
       } finally {
@@ -181,39 +184,69 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Recent Transactions List */}
-      <div className="dashboard-panel">
-        <h3 style={{ marginBottom: '24px' }}>Recent Transactions</h3>
-        {expenses.length === 0 ? (
-          <p className="text-muted">No transactions found. Start using the mobile app to sync data!</p>
-        ) : (
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr style={{ borderBottom: '2px solid var(--border-light)', textAlign: 'left' }}>
-                <th style={{ padding: '12px', color: 'var(--text-secondary)', fontWeight: 500 }}>Date</th>
-                <th style={{ padding: '12px', color: 'var(--text-secondary)', fontWeight: 500 }}>Category</th>
-                <th style={{ padding: '12px', color: 'var(--text-secondary)', fontWeight: 500 }}>Description</th>
-                <th style={{ padding: '12px', color: 'var(--text-secondary)', fontWeight: 500, textAlign: 'right' }}>Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              {expenses.slice(0, 5).map((tx, idx) => (
-                <tr key={idx} style={{ borderBottom: '1px solid var(--border-light)' }}>
-                  <td style={{ padding: '16px 12px' }}>{new Date(tx.date).toLocaleDateString()}</td>
-                  <td style={{ padding: '16px 12px' }}>
-                    <span style={{ background: 'var(--bg-tertiary)', padding: '4px 12px', borderRadius: '100px', fontSize: '12px', fontWeight: 500 }}>
-                      {tx.category}
-                    </span>
-                  </td>
-                  <td style={{ padding: '16px 12px' }}>{tx.description || 'N/A'}</td>
-                  <td style={{ padding: '16px 12px', textAlign: 'right', fontWeight: 600, color: 'var(--danger)' }}>
-                    - LKR {tx.amount.toLocaleString()}
-                  </td>
+      {/* Bottom Section: Transactions & Bills */}
+      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px' }}>
+        
+        {/* Recent Transactions List */}
+        <div className="dashboard-panel">
+          <h3 style={{ marginBottom: '24px' }}>Recent Transactions</h3>
+          {expenses.length === 0 ? (
+            <p className="text-muted">No transactions found. Start using the mobile app to sync data!</p>
+          ) : (
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr style={{ borderBottom: '2px solid var(--border-light)', textAlign: 'left' }}>
+                  <th style={{ padding: '12px', color: 'var(--text-secondary)', fontWeight: 500 }}>Date</th>
+                  <th style={{ padding: '12px', color: 'var(--text-secondary)', fontWeight: 500 }}>Category</th>
+                  <th style={{ padding: '12px', color: 'var(--text-secondary)', fontWeight: 500, textAlign: 'right' }}>Amount</th>
                 </tr>
+              </thead>
+              <tbody>
+                {expenses.slice(0, 5).map((tx, idx) => (
+                  <tr key={idx} style={{ borderBottom: '1px solid var(--border-light)' }}>
+                    <td style={{ padding: '16px 12px' }}>{new Date(tx.date).toLocaleDateString()}</td>
+                    <td style={{ padding: '16px 12px' }}>
+                      <span style={{ background: 'var(--bg-tertiary)', padding: '4px 12px', borderRadius: '100px', fontSize: '12px', fontWeight: 500 }}>
+                        {tx.category}
+                      </span>
+                    </td>
+                    <td style={{ padding: '16px 12px', textAlign: 'right', fontWeight: 600, color: 'var(--danger)' }}>
+                      - LKR {tx.amount.toLocaleString()}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+
+        {/* Upcoming Bills List */}
+        <div className="dashboard-panel">
+          <h3 style={{ marginBottom: '24px' }}>Upcoming Bills</h3>
+          {bills.length === 0 ? (
+            <p className="text-muted">No upcoming bills found.</p>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {bills.slice(0, 5).map((bill, idx) => (
+                <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px', background: 'var(--bg-primary)', borderRadius: '8px', border: '1px solid var(--border-light)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{ background: 'rgba(245, 158, 11, 0.1)', padding: '8px', borderRadius: '8px' }}>
+                      <Calendar size={18} color="var(--warning, #f59e0b)" />
+                    </div>
+                    <div>
+                      <p style={{ margin: 0, fontWeight: 500 }}>{bill.name}</p>
+                      <p className="text-muted" style={{ margin: 0, fontSize: '12px' }}>Due: {new Date(bill.dueDate).toLocaleDateString()}</p>
+                    </div>
+                  </div>
+                  <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
+                    LKR {bill.amount.toLocaleString()}
+                  </span>
+                </div>
               ))}
-            </tbody>
-          </table>
-        )}
+            </div>
+          )}
+        </div>
+
       </div>
 
     </div>

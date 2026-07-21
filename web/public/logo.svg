@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="108" height="108" viewBox="0 0 108 108">
   <rect width="108" height="108" rx="24" fill="#0B0F19"/>
   <circle cx="54" cy="54" r="32" fill="none" stroke="#FFD54F" stroke-width="4"/>
-  <text x="54" y="68" font-family="Arial, sans-serif" font-weight="bold" font-size="40" fill="#FFD54F" text-anchor="middle" letter-spacing="-4">PS</text>
-  <path d="M54,20 L54,88" stroke="#FFD54F" stroke-width="2" opacity="0.5"/>
+  <text x="54" y="69" font-family="Arial, sans-serif" font-weight="bold" font-size="44" fill="#FFD54F" text-anchor="middle">$</text>
+  <path d="M54,18 L54,90" stroke="#FFD54F" stroke-width="3" opacity="0.8"/>
 </svg>
