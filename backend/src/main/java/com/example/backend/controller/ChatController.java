@@ -1,7 +1,9 @@
 package com.example.backend.controller;
 
+import com.example.backend.entity.BillEntity;
 import com.example.backend.entity.ExpenseEntity;
 import com.example.backend.entity.IncomeEntity;
+import com.example.backend.repository.BillRepository;
 import com.example.backend.repository.BudgetLimitRepository;
 import com.example.backend.repository.ExpenseRepository;
 import com.example.backend.repository.IncomeRepository;
@@ -26,17 +28,20 @@ public class ChatController {
     private final ExpenseRepository expenseRepository;
     private final IncomeRepository incomeRepository;
     private final BudgetLimitRepository budgetLimitRepository;
+    private final BillRepository billRepository;
 
     public ChatController(MLServiceClient mlServiceClient,
                           GeminiService geminiService,
                           ExpenseRepository expenseRepository,
                           IncomeRepository incomeRepository,
-                          BudgetLimitRepository budgetLimitRepository) {
+                          BudgetLimitRepository budgetLimitRepository,
+                          BillRepository billRepository) {
         this.mlServiceClient = mlServiceClient;
         this.geminiService = geminiService;
         this.expenseRepository = expenseRepository;
         this.incomeRepository = incomeRepository;
         this.budgetLimitRepository = budgetLimitRepository;
+        this.billRepository = billRepository;
     }
 
     @PostMapping
@@ -83,6 +88,7 @@ public class ChatController {
 
             List<ExpenseEntity> allExpenses = expenseRepository.findByUserIdAndIsDeletedFalseOrderByDateDesc(userId);
             List<IncomeEntity> allIncomes = incomeRepository.findByUserIdAndIsDeletedFalseOrderByDateDesc(userId);
+            List<BillEntity> allBills = billRepository.findByUserIdAndIsDeletedFalseOrderByDueDateAsc(userId);
 
             // Fetch ML Forecast
             // Get the last 6 months of historical expenses (aggregated by month)
@@ -108,6 +114,17 @@ public class ChatController {
                     .map(ExpenseEntity::getAmount)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
 
+            BigDecimal monthlyPaidBills = allBills.stream()
+                    .filter(b -> "paid".equalsIgnoreCase(b.getStatus()))
+                    .filter(b -> {
+                        long epochMs = b.getDueDate() < 10000000000L ? b.getDueDate() * 1000L : b.getDueDate();
+                        return epochMs >= monthStart && epochMs <= monthEnd;
+                    })
+                    .map(BillEntity::getAmount)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            monthlyExpenses = monthlyExpenses.add(monthlyPaidBills);
+
             BigDecimal monthlyIncome = allIncomes.stream()
                     .filter(i -> {
                         long epochMs = i.getDate() < 10000000000L ? i.getDate() * 1000L : i.getDate();
@@ -116,8 +133,10 @@ public class ChatController {
                     .map(IncomeEntity::getAmount)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
 
+            boolean isFallback = false;
             Double predictedNextMonthExpense = mlServiceClient.generateForecast(userId, historicalData);
             if (predictedNextMonthExpense == null || predictedNextMonthExpense <= 0.0) {
+                isFallback = true;
                 if (monthlyExpenses.compareTo(BigDecimal.ZERO) > 0) {
                     predictedNextMonthExpense = monthlyExpenses.doubleValue() * 1.05;
                 } else if (monthlyIncome.compareTo(BigDecimal.ZERO) > 0) {
@@ -140,18 +159,21 @@ public class ChatController {
                     .map(e -> e.getKey() + " (LKR " + e.getValue().toPlainString() + ")")
                     .orElse("None");
 
+            String forecastMethodMsg = isFallback ? "Note: This forecast is a basic math projection. Tell the user we need at least 2 full months of data to unlock the true Machine Learning predictions." : "";
+
             return String.format(
                 "Total income this month: LKR %s.\n" +
-                "Total expenses this month: LKR %s.\n" +
+                "Total expenses this month (including paid bills): LKR %s.\n" +
                 "Remaining balance: LKR %s.\n" +
                 "Highest spending category: %s.\n" +
-                "Machine Learning Forecast for Next Month's Expenses: LKR %.2f.\n" +
-                "Instructions: Present the next month's forecast figure naturally to the user as their projected expense estimate. Do NOT say that 2 months of data is required.",
+                "Forecasted Expenses for Next Month: LKR %.2f.\n" +
+                "Instructions: Present the next month's forecast figure naturally to the user. %s",
                 monthlyIncome.toPlainString(),
                 monthlyExpenses.toPlainString(),
                 monthlyIncome.subtract(monthlyExpenses).toPlainString(),
                 topCategory,
-                predictedNextMonthExpense
+                predictedNextMonthExpense,
+                forecastMethodMsg
             );
         } catch (Exception e) {
             return "User is tracking their personal finances in Sri Lankan Rupees (LKR). Help them manage their budget wisely.";

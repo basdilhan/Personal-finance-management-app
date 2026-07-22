@@ -43,6 +43,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.android.material.button.MaterialButton;
 import com.team.financeapp.auth.AuthManager;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.team.financeapp.notifications.FcmTokenUploader;
 import com.team.financeapp.data.repository.GoalRepository;
 import com.team.financeapp.data.repository.BillRepository;
 import com.team.financeapp.data.repository.ExpenseRepository;
@@ -150,6 +152,10 @@ public class DashboardActivity extends AppCompatActivity {
         setupBackPressedCallback();
         loadDashboardData();
         
+        // Refresh FCM Token on every app launch to ensure it's up to date
+        FirebaseMessaging.getInstance().getToken()
+                .addOnSuccessListener(token -> FcmTokenUploader.uploadToken(this, token));
+
         LocalBroadcastManager.getInstance(this).registerReceiver(logoutReceiver,
                 new IntentFilter(com.team.financeapp.data.remote.ApiClient.ACTION_LOGOUT));
     }

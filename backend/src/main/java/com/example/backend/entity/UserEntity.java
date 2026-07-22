@@ -11,6 +11,7 @@ public class UserEntity {
     @Column(name = "id")
     private String id; // Firebase UID
 
+    @com.fasterxml.jackson.annotation.JsonAlias("name")
     @Column(name = "display_name", nullable = false)
     private String displayName = "User";
 
