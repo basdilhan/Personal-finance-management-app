@@ -30,11 +30,8 @@ public class UserController {
                                           @RequestBody UserEntity user) {
         return userRepository.findById(userId)
                 .map(existing -> {
-                    // Do not overwrite a valid name with a default "User" placeholder
-                    if (user.getDisplayName() != null && !user.getDisplayName().equals("User")) {
-                        existing.setDisplayName(user.getDisplayName());
-                    } else if (existing.getDisplayName() == null || existing.getDisplayName().isEmpty()) {
-                        existing.setDisplayName("User");
+                    if (user.getDisplayName() != null && !user.getDisplayName().trim().isEmpty()) {
+                        existing.setDisplayName(user.getDisplayName().trim());
                     }
                     
                     if (user.getEmail() != null) existing.setEmail(user.getEmail());

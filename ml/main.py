@@ -107,18 +107,22 @@ async def forecast_endpoint(req: ForecastRequest):
     non_zero_data = [x for x in req.historical_data if x > 0]
     
     if len(non_zero_data) == 0:
-        return {"predicted_next_month_expense": 0.0, "confidence_score": 0.0}
+        # Mathematical baseline for new users
+        return {"predicted_next_month_expense": 15000.0, "confidence_score": 0.3}
     
     if chronos_pipeline is None or len(non_zero_data) < 2:
+        # Mathematical fallback: average of available month data + 5% buffer
         avg_expense = sum(non_zero_data) / len(non_zero_data)
-        return {"predicted_next_month_expense": round(avg_expense, 2), "confidence_score": 0.5}
+        forecast_val = round(avg_expense * 1.05, 2)
+        return {"predicted_next_month_expense": forecast_val, "confidence_score": 0.5}
     
     context_tensor = torch.tensor(req.historical_data)
     forecast = chronos_pipeline.predict(context_tensor, prediction_length=1)
     predicted_value = float(forecast[0].median().item())
     
     if predicted_value < 1.0 and len(non_zero_data) > 0:
-        predicted_value = sum(non_zero_data) / len(non_zero_data)
+        avg_expense = sum(non_zero_data) / len(non_zero_data)
+        predicted_value = avg_expense * 1.05
     
     return {
         "predicted_next_month_expense": max(0.0, round(predicted_value, 2)),
