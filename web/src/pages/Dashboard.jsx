@@ -4,7 +4,7 @@ import apiClient from '../api/apiClient';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { Download, TrendingUp, TrendingDown, Wallet, Loader2, Calendar } from 'lucide-react';
 import { jsPDF } from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 
 export default function Dashboard() {
   const { currentUser } = useAuth();
@@ -35,25 +35,39 @@ export default function Dashboard() {
   }, []);
 
   // Calculate KPIs
-  const totalExpenses = expenses.reduce((acc, curr) => acc + curr.amount, 0);
+  const paidBillsTotal = bills.filter(b => b.status === 'paid').reduce((acc, curr) => acc + curr.amount, 0);
+  const totalExpenses = expenses.reduce((acc, curr) => acc + curr.amount, 0) + paidBillsTotal;
   const totalIncome = incomes.reduce((acc, curr) => acc + curr.amount, 0);
   const balance = totalIncome - totalExpenses;
 
   // Process data for charts
   const getMonthlyData = () => {
     const data = {};
+    
+    // Add regular expenses
     expenses.forEach(e => {
       const date = new Date(e.date);
       const month = date.toLocaleString('default', { month: 'short' });
       if (!data[month]) data[month] = { name: month, Expenses: 0, Income: 0 };
       data[month].Expenses += e.amount;
     });
+
+    // Add paid bills as expenses
+    bills.filter(b => b.status === 'paid').forEach(b => {
+      const date = new Date(b.dueDate);
+      const month = date.toLocaleString('default', { month: 'short' });
+      if (!data[month]) data[month] = { name: month, Expenses: 0, Income: 0 };
+      data[month].Expenses += b.amount;
+    });
+
+    // Add incomes
     incomes.forEach(i => {
       const date = new Date(i.date);
       const month = date.toLocaleString('default', { month: 'short' });
       if (!data[month]) data[month] = { name: month, Expenses: 0, Income: 0 };
       data[month].Income += i.amount;
     });
+    
     return Object.values(data);
   };
 
@@ -77,7 +91,7 @@ export default function Dashboard() {
       `LKR ${e.amount.toLocaleString()}`
     ]);
 
-    doc.autoTable({
+    autoTable(doc, {
       startY: 65,
       head: [['Date', 'Category', 'Description', 'Amount']],
       body: tableData,
@@ -160,7 +174,7 @@ export default function Dashboard() {
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-light)" />
                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: 'var(--text-secondary)'}} />
                 <YAxis axisLine={false} tickLine={false} tick={{fill: 'var(--text-secondary)'}} />
-                <Tooltip contentStyle={{ borderRadius: '8px', border: '1px solid var(--border-light)', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }} />
+                <Tooltip contentStyle={{ borderRadius: '8px', border: '1px solid var(--border-light)', background: 'var(--bg-primary)', color: 'var(--text-primary)' }} />
                 <Area type="monotone" dataKey="Income" stroke="var(--success)" fillOpacity={1} fill="url(#colorIncome)" />
                 <Area type="monotone" dataKey="Expenses" stroke="var(--danger)" fillOpacity={1} fill="url(#colorExpense)" />
               </AreaChart>
@@ -175,7 +189,7 @@ export default function Dashboard() {
               <BarChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-light)" />
                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: 'var(--text-secondary)'}} />
-                <Tooltip cursor={{fill: 'rgba(0,0,0,0.02)'}} />
+                <Tooltip cursor={{fill: 'rgba(255,255,255,0.05)'}} contentStyle={{ borderRadius: '8px', border: '1px solid var(--border-light)', background: 'var(--bg-primary)', color: 'var(--text-primary)' }} />
                 <Bar dataKey="Income" fill="var(--success)" radius={[4, 4, 0, 0]} />
                 <Bar dataKey="Expenses" fill="var(--danger)" radius={[4, 4, 0, 0]} />
               </BarChart>
@@ -228,7 +242,7 @@ export default function Dashboard() {
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               {bills.slice(0, 5).map((bill, idx) => (
-                <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px', background: 'var(--bg-primary)', borderRadius: '8px', border: '1px solid var(--border-light)' }}>
+                <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px solid var(--border-light)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <div style={{ background: 'rgba(245, 158, 11, 0.1)', padding: '8px', borderRadius: '8px' }}>
                       <Calendar size={18} color="var(--warning, #f59e0b)" />

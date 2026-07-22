@@ -35,9 +35,16 @@ export default function MLInsights() {
         income_bracket: String(income),
         savings_goal: Number(goal)
       });
+      
+      if (!res.data || !res.data.assigned_cluster) {
+        alert("The ML Backend is currently starting up or offline. Please try again in 60 seconds.");
+        return;
+      }
+      
       setProfile(res.data);
     } catch (err) {
       console.error("Failed to fetch ML Profile:", err);
+      alert("Failed to connect to the ML Backend. Please try again later.");
     } finally {
       setLoading(false);
     }

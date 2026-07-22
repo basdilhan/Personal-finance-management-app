@@ -1,16 +1,15 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { ShieldCheck, TrendingUp, Wallet } from 'lucide-react';
+import { ShieldCheck, TrendingUp } from 'lucide-react';
 
 export default function Login() {
-  const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   
-  const { login, signup, loginWithGoogle } = useAuth();
+  const { login, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
 
   async function handleSubmit(e) {
@@ -19,11 +18,7 @@ export default function Login() {
     setLoading(true);
 
     try {
-      if (isLogin) {
-        await login(email, password);
-      } else {
-        await signup(email, password);
-      }
+      await login(email, password);
       navigate('/dashboard');
     } catch (err) {
       setError(err.message || 'Failed to authenticate');
@@ -107,15 +102,16 @@ export default function Login() {
         display: 'flex', 
         alignItems: 'center', 
         justifyContent: 'center',
-        padding: '40px'
+        padding: '40px',
+        flexDirection: 'column'
       }}>
         <div style={{ width: '100%', maxWidth: '420px' }}>
           <div className="dashboard-panel" style={{ padding: '40px', background: 'var(--bg-secondary)', border: '1px solid var(--border-light)', borderRadius: '16px', boxShadow: '0 20px 40px rgba(0,0,0,0.4)' }}>
             <div style={{ textAlign: 'center', marginBottom: '32px' }}>
               <h2 style={{ fontSize: '28px', marginBottom: '8px' }}>
-                {isLogin ? 'Welcome Back' : 'Create an Account'}
+                Welcome Back
               </h2>
-              <p className="text-muted">Enter your details below to continue.</p>
+              <p className="text-muted">Enter your details below to sign in.</p>
             </div>
 
             {error && (
@@ -150,7 +146,7 @@ export default function Login() {
               </div>
 
               <button disabled={loading} type="submit" className="btn-primary" style={{ width: '100%', marginTop: '8px', padding: '14px' }}>
-                {isLogin ? 'Sign In' : 'Sign Up'}
+                Sign In
               </button>
             </form>
 
@@ -169,16 +165,6 @@ export default function Login() {
               </svg>
               Google
             </button>
-
-            <div style={{ textAlign: 'center', marginTop: '32px' }}>
-              <button 
-                type="button" 
-                onClick={() => setIsLogin(!isLogin)} 
-                style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '14px', fontWeight: 500 }}
-              >
-                {isLogin ? "Don't have an account? Sign Up" : "Already have an account? Sign In"}
-              </button>
-            </div>
           </div>
         </div>
       </div>

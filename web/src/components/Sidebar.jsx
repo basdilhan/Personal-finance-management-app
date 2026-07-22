@@ -2,7 +2,7 @@ import React from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, MessageSquare, BookOpen, LogOut, BrainCircuit, Moon, Sun, User } from 'lucide-react';
+import { LayoutDashboard, MessageSquare, BookOpen, LogOut, BrainCircuit, Moon, Sun, User, Activity } from 'lucide-react';
 
 export default function Sidebar() {
   const { currentUser, logout } = useAuth();
@@ -20,6 +20,7 @@ export default function Sidebar() {
 
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard size={20} /> },
+    { name: 'Reports & Analytics', path: '/reports', icon: <Activity size={20} /> },
     { name: 'My Profile', path: '/profile', icon: <User size={20} /> },
     { name: 'AI Insights', path: '/ai-insights', icon: <BrainCircuit size={20} /> },
     { name: 'DreamSaver AI', path: '/chatbot', icon: <MessageSquare size={20} /> },
@@ -27,14 +28,12 @@ export default function Sidebar() {
   ];
 
   return (
-    <div style={{
+    <div className="sidebar-glass" style={{
       width: '260px',
       height: '100vh',
       position: 'fixed',
       left: 0,
       top: 0,
-      background: 'var(--bg-secondary)',
-      borderRight: '1px solid var(--border-light)',
       display: 'flex',
       flexDirection: 'column',
       padding: '24px 0',
@@ -53,18 +52,18 @@ export default function Sidebar() {
           <NavLink 
             key={item.path} 
             to={item.path}
-            style={({ isActive }) => ({
+            className={({ isActive }) => isActive ? 'nav-item-active' : ''}
+            style={{
               display: 'flex',
               alignItems: 'center',
               gap: '12px',
               padding: '12px 16px',
               borderRadius: '8px',
-              color: isActive ? 'var(--accent-blue)' : 'var(--text-secondary)',
-              background: isActive ? 'var(--bg-tertiary)' : 'transparent',
+              color: 'var(--text-secondary)',
               textDecoration: 'none',
               fontWeight: 500,
-              transition: 'all 0.2s'
-            })}
+              transition: 'all 0.3s ease'
+            }}
           >
             {item.icon}
             {item.name}
@@ -72,20 +71,8 @@ export default function Sidebar() {
         ))}
       </div>
 
-      {/* Theme Toggle & User Profile Footer */}
+      {/* User Profile Footer */}
       <div style={{ padding: '0 24px', marginTop: 'auto' }}>
-        <button 
-          onClick={toggleTheme}
-          style={{ 
-            display: 'flex', alignItems: 'center', gap: '12px', width: '100%', 
-            padding: '12px', marginBottom: '16px', borderRadius: '8px', 
-            background: 'var(--bg-tertiary)', border: '1px solid var(--border-light)', 
-            color: 'var(--text-primary)', cursor: 'pointer', fontWeight: 500 
-          }}
-        >
-          {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
-          {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
-        </button>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '16px 0', borderTop: '1px solid var(--border-light)' }}>
           <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--accent-blue)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600 }}>

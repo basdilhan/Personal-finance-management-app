@@ -14,6 +14,7 @@ import Chatbot from './pages/Chatbot';
 import Blogs from './pages/Blogs';
 import MLInsights from './pages/MLInsights';
 import Profile from './pages/Profile';
+import Reports from './pages/Reports';
 
 // Protected Route Wrapper
 const PrivateRoute = ({ children }) => {
@@ -69,6 +70,12 @@ const AnimatedRoutes = () => {
         <Route path="/blogs" element={
           <PrivateRoute>
             <Blogs />
+          </PrivateRoute>
+        } />
+
+        <Route path="/reports" element={
+          <PrivateRoute>
+            <Reports />
           </PrivateRoute>
         } />
 
