@@ -5,6 +5,7 @@ import com.example.backend.repository.BudgetLimitRepository;
 import com.example.backend.repository.ExpenseRepository;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.repository.BillRepository;
+import com.example.backend.repository.GoalRepository;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -19,17 +20,20 @@ public class SmartAlertJob {
     private final BudgetLimitRepository budgetLimitRepository;
     private final ExpenseRepository expenseRepository;
     private final BillRepository billRepository;
+    private final GoalRepository goalRepository;
     private final NotificationService notificationService;
     private final UserRepository userRepository;
 
     public SmartAlertJob(BudgetLimitRepository budgetLimitRepository,
                          ExpenseRepository expenseRepository,
                          BillRepository billRepository,
+                         GoalRepository goalRepository,
                          NotificationService notificationService,
                          UserRepository userRepository) {
         this.budgetLimitRepository = budgetLimitRepository;
         this.expenseRepository = expenseRepository;
         this.billRepository = billRepository;
+        this.goalRepository = goalRepository;
         this.notificationService = notificationService;
         this.userRepository = userRepository;
     }
@@ -115,6 +119,31 @@ public class SmartAlertJob {
                         notificationService.sendPushNotification(fcmToken,
                                 "Upcoming Bill Due! ⏳",
                                 "Your bill '" + bill.getName() + "' for $" + bill.getAmount() + " is due " + dayText + ".");
+                    }
+                });
+    }
+
+    // Runs every day at 9:30 AM to check for savings goal due reminders
+    @Scheduled(cron = "0 30 9 * * ?")
+    public void checkGoalReminders() {
+        long now = System.currentTimeMillis();
+        long sevenDaysFromNow = now + (7L * 24 * 60 * 60 * 1000);
+
+        goalRepository.findAll().stream()
+                .filter(g -> !g.getIsDeleted() && g.getCurrentAmount().compareTo(g.getTargetAmount()) < 0)
+                .filter(g -> g.getTargetDate() != null && g.getTargetDate() >= now && g.getTargetDate() <= sevenDaysFromNow)
+                .forEach(goal -> {
+                    String fcmToken = userRepository.findById(goal.getUserId())
+                            .map(u -> u.getFcmToken())
+                            .orElse(null);
+
+                    if (fcmToken != null && !fcmToken.isEmpty()) {
+                        BigDecimal needed = goal.getTargetAmount().subtract(goal.getCurrentAmount());
+                        long daysUntilDue = (goal.getTargetDate() - now) / (1000 * 60 * 60 * 24);
+                        String dayText = daysUntilDue == 0 ? "due today" : "due in " + daysUntilDue + " day(s)";
+                        notificationService.sendPushNotification(fcmToken,
+                                "Savings Goal Reminder 🎯",
+                                "If you want to reach '" + goal.getName() + "', you still need to save LKR " + needed.toPlainString() + ". Target date is " + dayText + ".");
                     }
                 });
     }
