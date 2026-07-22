@@ -99,6 +99,23 @@ public class ChatController {
                 historicalData.add(monthlyAggregates.getOrDefault(ym, BigDecimal.ZERO).doubleValue());
             }
 
+            // Monthly totals for current month
+            BigDecimal monthlyExpenses = allExpenses.stream()
+                    .filter(e -> {
+                        long epochMs = e.getDate() < 10000000000L ? e.getDate() * 1000L : e.getDate();
+                        return epochMs >= monthStart && epochMs <= monthEnd;
+                    })
+                    .map(ExpenseEntity::getAmount)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            BigDecimal monthlyIncome = allIncomes.stream()
+                    .filter(i -> {
+                        long epochMs = i.getDate() < 10000000000L ? i.getDate() * 1000L : i.getDate();
+                        return epochMs >= monthStart && epochMs <= monthEnd;
+                    })
+                    .map(IncomeEntity::getAmount)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
             Double predictedNextMonthExpense = mlServiceClient.generateForecast(userId, historicalData);
             if (predictedNextMonthExpense == null || predictedNextMonthExpense <= 0.0) {
                 if (monthlyExpenses.compareTo(BigDecimal.ZERO) > 0) {
@@ -109,17 +126,6 @@ public class ChatController {
                     predictedNextMonthExpense = 15000.0;
                 }
             }
-
-            // Monthly totals for current month
-            BigDecimal monthlyExpenses = allExpenses.stream()
-                    .filter(e -> e.getDate() >= monthStart && e.getDate() <= monthEnd)
-                    .map(ExpenseEntity::getAmount)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-            BigDecimal monthlyIncome = allIncomes.stream()
-                    .filter(i -> i.getDate() >= monthStart && i.getDate() <= monthEnd)
-                    .map(IncomeEntity::getAmount)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
 
             // Top spending categories this month
             Map<String, BigDecimal> byCategory = allExpenses.stream()
