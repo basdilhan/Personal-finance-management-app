@@ -49,10 +49,10 @@ public class FcmTokenUploader {
                                             SharedPreferences prefs, String rawToken) {
         new Thread(() -> {
             try {
-                // Get backend URL from shared preferences (set after login)
-                SharedPreferences appPrefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE);
-                String baseUrl = appPrefs.getString("backend_url", "http://192.168.8.197:8080");
-
+                String baseUrl = com.team.financeapp.BuildConfig.BASE_URL;
+                if (baseUrl.endsWith("/")) {
+                    baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
+                }
                 URL url = new URL(baseUrl + "/api/users/fcm-token");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("PUT");
