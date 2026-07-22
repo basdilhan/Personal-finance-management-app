@@ -496,13 +496,11 @@ public class DashboardActivity extends AppCompatActivity {
             }
         }
 
-        double totalGoalSavings = sumGoalAddedSavings();
-
-        double totalCashOut = monthlyExpenses + monthlyPaidBills + totalGoalSavings;
+        double totalCashOut = monthlyExpenses + monthlyPaidBills;
         currentTotalExpenses = totalCashOut;
         currentMonthIncome = monthlyIncome;
 
-        // Portfolio balance follows: income - (expenses + paid bills + goal savings)
+        // Portfolio balance follows: income - (expenses + paid bills)
         double totalBalance = currentMonthIncome - currentTotalExpenses;
         currentTotalBalance = totalBalance;
         applyBalancePrivacyState();
@@ -523,7 +521,7 @@ public class DashboardActivity extends AppCompatActivity {
 
         if (textAlertMessage != null) {
             if (totalCashOut <= 0.0d && dueBillsTotal <= 0.0d) {
-                textAlertMessage.setText("No cash-out activity or due bills yet. Add expenses, pay bills, or save toward a goal to see your insight.");
+                textAlertMessage.setText("No cash-out activity or due bills yet. Add expenses or pay bills to see your insight.");
             } else if (currentMonthIncome <= 0.0d) {
                 textAlertMessage.setText("You've recorded spending and bills, but no income entries yet. Add income to see your remaining balance.");
             } else {
