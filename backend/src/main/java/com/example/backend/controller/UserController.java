@@ -12,10 +12,12 @@ public class UserController {
 
     private final UserRepository userRepository;
     private final com.example.backend.service.MLServiceClient mlServiceClient;
+    private final com.example.backend.service.NotificationService notificationService;
 
-    public UserController(UserRepository userRepository, com.example.backend.service.MLServiceClient mlServiceClient) {
+    public UserController(UserRepository userRepository, com.example.backend.service.MLServiceClient mlServiceClient, com.example.backend.service.NotificationService notificationService) {
         this.userRepository = userRepository;
         this.mlServiceClient = mlServiceClient;
+        this.notificationService = notificationService;
     }
 
     @GetMapping("/me")
@@ -61,6 +63,25 @@ public class UserController {
                     user.setFcmToken(token);
                     userRepository.save(user);
                     return ResponseEntity.ok().<Void>build();
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    /**
+     * Endpoint to immediately test FCM server-side notifications.
+     */
+    @PostMapping("/test-notification")
+    public ResponseEntity<String> testPushNotification(@RequestHeader("X-User-Id") String userId) {
+        return userRepository.findById(userId)
+                .map(user -> {
+                    String fcmToken = user.getFcmToken();
+                    if (fcmToken == null || fcmToken.isEmpty()) {
+                        return ResponseEntity.badRequest().body("No FCM token found for user.");
+                    }
+                    notificationService.sendPushNotification(fcmToken,
+                            "Test Server Notification 🚀",
+                            "Your Spring Boot backend successfully sent this FCM message!");
+                    return ResponseEntity.ok("Test push notification sent successfully.");
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
