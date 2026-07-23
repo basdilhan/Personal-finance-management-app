@@ -61,12 +61,12 @@ except Exception as e:
 # 3. K-Means Clustering for Cold Start
 try:
     kmeans_model = joblib.load("models/kmeans_cold_start.pkl")
-    # Budgets are defined in LKR
+    # Budgets are defined as percentages of their total income
     cluster_profiles = {
-        0: {"name": "Starting Out (Young, Low Income)", "budget": 25000.0, "savings": 5000.0},
-        1: {"name": "Established Professional (Mid Age, High Income)", "budget": 150000.0, "savings": 50000.0},
-        2: {"name": "Frugal Saver (Mixed Age, Mid Income, High Goal)", "budget": 80000.0, "savings": 40000.0},
-        3: {"name": "High Spender (Mixed Age, High Income, Low Goal)", "budget": 250000.0, "savings": 10000.0},
+        0: {"name": "Starting Out (Young, Low Income)", "budget_pct": 0.80, "savings_pct": 0.20},
+        1: {"name": "Established Professional (Mid Age, High Income)", "budget_pct": 0.60, "savings_pct": 0.40},
+        2: {"name": "Frugal Saver (Mixed Age, Mid Income, High Goal)", "budget_pct": 0.50, "savings_pct": 0.50},
+        3: {"name": "High Spender (Mixed Age, High Income, Low Goal)", "budget_pct": 0.90, "savings_pct": 0.10},
     }
     print("Loaded pre-trained K-Means Cold Start model from disk.")
 except Exception as e:
@@ -208,9 +208,12 @@ async def cold_start_profile(req: ColdStartRequest):
     cluster_id = int(kmeans_model.predict(features)[0])
     profile = cluster_profiles.get(cluster_id, cluster_profiles[0])
     
+    # Dynamically scale recommendations based on the user's actual income
+    actual_income = float(req.income_bracket)
+    
     return {
         "assigned_cluster": profile["name"],
-        "recommended_monthly_budget": profile["budget"],
-        "recommended_savings_goal": profile["savings"]
+        "recommended_monthly_budget": round(actual_income * profile["budget_pct"], 2),
+        "recommended_savings_goal": round(actual_income * profile["savings_pct"], 2)
     }
 
