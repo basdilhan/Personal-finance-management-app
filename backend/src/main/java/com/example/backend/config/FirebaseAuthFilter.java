@@ -53,12 +53,15 @@ public class FirebaseAuthFilter extends OncePerRequestFilter {
                     uid, null, new ArrayList<>());
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            filterChain.doFilter(request, response);
-
         } catch (Exception e) {
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("Invalid Firebase token: " + e.getMessage());
+            return;
         }
+
+        // Proceed with the request outside the token verification catch block
+        // so that application errors return 500, not 401.
+        filterChain.doFilter(request, response);
     }
 }
