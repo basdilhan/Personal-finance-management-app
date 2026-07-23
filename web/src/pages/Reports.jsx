@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import apiClient from '../api/apiClient';
+import { FinanceService } from '../services/FinanceService';
+import { formatDateShort } from '../utils/dateUtils';
+import { LoadingSpinner, EmptyState } from '../components/common/UIStates';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell } from 'recharts';
-import { FileText, ShieldAlert, ShieldCheck, Shield, Activity, Download, Loader2 } from 'lucide-react';
+import { FileText, ShieldAlert, ShieldCheck, Shield, Activity, Download } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
@@ -17,14 +19,14 @@ export default function Reports() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const [expenseRes, incomeRes, billRes] = await Promise.all([
-          apiClient.get('/expenses'),
-          apiClient.get('/incomes'),
-          apiClient.get('/bills').catch(() => ({ data: [] }))
+        const [expenseData, incomeData, billData] = await Promise.all([
+          FinanceService.getExpenses(),
+          FinanceService.getIncomes(),
+          FinanceService.getBills().catch(() => [])
         ]);
-        setExpenses(expenseRes.data || []);
-        setIncomes(incomeRes.data || []);
-        setBills(billRes.data || []);
+        setExpenses(expenseData);
+        setIncomes(incomeData);
+        setBills(billData);
       } catch (error) {
         console.error("Error fetching financial data:", error);
       } finally {
@@ -115,7 +117,7 @@ export default function Reports() {
     autoTable(doc, {
       startY: 115,
       head: [['Date', 'Source', 'Amount (LKR)']],
-      body: incomes.map(i => [new Date(i.date).toLocaleDateString(), i.source || 'N/A', i.amount.toLocaleString()]),
+      body: incomes.map(i => [formatDateShort(i.date), i.source || 'N/A', i.amount.toLocaleString()]),
       headStyles: { fillColor: [16, 185, 129] }, // Success green
       margin: { top: 10 }
     });
@@ -125,7 +127,7 @@ export default function Reports() {
     autoTable(doc, {
       startY: finalY + 15,
       head: [['Date', 'Category', 'Description', 'Amount (LKR)']],
-      body: expenses.map(e => [new Date(e.date).toLocaleDateString(), e.category, e.description || 'N/A', e.amount.toLocaleString()]),
+      body: expenses.map(e => [formatDateShort(e.date), e.category, e.description || 'N/A', e.amount.toLocaleString()]),
       headStyles: { fillColor: [239, 68, 68] }, // Danger red
     });
 
@@ -135,7 +137,7 @@ export default function Reports() {
       autoTable(doc, {
         startY: finalY + 15,
         head: [['Due Date', 'Bill Name', 'Status', 'Amount (LKR)']],
-        body: bills.map(b => [new Date(b.dueDate).toLocaleDateString(), b.name, b.status || 'Pending', b.amount.toLocaleString()]),
+        body: bills.map(b => [formatDateShort(b.dueDate), b.name, b.status || 'Pending', b.amount.toLocaleString()]),
         headStyles: { fillColor: [245, 158, 11] }, // Warning orange
       });
     }
@@ -153,11 +155,7 @@ export default function Reports() {
   };
 
   if (loading) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
-        <Loader2 className="lucide-spin" size={48} color="var(--accent-blue)" />
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   return (

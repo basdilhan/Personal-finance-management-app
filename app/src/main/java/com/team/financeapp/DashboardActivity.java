@@ -626,7 +626,7 @@ public class DashboardActivity extends AppCompatActivity {
         Map<String, Double> grouped = new HashMap<>();
         double total = 0.0d;
         for (IncomeEntry entry : latestIncomes) {
-            long normalizedDate = normalizeEpochMillis(entry.getDate());
+            long normalizedDate = com.team.financeapp.utils.DateUtils.normalizeEpochMillis(entry.getDate());
             if (normalizedDate <= 0L) continue;
             
             String key = normalizeIncomeSource(entry.getSource());
@@ -664,50 +664,9 @@ public class DashboardActivity extends AppCompatActivity {
     }
 
     private void setupPieChart(PieChart chart, List<PieEntry> entries, List<Integer> colors, String label) {
-        chart.setUsePercentValues(true);
-        chart.getDescription().setEnabled(false);
-        chart.setExtraOffsets(5, 10, 5, 5);
-
-        chart.setDragDecelerationFrictionCoef(0.95f);
-
-        chart.setDrawHoleEnabled(true);
-        chart.setHoleColor(android.graphics.Color.TRANSPARENT);
-
-        chart.setTransparentCircleColor(android.graphics.Color.WHITE);
-        chart.setTransparentCircleAlpha(30);
-
-        chart.setHoleRadius(50f);
-        chart.setTransparentCircleRadius(55f);
-
-        chart.setDrawCenterText(true);
-        chart.setCenterText(label);
-        chart.setCenterTextColor(getColorCompat(R.color.text_primary));
-        chart.setCenterTextSize(16f);
-
-        chart.setRotationAngle(0);
-        chart.setRotationEnabled(true);
-        chart.setHighlightPerTapEnabled(true);
-        chart.getLegend().setEnabled(false);
-
-        PieDataSet dataSet = new PieDataSet(entries, label);
-        dataSet.setSliceSpace(3f);
-        dataSet.setSelectionShift(8f);
-        dataSet.setColors(colors);
-        
-        dataSet.setValueLinePart1OffsetPercentage(80.f);
-        dataSet.setValueLinePart1Length(0.2f);
-        dataSet.setValueLinePart2Length(0.4f);
-        dataSet.setYValuePosition(PieDataSet.ValuePosition.OUTSIDE_SLICE);
-
-        PieData data = new PieData(dataSet);
-        data.setValueFormatter(new PercentFormatter(chart));
-        data.setValueTextSize(12f);
-        data.setValueTextColor(getColorCompat(R.color.text_primary));
-
-        chart.setData(data);
-        chart.animateY(1400, Easing.EaseInOutQuad);
-        chart.invalidate();
+        com.team.financeapp.utils.ChartHelper.setupPieChart(chart, entries, colors, label, getColorCompat(R.color.text_primary));
     }
+
 
     private void updateGoalsChartFromData() {
         // Implementation for goals chart update (omitted for brevity)
@@ -775,7 +734,7 @@ public class DashboardActivity extends AppCompatActivity {
             if ("paid".equalsIgnoreCase(bill.getStatus())) {
                 continue;
             }
-            long normalizedDueDate = normalizeEpochMillis(bill.getDueDate());
+            long normalizedDueDate = com.team.financeapp.utils.DateUtils.normalizeEpochMillis(bill.getDueDate());
             if (normalizedDueDate >= now - (24L * 60 * 60 * 1000)) {
                 sortedUpcoming.add(bill);
             }

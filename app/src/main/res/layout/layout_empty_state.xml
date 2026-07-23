@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout_empty_state"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="24dp"
+    android:visibility="gone">
+
+    <ImageView
+        android:id="@+id/image_empty_state"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:src="@drawable/ic_target"
+        android:alpha="0.5" />
+
+    <TextView
+        android:id="@+id/text_empty_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="No data found"
+        android:textColor="@color/text_primary"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/text_empty_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Start adding records to see them here."
+        android:textColor="@color/text_secondary"
+        android:textSize="14sp"
+        android:textAlignment="center" />
+</LinearLayout>

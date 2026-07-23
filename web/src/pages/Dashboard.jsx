@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import apiClient from '../api/apiClient';
+import { FinanceService } from '../services/FinanceService';
+import { formatDateShort, getMonthName } from '../utils/dateUtils';
+import { LoadingSpinner, EmptyState } from '../components/common/UIStates';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
-import { Download, TrendingUp, TrendingDown, Wallet, Loader2, Calendar } from 'lucide-react';
+import { Download, TrendingUp, TrendingDown, Wallet, Calendar } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
@@ -17,14 +19,14 @@ export default function Dashboard() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const [expenseRes, incomeRes, billRes] = await Promise.all([
-          apiClient.get('/expenses'),
-          apiClient.get('/incomes'),
-          apiClient.get('/bills').catch(() => ({ data: [] }))
+        const [expenseData, incomeData, billData] = await Promise.all([
+          FinanceService.getExpenses(),
+          FinanceService.getIncomes(),
+          FinanceService.getBills().catch(() => [])
         ]);
-        setExpenses(expenseRes.data || []);
-        setIncomes(incomeRes.data || []);
-        setBills(billRes.data || []);
+        setExpenses(expenseData);
+        setIncomes(incomeData);
+        setBills(billData);
       } catch (error) {
         console.error("Error fetching financial data:", error);
       } finally {
@@ -44,26 +46,20 @@ export default function Dashboard() {
   const getMonthlyData = () => {
     const data = {};
     
-    // Add regular expenses
     expenses.forEach(e => {
-      const date = new Date(e.date);
-      const month = date.toLocaleString('default', { month: 'short' });
+      const month = getMonthName(e.date);
       if (!data[month]) data[month] = { name: month, Expenses: 0, Income: 0 };
       data[month].Expenses += e.amount;
     });
 
-    // Add paid bills as expenses
     bills.filter(b => b.status === 'paid').forEach(b => {
-      const date = new Date(b.dueDate);
-      const month = date.toLocaleString('default', { month: 'short' });
+      const month = getMonthName(b.dueDate);
       if (!data[month]) data[month] = { name: month, Expenses: 0, Income: 0 };
       data[month].Expenses += b.amount;
     });
 
-    // Add incomes
     incomes.forEach(i => {
-      const date = new Date(i.date);
-      const month = date.toLocaleString('default', { month: 'short' });
+      const month = getMonthName(i.date);
       if (!data[month]) data[month] = { name: month, Expenses: 0, Income: 0 };
       data[month].Income += i.amount;
     });
@@ -79,13 +75,13 @@ export default function Dashboard() {
     doc.text('DreamSaver Financial Report', 14, 22);
     
     doc.setFontSize(12);
-    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 32);
+    doc.text(`Generated on: ${formatDateShort(new Date())}`, 14, 32);
     doc.text(`Total Income: LKR ${totalIncome.toLocaleString()}`, 14, 42);
     doc.text(`Total Expenses: LKR ${totalExpenses.toLocaleString()}`, 14, 48);
     doc.text(`Net Balance: LKR ${balance.toLocaleString()}`, 14, 54);
 
     const tableData = expenses.map(e => [
-      new Date(e.date).toLocaleDateString(),
+      formatDateShort(e.date),
       e.category,
       e.description || 'N/A',
       `LKR ${e.amount.toLocaleString()}`
@@ -101,11 +97,7 @@ export default function Dashboard() {
   };
 
   if (loading) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
-        <Loader2 className="lucide-spin" size={48} color="var(--accent-blue)" />
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   return (
@@ -204,8 +196,8 @@ export default function Dashboard() {
         {/* Recent Transactions List */}
         <div className="dashboard-panel">
           <h3 style={{ marginBottom: '24px' }}>Recent Transactions</h3>
-          {expenses.length === 0 ? (
-            <p className="text-muted">No transactions found. Start using the mobile app to sync data!</p>
+          {expenses.length === 0 && bills.filter(b => b.status === 'paid').length === 0 ? (
+            <EmptyState title="No transactions yet" message="Start adding expenses in the mobile app to see them here!" />
           ) : (
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
@@ -216,9 +208,17 @@ export default function Dashboard() {
                 </tr>
               </thead>
               <tbody>
-                {expenses.slice(0, 5).map((tx, idx) => (
+                {[...expenses, ...bills.filter(b => b.status === 'paid').map(b => ({
+                  date: b.dueDate,
+                  category: b.name + ' (Bill)',
+                  amount: b.amount,
+                  description: 'Paid Bill'
+                }))]
+                .sort((a, b) => new Date(b.date) - new Date(a.date))
+                .slice(0, 5)
+                .map((tx, idx) => (
                   <tr key={idx} style={{ borderBottom: '1px solid var(--border-light)' }}>
-                    <td style={{ padding: '16px 12px' }}>{new Date(tx.date).toLocaleDateString()}</td>
+                    <td style={{ padding: '16px 12px' }}>{formatDateShort(tx.date)}</td>
                     <td style={{ padding: '16px 12px' }}>
                       <span style={{ background: 'var(--bg-tertiary)', padding: '4px 12px', borderRadius: '100px', fontSize: '12px', fontWeight: 500 }}>
                         {tx.category}
@@ -237,11 +237,11 @@ export default function Dashboard() {
         {/* Upcoming Bills List */}
         <div className="dashboard-panel">
           <h3 style={{ marginBottom: '24px' }}>Upcoming Bills</h3>
-          {bills.length === 0 ? (
+          {bills.filter(b => b.status !== 'paid' && b.status !== 'Paid').length === 0 ? (
             <p className="text-muted">No upcoming bills found.</p>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {bills.slice(0, 5).map((bill, idx) => (
+              {bills.filter(b => b.status !== 'paid' && b.status !== 'Paid').slice(0, 5).map((bill, idx) => (
                 <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px solid var(--border-light)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <div style={{ background: 'rgba(245, 158, 11, 0.1)', padding: '8px', borderRadius: '8px' }}>
