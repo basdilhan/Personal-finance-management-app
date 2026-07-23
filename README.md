@@ -52,7 +52,7 @@ To run the entire ecosystem locally, you will need to start the 3 main services 
 2. Ensure you have your `application.properties` set up with your Database URL and Firebase credentials.
 3. Run the server:
    ```bash
-   ./mvnw spring-boot:run
+   ./gradlew bootRun
    ```
 4. The server will start on `http://localhost:8080`.
 
@@ -95,7 +95,7 @@ To run the entire ecosystem locally, you will need to start the 3 main services 
 | :--- | :--- |
 | **Mobile App** | Java, Android SDK (API 24-34), Material 3, SQLite (Room), Google ML Kit, Retrofit |
 | **Web App** | React 19, Vite, Recharts, Lucide Icons, Vanilla CSS (Aurora Glass UI) |
-| **Backend** | Java 17, Spring Boot 3, Spring Data JPA, PostgreSQL, Firebase Admin SDK |
+| **Backend** | Java 17, Spring Boot 4.1.0, Spring Data JPA, PostgreSQL, Firebase Admin SDK |
 | **AI / ML** | Python, FastAPI, PyTorch, Scikit-Learn, Amazon Chronos, HuggingFace Inference API |
 
 ---
