@@ -1,6 +1,8 @@
 package com.example.backend.service;
 
 import com.example.backend.entity.BudgetLimitEntity;
+import com.example.backend.entity.BillEntity;
+import com.example.backend.entity.GoalEntity;
 import com.example.backend.repository.BudgetLimitRepository;
 import com.example.backend.repository.ExpenseRepository;
 import com.example.backend.repository.UserRepository;
@@ -10,6 +12,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.math.BigDecimal;
@@ -43,33 +46,33 @@ public class SmartAlertJob {
     public void checkBudgetsAndNotify() {
         String currentMonthYear = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM"));
         List<BudgetLimitEntity> allBudgets = budgetLimitRepository.findAll();
+        
+        LocalDate start = LocalDate.now().withDayOfMonth(1);
+        LocalDate end = start.plusMonths(1).minusDays(1);
+        long startMillis = start.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        long endMillis = end.atTime(23, 59, 59).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 
         for (BudgetLimitEntity budget : allBudgets) {
             if (!budget.getMonthYear().equals(currentMonthYear)) continue;
 
-            BigDecimal totalSpent = expenseRepository.findAll().stream()
-                    .filter(e -> e.getUserId().equals(budget.getUserId()))
-                    .filter(e -> e.getCategory().equals(budget.getCategory()))
-                    .map(e -> e.getAmount())
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            BigDecimal totalSpent = expenseRepository.sumByCategoryAndDateBetween(
+                    budget.getUserId(), budget.getCategory(), startMillis, endMillis);
 
-            // Fetch real FCM token from DB
             String fcmToken = userRepository.findById(budget.getUserId())
                     .map(u -> u.getFcmToken())
                     .orElse(null);
 
             if (fcmToken == null || fcmToken.isEmpty()) {
-                System.out.println("No FCM token for user " + budget.getUserId() + ", skipping push notification.");
                 continue;
             }
 
             if (totalSpent.compareTo(budget.getLimitAmount()) >= 0) {
                 notificationService.sendPushNotification(fcmToken,
-                        "Budget Exceeded! 🚨",
+                        "Budget Exceeded! \uD83D\uDEA8",
                         "You have exceeded your " + budget.getCategory() + " budget for this month.");
             } else if (totalSpent.compareTo(budget.getLimitAmount().multiply(new BigDecimal("0.8"))) >= 0) {
                 notificationService.sendPushNotification(fcmToken,
-                        "Budget Warning ⚠️",
+                        "Budget Warning \u26A0\uFE0F",
                         "You have spent 80% of your " + budget.getCategory() + " budget.");
             }
         }
@@ -84,16 +87,11 @@ public class SmartAlertJob {
             String fcmToken = user.getFcmToken();
             if (fcmToken == null || fcmToken.isEmpty()) return;
 
-            BigDecimal weeklyTotal = expenseRepository.findAll().stream()
-                    .filter(e -> e.getUserId().equals(user.getId()))
-                    .filter(e -> !e.getIsDeleted())
-                    .filter(e -> e.getDate() != null && e.getDate() >= oneWeekAgoMillis)
-                    .map(e -> e.getAmount())
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            BigDecimal weeklyTotal = expenseRepository.sumByDateGreaterThanEqual(user.getId(), oneWeekAgoMillis);
 
             if (weeklyTotal.compareTo(BigDecimal.ZERO) > 0) {
                 notificationService.sendPushNotification(fcmToken,
-                        "Weekly Spending Summary 📊",
+                        "Weekly Spending Summary \uD83D\uDCCA",
                         "You spent $" + weeklyTotal.toString() + " over the last 7 days.");
             }
         });
@@ -105,22 +103,21 @@ public class SmartAlertJob {
         long now = System.currentTimeMillis();
         long threeDaysFromNow = now + (3L * 24 * 60 * 60 * 1000);
 
-        billRepository.findAll().stream()
-                .filter(b -> !b.getIsDeleted() && "pending".equalsIgnoreCase(b.getStatus()))
-                .filter(b -> b.getDueDate() != null && b.getDueDate() >= now && b.getDueDate() <= threeDaysFromNow)
-                .forEach(bill -> {
-                    String fcmToken = userRepository.findById(bill.getUserId())
-                            .map(u -> u.getFcmToken())
-                            .orElse(null);
+        List<BillEntity> upcomingBills = billRepository.findByStatusIgnoreCaseAndIsDeletedFalseAndDueDateBetween("pending", now, threeDaysFromNow);
 
-                    if (fcmToken != null && !fcmToken.isEmpty()) {
-                        long daysUntilDue = (bill.getDueDate() - now) / (1000 * 60 * 60 * 24);
-                        String dayText = daysUntilDue == 0 ? "today" : "in " + daysUntilDue + " day(s)";
-                        notificationService.sendPushNotification(fcmToken,
-                                "Upcoming Bill Due! ⏳",
-                                "Your bill '" + bill.getName() + "' for $" + bill.getAmount() + " is due " + dayText + ".");
-                    }
-                });
+        upcomingBills.forEach(bill -> {
+            String fcmToken = userRepository.findById(bill.getUserId())
+                    .map(u -> u.getFcmToken())
+                    .orElse(null);
+
+            if (fcmToken != null && !fcmToken.isEmpty()) {
+                long daysUntilDue = (bill.getDueDate() - now) / (1000 * 60 * 60 * 24);
+                String dayText = daysUntilDue == 0 ? "today" : "in " + daysUntilDue + " day(s)";
+                notificationService.sendPushNotification(fcmToken,
+                        "Upcoming Bill Due! \u23F3",
+                        "Your bill '" + bill.getName() + "' for $" + bill.getAmount() + " is due " + dayText + ".");
+            }
+        });
     }
 
     // Runs every day at 9:30 AM to check for savings goal due reminders
@@ -129,9 +126,10 @@ public class SmartAlertJob {
         long now = System.currentTimeMillis();
         long sevenDaysFromNow = now + (7L * 24 * 60 * 60 * 1000);
 
-        goalRepository.findAll().stream()
-                .filter(g -> !g.getIsDeleted() && g.getCurrentAmount().compareTo(g.getTargetAmount()) < 0)
-                .filter(g -> g.getTargetDate() != null && g.getTargetDate() >= now && g.getTargetDate() <= sevenDaysFromNow)
+        List<GoalEntity> endingGoals = goalRepository.findByIsDeletedFalseAndTargetDateBetween(now, sevenDaysFromNow);
+
+        endingGoals.stream()
+                .filter(g -> g.getCurrentAmount().compareTo(g.getTargetAmount()) < 0)
                 .forEach(goal -> {
                     String fcmToken = userRepository.findById(goal.getUserId())
                             .map(u -> u.getFcmToken())
@@ -142,11 +140,9 @@ public class SmartAlertJob {
                         long daysUntilDue = (goal.getTargetDate() - now) / (1000 * 60 * 60 * 24);
                         String dayText = daysUntilDue == 0 ? "due today" : "due in " + daysUntilDue + " day(s)";
                         notificationService.sendPushNotification(fcmToken,
-                                "Savings Goal Reminder 🎯",
+                                "Savings Goal Reminder \uD83C\uDFAF",
                                 "If you want to reach '" + goal.getName() + "', you still need to save LKR " + needed.toPlainString() + ". Target date is " + dayText + ".");
                     }
                 });
     }
 }
-
-
