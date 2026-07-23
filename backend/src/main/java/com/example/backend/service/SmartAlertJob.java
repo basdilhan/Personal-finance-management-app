@@ -45,19 +45,14 @@ public class SmartAlertJob {
     @Scheduled(cron = "0 0 9 * * ?")
     public void checkBudgetsAndNotify() {
         String currentMonthYear = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM"));
-        List<BudgetLimitEntity> allBudgets = budgetLimitRepository.findAll();
+        List<BudgetLimitEntity> activeBudgets = budgetLimitRepository.findByMonthYear(currentMonthYear);
         
         LocalDate start = LocalDate.now().withDayOfMonth(1);
         LocalDate end = start.plusMonths(1).minusDays(1);
         long startMillis = start.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
         long endMillis = end.atTime(23, 59, 59).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 
-        for (BudgetLimitEntity budget : allBudgets) {
-            if (!budget.getMonthYear().equals(currentMonthYear)) continue;
-
-            BigDecimal totalSpent = expenseRepository.sumByCategoryAndDateBetween(
-                    budget.getUserId(), budget.getCategory(), startMillis, endMillis);
-
+        for (BudgetLimitEntity budget : activeBudgets) {
             String fcmToken = userRepository.findById(budget.getUserId())
                     .map(u -> u.getFcmToken())
                     .orElse(null);
@@ -65,6 +60,9 @@ public class SmartAlertJob {
             if (fcmToken == null || fcmToken.isEmpty()) {
                 continue;
             }
+
+            BigDecimal totalSpent = expenseRepository.sumByCategoryAndDateBetween(
+                    budget.getUserId(), budget.getCategory(), startMillis, endMillis);
 
             if (totalSpent.compareTo(budget.getLimitAmount()) >= 0) {
                 notificationService.sendPushNotification(fcmToken,
@@ -83,18 +81,24 @@ public class SmartAlertJob {
     public void weeklyExpensesSummary() {
         long oneWeekAgoMillis = System.currentTimeMillis() - (7L * 24 * 60 * 60 * 1000);
         
-        userRepository.findAll().forEach(user -> {
-            String fcmToken = user.getFcmToken();
-            if (fcmToken == null || fcmToken.isEmpty()) return;
+        List<Object[]> userExpenses = expenseRepository.sumExpensesGroupedByUser(oneWeekAgoMillis);
 
-            BigDecimal weeklyTotal = expenseRepository.sumByDateGreaterThanEqual(user.getId(), oneWeekAgoMillis);
+        for (Object[] row : userExpenses) {
+            String userId = (String) row[0];
+            BigDecimal weeklyTotal = (BigDecimal) row[1];
 
             if (weeklyTotal.compareTo(BigDecimal.ZERO) > 0) {
-                notificationService.sendPushNotification(fcmToken,
-                        "Weekly Spending Summary \uD83D\uDCCA",
-                        "You spent $" + weeklyTotal.toString() + " over the last 7 days.");
+                String fcmToken = userRepository.findById(userId)
+                        .map(u -> u.getFcmToken())
+                        .orElse(null);
+
+                if (fcmToken != null && !fcmToken.isEmpty()) {
+                    notificationService.sendPushNotification(fcmToken,
+                            "Weekly Spending Summary \uD83D\uDCCA",
+                            "You spent $" + weeklyTotal.toString() + " over the last 7 days.");
+                }
             }
-        });
+        }
     }
 
     // Runs every day at 10 AM to check for due bills

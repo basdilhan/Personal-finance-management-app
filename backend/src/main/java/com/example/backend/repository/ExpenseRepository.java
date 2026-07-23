@@ -16,4 +16,7 @@ public interface ExpenseRepository extends JpaRepository<ExpenseEntity, Integer>
 
     @Query("SELECT COALESCE(SUM(e.amount), 0) FROM ExpenseEntity e WHERE e.userId = :userId AND e.isDeleted = false AND e.date >= :startDate")
     java.math.BigDecimal sumByDateGreaterThanEqual(String userId, Long startDate);
+
+    @Query("SELECT e.userId, SUM(e.amount) FROM ExpenseEntity e WHERE e.isDeleted = false AND e.date >= :startDate GROUP BY e.userId")
+    List<Object[]> sumExpensesGroupedByUser(Long startDate);
 }

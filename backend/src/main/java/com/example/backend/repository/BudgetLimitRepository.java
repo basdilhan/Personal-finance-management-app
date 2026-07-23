@@ -8,4 +8,5 @@ import java.util.Optional;
 public interface BudgetLimitRepository extends JpaRepository<BudgetLimitEntity, Integer> {
     List<BudgetLimitEntity> findByUserIdAndMonthYear(String userId, String monthYear);
     Optional<BudgetLimitEntity> findByUserIdAndCategoryAndMonthYear(String userId, String category, String monthYear);
+    List<BudgetLimitEntity> findByMonthYear(String monthYear);
 }
