@@ -200,16 +200,20 @@ async def cold_start_profile(req: ColdStartRequest):
     try:
         income_k = float(req.income_bracket) / 1000.0
         savings_k = float(req.savings_goal) / 1000.0
+        actual_income = float(req.income_bracket)
     except ValueError:
         income_k = 50.0
         savings_k = 5.0
+        actual_income = 50000.0
 
-    features = np.array([[req.age, income_k, savings_k]])
-    cluster_id = int(kmeans_model.predict(features)[0])
+    if kmeans_model is not None:
+        features = np.array([[req.age, income_k, savings_k]])
+        cluster_id = int(kmeans_model.predict(features)[0])
+    else:
+        cluster_id = 0 # Fallback if model not loaded
+
     profile = cluster_profiles.get(cluster_id, cluster_profiles[0])
-    
-    # Dynamically scale recommendations based on the user's actual income
-    actual_income = float(req.income_bracket)
+
     
     return {
         "assigned_cluster": profile["name"],
