@@ -15,10 +15,12 @@ public class ExpenseController {
 
     private final ExpenseRepository expenseRepository;
     private final com.example.backend.service.MLServiceClient mlServiceClient;
+    private final com.example.backend.service.AuditService auditService;
 
-    public ExpenseController(ExpenseRepository expenseRepository, com.example.backend.service.MLServiceClient mlServiceClient) {
+    public ExpenseController(ExpenseRepository expenseRepository, com.example.backend.service.MLServiceClient mlServiceClient, com.example.backend.service.AuditService auditService) {
         this.expenseRepository = expenseRepository;
         this.mlServiceClient = mlServiceClient;
+        this.auditService = auditService;
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -54,7 +56,9 @@ public class ExpenseController {
         expense.setCategoryIcon(req.categoryIcon != null ? req.categoryIcon : 0);
         expense.setIsDeleted(false);
 
-        return ResponseEntity.ok(expenseRepository.save(expense));
+        ExpenseEntity saved = expenseRepository.save(expense);
+        auditService.logAction(userId, "EXPENSE", "CREATED", String.valueOf(saved.getId()), "Created expense: " + saved.getAmount() + " in " + saved.getCategory());
+        return ResponseEntity.ok(saved);
     }
 
     @PutMapping("/{id}")
@@ -70,7 +74,9 @@ public class ExpenseController {
                     if (req.date != null) existing.setDate(req.date);
                     if (req.time != null) existing.setTime(req.time);
                     if (req.categoryIcon != null) existing.setCategoryIcon(req.categoryIcon);
-                    return ResponseEntity.ok(expenseRepository.save(existing));
+                    ExpenseEntity saved = expenseRepository.save(existing);
+                    auditService.logAction(userId, "EXPENSE", "UPDATED", String.valueOf(saved.getId()), "Updated expense: " + saved.getAmount() + " in " + saved.getCategory());
+                    return ResponseEntity.ok(saved);
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -83,6 +89,7 @@ public class ExpenseController {
                 .map(existing -> {
                     existing.setIsDeleted(true);
                     expenseRepository.save(existing);
+                    auditService.logAction(userId, "EXPENSE", "DELETED", String.valueOf(existing.getId()), "Deleted expense");
                     return ResponseEntity.ok().<Void>build();
                 })
                 .orElse(ResponseEntity.notFound().build());
