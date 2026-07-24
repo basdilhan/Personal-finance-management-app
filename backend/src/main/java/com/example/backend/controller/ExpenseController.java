@@ -95,16 +95,4 @@ public class ExpenseController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping("/categorize")
-    public ResponseEntity<java.util.Map<String, String>> autoCategorize(@RequestBody java.util.Map<String, String> request) {
-        String description = request.get("description");
-        if (description == null || description.trim().isEmpty()) {
-            return ResponseEntity.badRequest().build();
-        }
-        
-        String category = mlServiceClient.autoCategorize(description);
-        java.util.Map<String, String> response = new java.util.HashMap<>();
-        response.put("category", category);
-        return ResponseEntity.ok(response);
-    }
 }

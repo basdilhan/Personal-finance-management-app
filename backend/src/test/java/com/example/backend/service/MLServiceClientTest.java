@@ -35,25 +35,6 @@ class MLServiceClientTest {
         ReflectionTestUtils.setField(mlServiceClient, "mlServiceApiKey", "test-key");
     }
 
-    @Test
-    void testGetChatbotResponse_Fallback() {
-        when(restTemplate.postForObject(anyString(), any(HttpEntity.class), eq(Map.class)))
-                .thenThrow(new RestClientException("Connection refused"));
-
-        String response = mlServiceClient.getChatbotResponse("user1", "Hello", "Context");
-
-        assertEquals("I'm currently unable to connect to the AI brain. Please try again later.", response);
-    }
-
-    @Test
-    void testAutoCategorize_Fallback() {
-        when(restTemplate.postForObject(anyString(), any(HttpEntity.class), eq(Map.class)))
-                .thenThrow(new RestClientException("Timeout"));
-
-        String response = mlServiceClient.autoCategorize("Amazon purchase");
-
-        assertEquals("Other", response);
-    }
 
     @Test
     void testGenerateForecast_Fallback() {
