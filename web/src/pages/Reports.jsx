@@ -122,8 +122,28 @@ export default function Reports() {
       margin: { top: 10 }
     });
 
-    // Expenses Table
+    // Expenses Category Breakdown Table
     let finalY = doc.lastAutoTable.finalY || 115;
+    
+    if (radarData.length > 0) {
+      doc.setFontSize(14);
+      doc.setTextColor(0, 0, 0);
+      doc.text('Expense Breakdown by Category', 14, finalY + 15);
+      
+      autoTable(doc, {
+        startY: finalY + 20,
+        head: [['Category', 'Amount (LKR)', '% of Total']],
+        body: radarData.map(c => [
+          c.category, 
+          c.amount.toLocaleString(), 
+          trueTotalExpenses > 0 ? ((c.amount / trueTotalExpenses) * 100).toFixed(1) + '%' : '0%'
+        ]),
+        headStyles: { fillColor: [37, 99, 235] }, // Accent blue
+      });
+      finalY = doc.lastAutoTable.finalY || finalY + 20;
+    }
+
+    // Expenses Table
     autoTable(doc, {
       startY: finalY + 15,
       head: [['Date', 'Category', 'Description', 'Amount (LKR)']],
