@@ -20,7 +20,9 @@ except ImportError:
     print("WARNING: chronos package not installed. Forecasting will use fallback.")
 
 # --- Security Setup ---
-INTERNAL_API_KEY = os.getenv("ML_SERVICE_API_KEY", "dev_secret_key_123")
+INTERNAL_API_KEY = os.getenv("ML_SERVICE_API_KEY")
+if not INTERNAL_API_KEY:
+    raise RuntimeError("Missing ML_SERVICE_API_KEY")
 
 def verify_api_key(x_api_key: str = Header(None)):
     if x_api_key != INTERNAL_API_KEY:
@@ -61,31 +63,27 @@ except Exception as e:
 # 3. K-Means Clustering for Cold Start
 try:
     kmeans_model = joblib.load("models/kmeans_cold_start.pkl")
+    scaler = joblib.load("models/kmeans_scaler.pkl")
+    label_map = joblib.load("models/kmeans_label_map.pkl")
     # Budgets are defined as percentages of their total income
     cluster_profiles = {
-        0: {"name": "Starting Out (Young, Low Income)", "budget_pct": 0.80, "savings_pct": 0.20},
-        1: {"name": "Established Professional (Mid Age, High Income)", "budget_pct": 0.60, "savings_pct": 0.40},
-        2: {"name": "Frugal Saver (Mixed Age, Mid Income, High Goal)", "budget_pct": 0.50, "savings_pct": 0.50},
-        3: {"name": "High Spender (Mixed Age, High Income, Low Goal)", "budget_pct": 0.90, "savings_pct": 0.10},
+        0: {"name": "Conservative Budget (Lowest Income)", "budget_pct": 0.85, "savings_pct": 0.15},
+        1: {"name": "Balanced Budget (Lower-Mid Income)", "budget_pct": 0.75, "savings_pct": 0.25},
+        2: {"name": "Growth Focused (Upper-Mid Income)", "budget_pct": 0.65, "savings_pct": 0.35},
+        3: {"name": "Aggressive Savings (Highest Income)", "budget_pct": 0.50, "savings_pct": 0.50},
     }
     print("Loaded pre-trained K-Means Cold Start model from disk.")
 except Exception as e:
-    print(f"Failed to load K-Means model: {e}. Please run train_kmeans.py first.")
+    print(f"Failed to load K-Means model, scaler, or label_map: {e}. Please run train_kmeans.py first.")
     kmeans_model = None
+    scaler = None
+    label_map = None
 
 
 # --- Data Models ---
-class ChatRequest(BaseModel):
-    user_id: str
-    message: str
-    context: str
-
 class ForecastRequest(BaseModel):
     user_id: str
     historical_data: List[float] # List of past monthly expense totals
-
-class CategorizeRequest(BaseModel):
-    description: str
 
 class ColdStartRequest(BaseModel):
     user_id: str
@@ -95,106 +93,41 @@ class ColdStartRequest(BaseModel):
 
 # --- Endpoints ---
 
-@app.post("/api/ml/chat", dependencies=[Depends(verify_api_key)])
-async def chat_endpoint(req: ChatRequest):
-    return {
-        "reply": f"Based on your query '{req.message}', and your context: {req.context}. I recommend reviewing your Food budget and transferring $50 to savings.",
-        "model_used": "mock-llm-v1"
-    }
-
 @app.post("/api/ml/forecast", dependencies=[Depends(verify_api_key)])
 async def forecast_endpoint(req: ForecastRequest):
-    non_zero_data = [x for x in req.historical_data if x > 0]
-    
-    if len(non_zero_data) == 0:
-        # Mathematical baseline for new users
-        return {"predicted_next_month_expense": 15000.0, "confidence_score": 0.3}
-    
-    if chronos_pipeline is None or len(non_zero_data) < 2:
-        # Mathematical fallback: average of available month data + 5% buffer
-        avg_expense = sum(non_zero_data) / len(non_zero_data)
-        forecast_val = round(avg_expense * 1.05, 2)
-        return {"predicted_next_month_expense": forecast_val, "confidence_score": 0.5}
-    
-    context_tensor = torch.tensor(req.historical_data)
-    torch.manual_seed(42) # Force probabilistic model to generate deterministic results for the same input
-    forecast = chronos_pipeline.predict(context_tensor, prediction_length=1)
-    predicted_value = float(forecast[0].median().item())
-    
-    if predicted_value < 1.0 and len(non_zero_data) > 0:
-        avg_expense = sum(non_zero_data) / len(non_zero_data)
-        predicted_value = avg_expense * 1.05
-    
-    return {
-        "predicted_next_month_expense": max(0.0, round(predicted_value, 2)),
-        "confidence_score": 0.85
-    }
-
-import requests
-
-@app.post("/api/ml/categorize", dependencies=[Depends(verify_api_key)])
-def auto_categorize(req: CategorizeRequest):
-    API_URL = "https://api-inference.huggingface.co/models/samudu123/srilanka-transaction-classifier"
-    
-    HF_TOKEN = os.getenv("HF_API_TOKEN", "")
-    headers = {}
-    if HF_TOKEN:
-        headers["Authorization"] = f"Bearer {HF_TOKEN}"
-        
+    import datetime
+    from fastapi.responses import JSONResponse
     try:
-        import time
-        max_retries = 3
-        best_category = "other"
-        confidence = 0.0
+        non_zero_data = [x for x in req.historical_data if x > 0]
         
-        for attempt in range(max_retries):
-            response = requests.post(API_URL, headers=headers, json={"inputs": req.description})
-            result = response.json()
-            
-            # Check if model is loading
-            if isinstance(result, dict) and "estimated_time" in result:
-                wait_time = min(result["estimated_time"], 20.0) # Wait up to 20s per attempt
-                print(f"HF Model loading, waiting {wait_time}s... (Attempt {attempt+1}/{max_retries})")
-                time.sleep(wait_time)
-                continue
-            
-            # Parse successful inference API response
-            if isinstance(result, list) and len(result) > 0:
-                if isinstance(result[0], list):
-                    best_pred = result[0][0]
-                else:
-                    best_pred = result[0]
-                    
-                best_category = best_pred.get("label", "other").lower()
-                confidence = best_pred.get("score", 0.5)
-            break
-            
+        if len(non_zero_data) == 0:
+            # Mathematical baseline for new users
+            return {"predicted_next_month_expense": 15000.0, "confidence_score": 0.3}
+        
+        if chronos_pipeline is None or len(non_zero_data) < 2:
+            # Mathematical fallback: average of available month data + 5% buffer
+            avg_expense = sum(non_zero_data) / len(non_zero_data)
+            forecast_val = round(avg_expense * 1.05, 2)
+            return {"predicted_next_month_expense": forecast_val, "confidence_score": 0.5}
+        
+        context_tensor = torch.tensor(non_zero_data)
+        torch.manual_seed(42) # Force probabilistic model to generate deterministic results for the same input
+        forecast = chronos_pipeline.predict(context_tensor, prediction_length=1)
+        predicted_value = float(forecast[0].median().item())
+        
+        if predicted_value < 1.0 and len(non_zero_data) > 0:
+            avg_expense = sum(non_zero_data) / len(non_zero_data)
+            predicted_value = avg_expense * 1.05
+        
+        return {
+            "predicted_next_month_expense": max(0.0, round(predicted_value, 2)),
+            "confidence_score": 0.85
+        }
     except Exception as e:
-        print("HF API Error:", e)
-        best_category = "other"
-        confidence = 0.0
-    
-    if "label" in best_category:
-        best_category = best_category.split('_')[-1]
-        
-    category_mapping = {
-        "food": "Food & Dining",
-        "transport": "Transportation",
-        "utilities": "Mobile & Internet",
-        "health": "Healthcare",
-        "education": "Education",
-        "entertainment": "Entertainment",
-        "shopping": "Shopping",
-        "groceries": "Groceries",
-        "fuel": "Fuel"
-    }
-    
-    mapped_category = category_mapping.get(best_category, best_category.capitalize())
-    
-    return {
-        "category": mapped_category,
-        "confidence": float(confidence)
-    }
+        timestamp = datetime.datetime.now().isoformat()
+        print(f"[{timestamp}] Error in forecast_endpoint: {str(e)}")
+        return JSONResponse(status_code=500, content={"message": "Internal model error during forecasting", "error": str(e)})
+
 
 @app.post("/api/ml/cold_start", dependencies=[Depends(verify_api_key)])
 async def cold_start_profile(req: ColdStartRequest):
@@ -207,9 +140,11 @@ async def cold_start_profile(req: ColdStartRequest):
         savings_k = 5.0
         actual_income = 50000.0
 
-    if kmeans_model is not None:
+    if kmeans_model is not None and scaler is not None and label_map is not None:
         features = np.array([[req.age, income_k, savings_k]])
-        cluster_id = int(kmeans_model.predict(features)[0])
+        scaled_features = scaler.transform(features)
+        raw_cluster_id = int(kmeans_model.predict(scaled_features)[0])
+        cluster_id = label_map[raw_cluster_id]
     else:
         cluster_id = 0 # Fallback if model not loaded
 

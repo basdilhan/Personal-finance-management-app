@@ -43,51 +43,6 @@ public class MLServiceClient {
         return headers;
     }
 
-    /**
-     * Call Step 4 Chatbot endpoint.
-     */
-    public String getChatbotResponse(String userId, String message, String context) {
-        String url = mlServiceUrl + "/api/ml/chat";
-
-        Map<String, String> requestBody = new HashMap<>();
-        requestBody.put("user_id", userId);
-        requestBody.put("message", message);
-        requestBody.put("context", context);
-
-        HttpEntity<Map<String, String>> request = new HttpEntity<>(requestBody, getSecureHeaders());
-
-        try {
-            Map<String, Object> response = restTemplate.postForObject(url, request, Map.class);
-            if (response != null && response.containsKey("reply")) {
-                return (String) response.get("reply");
-            }
-        } catch (Exception e) {
-            System.err.println("Error calling ML Chat endpoint: " + e.getMessage());
-        }
-        return "I'm currently unable to connect to the AI brain. Please try again later.";
-    }
-
-    /**
-     * Call Step 6b Auto-Categorization endpoint.
-     */
-    public String autoCategorize(String description) {
-        String url = mlServiceUrl + "/api/ml/categorize";
-
-        Map<String, String> requestBody = new HashMap<>();
-        requestBody.put("description", description);
-
-        HttpEntity<Map<String, String>> request = new HttpEntity<>(requestBody, getSecureHeaders());
-
-        try {
-            Map<String, Object> response = restTemplate.postForObject(url, request, Map.class);
-            if (response != null && response.containsKey("category")) {
-                return (String) response.get("category");
-            }
-        } catch (Exception e) {
-            System.err.println("Error calling ML Categorization endpoint: " + e.getMessage());
-        }
-        return "Other"; // Fallback category
-    }
 
     /**
      * Call Step 6a Forecast endpoint.

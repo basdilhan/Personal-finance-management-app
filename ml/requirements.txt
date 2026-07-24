@@ -1,12 +1,12 @@
-fastapi
-uvicorn
-pydantic
-python-dotenv
-requests
+fastapi==0.139.0
+uvicorn==0.51.0
+pydantic==2.13.4
+python-dotenv==1.2.2
+requests==2.34.2
 --extra-index-url https://download.pytorch.org/whl/cpu
-transformers
-torch
-scikit-learn
-pandas
-joblib
-git+https://github.com/amazon-science/chronos-forecasting.git
+transformers==5.12.0
+torch==2.12.0
+scikit-learn==1.9.0
+pandas==3.0.3
+joblib==1.5.3
+chronos-forecasting @ git+https://github.com/amazon-science/chronos-forecasting.git@7dc4435706a4454feb79df44ca9f33631f3027bf
