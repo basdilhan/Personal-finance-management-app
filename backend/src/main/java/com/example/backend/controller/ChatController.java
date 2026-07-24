@@ -7,6 +7,8 @@ import com.example.backend.repository.BillRepository;
 import com.example.backend.repository.BudgetLimitRepository;
 import com.example.backend.repository.ExpenseRepository;
 import com.example.backend.repository.IncomeRepository;
+import com.example.backend.repository.ForecastRepository;
+import com.example.backend.entity.ForecastEntity;
 import com.example.backend.service.MLServiceClient;
 import com.example.backend.service.GeminiService;
 import org.springframework.http.ResponseEntity;
@@ -29,19 +31,22 @@ public class ChatController {
     private final IncomeRepository incomeRepository;
     private final BudgetLimitRepository budgetLimitRepository;
     private final BillRepository billRepository;
+    private final ForecastRepository forecastRepository;
 
     public ChatController(MLServiceClient mlServiceClient,
                           GeminiService geminiService,
                           ExpenseRepository expenseRepository,
                           IncomeRepository incomeRepository,
                           BudgetLimitRepository budgetLimitRepository,
-                          BillRepository billRepository) {
+                          BillRepository billRepository,
+                          ForecastRepository forecastRepository) {
         this.mlServiceClient = mlServiceClient;
         this.geminiService = geminiService;
         this.expenseRepository = expenseRepository;
         this.incomeRepository = incomeRepository;
         this.budgetLimitRepository = budgetLimitRepository;
         this.billRepository = billRepository;
+        this.forecastRepository = forecastRepository;
     }
 
     @PostMapping
@@ -134,15 +139,26 @@ public class ChatController {
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
 
             boolean isFallback = false;
-            Double predictedNextMonthExpense = mlServiceClient.generateForecast(userId, historicalData);
+            Double predictedNextMonthExpense = null;
+            
+            java.util.Optional<ForecastEntity> existingForecast = forecastRepository.findByUserIdAndForecastMonth(userId, currentMonth.toString());
+            if (existingForecast.isPresent()) {
+                predictedNextMonthExpense = existingForecast.get().getPredictedExpense().doubleValue();
+            }
+            
             if (predictedNextMonthExpense == null || predictedNextMonthExpense <= 0.0) {
-                isFallback = true;
-                if (monthlyExpenses.compareTo(BigDecimal.ZERO) > 0) {
-                    predictedNextMonthExpense = monthlyExpenses.doubleValue() * 1.05;
-                } else if (monthlyIncome.compareTo(BigDecimal.ZERO) > 0) {
-                    predictedNextMonthExpense = monthlyIncome.doubleValue() * 0.40;
-                } else {
-                    predictedNextMonthExpense = 15000.0;
+                // If it doesn't exist yet, we can ask the ML service or use a fallback
+                predictedNextMonthExpense = mlServiceClient.generateForecast(userId, historicalData);
+                
+                if (predictedNextMonthExpense == null || predictedNextMonthExpense <= 0.0) {
+                    isFallback = true;
+                    if (monthlyExpenses.compareTo(BigDecimal.ZERO) > 0) {
+                        predictedNextMonthExpense = monthlyExpenses.doubleValue() * 1.05;
+                    } else if (monthlyIncome.compareTo(BigDecimal.ZERO) > 0) {
+                        predictedNextMonthExpense = monthlyIncome.doubleValue() * 0.40;
+                    } else {
+                        predictedNextMonthExpense = 15000.0;
+                    }
                 }
             }
 

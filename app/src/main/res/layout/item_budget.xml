@@ -45,7 +45,7 @@
             android:id="@+id/tv_budget_status"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="$0.00 / $100.00"
+            android:text="LKR 0.00 / LKR 100.00"
             android:textColor="#64748B"
             android:textSize="14sp"
             android:layout_marginBottom="8dp" />
