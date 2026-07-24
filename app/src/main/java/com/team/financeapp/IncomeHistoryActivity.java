@@ -33,6 +33,7 @@ public class IncomeHistoryActivity extends AppCompatActivity implements IncomeAd
     private static final String TAG = "IncomeHistoryActivity";
 
     private TextView tvTotalIncome;
+    private TextView tvTotalIncomeLabel;
     private LinearLayout emptyStateContainer;
     private MaterialButton btnAddFirstIncome;
     private MaterialButton btnLogout;
@@ -73,6 +74,7 @@ public class IncomeHistoryActivity extends AppCompatActivity implements IncomeAd
 
     private void initializeViews() {
         tvTotalIncome = findViewById(R.id.tv_total_income);
+        tvTotalIncomeLabel = findViewById(R.id.tv_total_income_label);
         emptyStateContainer = findViewById(R.id.empty_state_container);
         btnAddFirstIncome = findViewById(R.id.btn_add_first_income);
         btnLogout = findViewById(R.id.btn_logout);
@@ -246,18 +248,23 @@ public class IncomeHistoryActivity extends AppCompatActivity implements IncomeAd
 
     private void calculateHeaderTotalIncome() {
         double total = 0;
-        Calendar now = Calendar.getInstance();
-        int currentMonth = now.get(Calendar.MONTH);
-        int currentYear = now.get(Calendar.YEAR);
-
-        for (IncomeEntry entry : allIncomeList) {
-            Calendar cal = Calendar.getInstance();
-            cal.setTimeInMillis(normalizeEpochMillis(entry.getDate()));
-            if (cal.get(Calendar.MONTH) == currentMonth && cal.get(Calendar.YEAR) == currentYear) {
-                total += entry.getAmount();
-            }
+        for (IncomeEntry entry : incomeList) {
+            total += entry.getAmount();
         }
         tvTotalIncome.setText(String.format(Locale.getDefault(), "LKR %,.2f", total));
+
+        if (tvTotalIncomeLabel != null) {
+            int checkedId = chipGroupFilter != null ? chipGroupFilter.getCheckedChipId() : R.id.chip_all;
+            if (checkedId == R.id.chip_this_month) {
+                tvTotalIncomeLabel.setText("Total This Month");
+            } else if (checkedId == R.id.chip_last_7_days) {
+                tvTotalIncomeLabel.setText("Total Last 7 Days");
+            } else if (checkedId == R.id.chip_all) {
+                tvTotalIncomeLabel.setText("Total All Time");
+            } else {
+                tvTotalIncomeLabel.setText("Total (Filtered)");
+            }
+        }
     }
 
     private long normalizeEpochMillis(long raw) {

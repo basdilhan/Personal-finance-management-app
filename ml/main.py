@@ -117,6 +117,7 @@ async def forecast_endpoint(req: ForecastRequest):
         return {"predicted_next_month_expense": forecast_val, "confidence_score": 0.5}
     
     context_tensor = torch.tensor(req.historical_data)
+    torch.manual_seed(42) # Force probabilistic model to generate deterministic results for the same input
     forecast = chronos_pipeline.predict(context_tensor, prediction_length=1)
     predicted_value = float(forecast[0].median().item())
     

@@ -52,7 +52,22 @@ public class ForecastController {
                 historicalData.add(monthlyAggregates.getOrDefault(ym, BigDecimal.ZERO).doubleValue());
             }
 
-            Double predictedNextMonthExpense = mlServiceClient.generateForecast(userId, historicalData);
+            Double predictedNextMonthExpense;
+            String monthString = currentMonth.toString();
+            java.util.Optional<ForecastEntity> existing = forecastRepository.findByUserIdAndForecastMonth(userId, monthString);
+
+            if (existing.isPresent()) {
+                predictedNextMonthExpense = existing.get().getPredictedExpense().doubleValue();
+            } else {
+                predictedNextMonthExpense = mlServiceClient.generateForecast(userId, historicalData);
+                if (predictedNextMonthExpense == null) predictedNextMonthExpense = 0.0;
+                
+                ForecastEntity newForecast = new ForecastEntity();
+                newForecast.setUserId(userId);
+                newForecast.setForecastMonth(monthString);
+                newForecast.setPredictedExpense(BigDecimal.valueOf(predictedNextMonthExpense));
+                forecastRepository.save(newForecast);
+            }
 
             return ResponseEntity.ok(Map.of(
                 "historical_data", historicalData,
