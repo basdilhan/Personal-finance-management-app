@@ -14,9 +14,11 @@ import java.util.List;
 public class GoalController {
 
     private final GoalRepository goalRepository;
+    private final com.example.backend.service.AuditService auditService;
 
-    public GoalController(GoalRepository goalRepository) {
+    public GoalController(GoalRepository goalRepository, com.example.backend.service.AuditService auditService) {
         this.goalRepository = goalRepository;
+        this.auditService = auditService;
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -58,7 +60,9 @@ public class GoalController {
         goal.setProgressCircleBg(req.progressCircleBg != null ? req.progressCircleBg : 0);
         goal.setIsDeleted(false);
 
-        return ResponseEntity.ok(goalRepository.save(goal));
+        GoalEntity saved = goalRepository.save(goal);
+        auditService.logAction(userId, "GOAL", "CREATED", String.valueOf(saved.getId()), "Created goal: " + saved.getName());
+        return ResponseEntity.ok(saved);
     }
 
     @PutMapping("/{id}")
@@ -77,7 +81,9 @@ public class GoalController {
                     if (req.category != null) existing.setCategory(req.category);
                     if (req.categoryIcon != null) existing.setCategoryIcon(req.categoryIcon);
                     if (req.progressCircleBg != null) existing.setProgressCircleBg(req.progressCircleBg);
-                    return ResponseEntity.ok(goalRepository.save(existing));
+                    GoalEntity saved = goalRepository.save(existing);
+                    auditService.logAction(userId, "GOAL", "UPDATED", String.valueOf(saved.getId()), "Updated goal: " + saved.getName());
+                    return ResponseEntity.ok(saved);
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -104,7 +110,9 @@ public class GoalController {
                     BigDecimal newAdded = (existing.getAddedSavingsAmount() != null ? existing.getAddedSavingsAmount() : BigDecimal.ZERO).add(amountToAdd);
                     existing.setCurrentAmount(newCurrent);
                     existing.setAddedSavingsAmount(newAdded);
-                    return ResponseEntity.ok(goalRepository.save(existing));
+                    GoalEntity saved = goalRepository.save(existing);
+                    auditService.logAction(userId, "GOAL", "UPDATED", String.valueOf(saved.getId()), "Added savings to goal: " + saved.getName() + " (+" + amountToAdd + ")");
+                    return ResponseEntity.ok(saved);
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -117,6 +125,7 @@ public class GoalController {
                 .map(existing -> {
                     existing.setIsDeleted(true);
                     goalRepository.save(existing);
+                    auditService.logAction(userId, "GOAL", "DELETED", String.valueOf(existing.getId()), "Deleted goal");
                     return ResponseEntity.ok().<Void>build();
                 })
                 .orElse(ResponseEntity.notFound().build());

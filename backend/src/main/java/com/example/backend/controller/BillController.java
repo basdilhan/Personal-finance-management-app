@@ -14,9 +14,11 @@ import java.util.List;
 public class BillController {
 
     private final BillRepository billRepository;
+    private final com.example.backend.service.AuditService auditService;
 
-    public BillController(BillRepository billRepository) {
+    public BillController(BillRepository billRepository, com.example.backend.service.AuditService auditService) {
         this.billRepository = billRepository;
+        this.auditService = auditService;
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -58,7 +60,9 @@ public class BillController {
         bill.setIsRecurring(req.isRecurring != null ? req.isRecurring : false);
         bill.setIsDeleted(false);
 
-        return ResponseEntity.ok(billRepository.save(bill));
+        BillEntity saved = billRepository.save(bill);
+        auditService.logAction(userId, "BILL", "CREATED", String.valueOf(saved.getId()), "Created bill: " + saved.getName());
+        return ResponseEntity.ok(saved);
     }
 
     @PutMapping("/{id}")
@@ -77,7 +81,9 @@ public class BillController {
                     if (req.status != null) existing.setStatus(req.status);
                     if (req.indicatorColor != null) existing.setIndicatorColor(req.indicatorColor);
                     if (req.isRecurring != null) existing.setIsRecurring(req.isRecurring);
-                    return ResponseEntity.ok(billRepository.save(existing));
+                    BillEntity saved = billRepository.save(existing);
+                    auditService.logAction(userId, "BILL", "UPDATED", String.valueOf(saved.getId()), "Updated bill: " + saved.getName());
+                    return ResponseEntity.ok(saved);
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -90,6 +96,7 @@ public class BillController {
                 .map(existing -> {
                     existing.setIsDeleted(true);
                     billRepository.save(existing);
+                    auditService.logAction(userId, "BILL", "DELETED", String.valueOf(existing.getId()), "Deleted bill");
                     return ResponseEntity.ok().<Void>build();
                 })
                 .orElse(ResponseEntity.notFound().build());

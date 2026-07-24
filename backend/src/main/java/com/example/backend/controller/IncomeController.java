@@ -14,9 +14,11 @@ import java.util.List;
 public class IncomeController {
 
     private final IncomeRepository incomeRepository;
+    private final com.example.backend.service.AuditService auditService;
 
-    public IncomeController(IncomeRepository incomeRepository) {
+    public IncomeController(IncomeRepository incomeRepository, com.example.backend.service.AuditService auditService) {
         this.incomeRepository = incomeRepository;
+        this.auditService = auditService;
     }
 
     // DTO to safely accept Android payload (ignores Android-only fields like localId, syncState, remoteId)
@@ -55,7 +57,9 @@ public class IncomeController {
         income.setSourceIcon(req.sourceIcon != null ? req.sourceIcon : 0);
         income.setIsDeleted(false);
 
-        return ResponseEntity.ok(incomeRepository.save(income));
+        IncomeEntity saved = incomeRepository.save(income);
+        auditService.logAction(userId, "INCOME", "CREATED", String.valueOf(saved.getId()), "Added income: " + saved.getAmount() + " from " + saved.getSource());
+        return ResponseEntity.ok(saved);
     }
 
     @PutMapping("/{id}")
@@ -73,7 +77,9 @@ public class IncomeController {
                     if (req.date != null) existing.setDate(req.date);
                     if (req.time != null) existing.setTime(req.time);
                     if (req.sourceIcon != null) existing.setSourceIcon(req.sourceIcon);
-                    return ResponseEntity.ok(incomeRepository.save(existing));
+                    IncomeEntity saved = incomeRepository.save(existing);
+                    auditService.logAction(userId, "INCOME", "UPDATED", String.valueOf(saved.getId()), "Updated income: " + saved.getAmount() + " from " + saved.getSource());
+                    return ResponseEntity.ok(saved);
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -87,6 +93,7 @@ public class IncomeController {
                 .map(existing -> {
                     existing.setIsDeleted(true);
                     incomeRepository.save(existing);
+                    auditService.logAction(userId, "INCOME", "DELETED", String.valueOf(existing.getId()), "Deleted income");
                     return ResponseEntity.ok().<Void>build();
                 })
                 .orElse(ResponseEntity.notFound().build());

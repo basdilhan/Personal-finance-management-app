@@ -123,6 +123,22 @@
                                 android:layout_marginEnd="8dp">
 
                                 <ImageView
+                                    android:id="@+id/btn_sync_status"
+                                    android:layout_width="42dp"
+                                    android:layout_height="42dp"
+                                    android:background="@drawable/circle_translucent"
+                                    android:contentDescription="Sync Status"
+                                    android:src="@drawable/ic_sync"
+                                    android:padding="10dp"
+                                    android:scaleType="centerInside" />
+                            </FrameLayout>
+
+                            <FrameLayout
+                                android:layout_width="42dp"
+                                android:layout_height="42dp"
+                                android:layout_marginEnd="8dp">
+
+                                <ImageView
                                     android:id="@+id/btn_notifications"
                                     android:layout_width="42dp"
                                     android:layout_height="42dp"
@@ -728,6 +744,8 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
+                <include layout="@layout/layout_empty_state" android:id="@+id/empty_state_expenses" android:layout_width="match_parent" android:layout_height="wrap_content" android:visibility="gone" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -759,6 +777,8 @@
                             android:layout_height="300dp" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
+
+                <include layout="@layout/layout_empty_state" android:id="@+id/empty_state_incomes" android:layout_width="match_parent" android:layout_height="wrap_content" android:visibility="gone" />
 
                 <!-- Savings Goal Section -->
                 <LinearLayout
@@ -934,6 +954,8 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
+                <include layout="@layout/layout_empty_state" android:id="@+id/empty_state_goals" android:layout_width="match_parent" android:layout_height="wrap_content" android:visibility="gone" />
+
                 <!-- Upcoming Bills Section -->
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -965,6 +987,7 @@
 
                 <!-- Bill Cards Container -->
                 <LinearLayout
+                    android:id="@+id/container_bills"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
@@ -1224,6 +1247,8 @@
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
                 </LinearLayout>
+
+                <include layout="@layout/layout_empty_state" android:id="@+id/empty_state_bills" android:layout_width="match_parent" android:layout_height="wrap_content" android:visibility="gone" />
 
                 <!-- Bottom Spacing -->
                 <View
