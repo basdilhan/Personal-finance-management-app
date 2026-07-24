@@ -246,8 +246,16 @@ public class IncomeHistoryActivity extends AppCompatActivity implements IncomeAd
 
     private void calculateHeaderTotalIncome() {
         double total = 0;
+        Calendar now = Calendar.getInstance();
+        int currentMonth = now.get(Calendar.MONTH);
+        int currentYear = now.get(Calendar.YEAR);
+
         for (IncomeEntry entry : allIncomeList) {
-            total += entry.getAmount();
+            Calendar cal = Calendar.getInstance();
+            cal.setTimeInMillis(normalizeEpochMillis(entry.getDate()));
+            if (cal.get(Calendar.MONTH) == currentMonth && cal.get(Calendar.YEAR) == currentYear) {
+                total += entry.getAmount();
+            }
         }
         tvTotalIncome.setText(String.format(Locale.getDefault(), "LKR %,.2f", total));
     }

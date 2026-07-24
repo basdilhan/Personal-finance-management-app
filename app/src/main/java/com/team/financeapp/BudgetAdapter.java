@@ -48,7 +48,7 @@ public class BudgetAdapter extends RecyclerView.Adapter<BudgetAdapter.BudgetView
         double spent = progress.getSpentAmount();
         double limit = progress.getLimit().limitAmount;
 
-        holder.tvStatus.setText(String.format("$%.2f / $%.2f", spent, limit));
+        holder.tvStatus.setText(String.format(java.util.Locale.getDefault(), "LKR %,.2f / LKR %,.2f", spent, limit));
 
         int percent = limit > 0 ? (int) ((spent / limit) * 100) : 0;
         holder.progressBar.setProgress(percent);

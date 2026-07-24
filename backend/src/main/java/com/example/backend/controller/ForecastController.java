@@ -42,7 +42,7 @@ public class ForecastController {
 
             Map<YearMonth, BigDecimal> monthlyAggregates = allExpenses.stream()
                 .collect(Collectors.groupingBy(
-                    e -> YearMonth.from(java.time.Instant.ofEpochMilli(e.getDate()).atZone(ZoneId.of("Asia/Colombo")).toLocalDate()),
+                    e -> YearMonth.from(java.time.Instant.ofEpochMilli(e.getDate() < 10000000000L ? e.getDate() * 1000L : e.getDate()).atZone(ZoneId.of("Asia/Colombo")).toLocalDate()),
                     Collectors.reducing(BigDecimal.ZERO, ExpenseEntity::getAmount, BigDecimal::add)
                 ));
 
