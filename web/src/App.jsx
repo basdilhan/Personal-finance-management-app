@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
+import { LanguageProvider } from './context/LanguageContext';
 import { AnimatePresence, motion } from 'framer-motion';
 
 // Components
@@ -12,6 +13,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Chatbot from './pages/Chatbot';
 import Blogs from './pages/Blogs';
+import Learn from './pages/Learn';
 import MLInsights from './pages/MLInsights';
 import Profile from './pages/Profile';
 import Reports from './pages/Reports';
@@ -72,6 +74,12 @@ const AnimatedRoutes = () => {
             <Blogs />
           </PrivateRoute>
         } />
+        
+        <Route path="/learn" element={
+          <PrivateRoute>
+            <Learn />
+          </PrivateRoute>
+        } />
 
         <Route path="/reports" element={
           <PrivateRoute>
@@ -94,11 +102,13 @@ const AnimatedRoutes = () => {
 function App() {
   return (
     <ThemeProvider>
-      <AuthProvider>
-        <Router>
-          <AnimatedRoutes />
-        </Router>
-      </AuthProvider>
+      <LanguageProvider>
+        <AuthProvider>
+          <Router>
+            <AnimatedRoutes />
+          </Router>
+        </AuthProvider>
+      </LanguageProvider>
     </ThemeProvider>
   );
 }
