@@ -1,0 +1,10 @@
+import numpy as np
+np.random.seed(42)
+incomes = np.random.lognormal(mean=4.25, sigma=0.6, size=1000)
+incomes = np.clip(incomes, 30.0, 500.0)
+print(f"Mean:   {np.mean(incomes):.2f}k LKR")
+print(f"Median: {np.median(incomes):.2f}k LKR")
+print(f"Min:    {np.min(incomes):.2f}k LKR")
+print(f"Max:    {np.max(incomes):.2f}k LKR")
+print(f"% under 100k: {(incomes < 100).sum() / 10:.1f}%")
+print(f"% over 300k:  {(incomes > 300).sum() / 10:.1f}%")
