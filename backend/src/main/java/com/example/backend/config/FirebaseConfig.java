@@ -8,8 +8,13 @@ import org.springframework.context.annotation.Configuration;
 import jakarta.annotation.PostConstruct;
 import java.io.InputStream;
 
+import org.springframework.context.annotation.Lazy;
+
 @Configuration
+@Lazy(false)
 public class FirebaseConfig {
+
+    public static String initError = null;
 
     @PostConstruct
     public void initialize() {
@@ -52,6 +57,7 @@ public class FirebaseConfig {
                 System.out.println("Firebase initialized successfully!");
             }
         } catch (Exception e) {
+            initError = e.getMessage();
             System.out.println("FirebaseConfig error: " + e.getMessage());
             e.printStackTrace();
         }
