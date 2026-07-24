@@ -55,6 +55,9 @@
             android:name=".chatbot.ChatbotActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".EducationActivity"
+            android:exported="false" />
 
         <receiver
             android:name=".notifications.FinancialReminderReceiver"

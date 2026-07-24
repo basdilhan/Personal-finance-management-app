@@ -137,32 +137,6 @@ public class AddExpenseActivity extends AppCompatActivity {
         etDate.setFocusable(false);
         etDate.setClickable(true);
 
-        // Magical real-time AI auto-categorization when user stops typing
-        final android.os.Handler typingHandler = new android.os.Handler();
-        final Runnable typingRunnable = new Runnable() {
-            @Override
-            public void run() {
-                autoCategorizeWithAI();
-            }
-        };
-
-        etDescription.addTextChangedListener(new android.text.TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
-            
-            @Override
-            public void afterTextChanged(android.text.Editable s) {
-                typingHandler.removeCallbacks(typingRunnable);
-                String text = s.toString().trim();
-                if (text.length() >= 3) {
-                    typingHandler.postDelayed(typingRunnable, 1500); // 1.5 seconds after typing stops
-                }
-            }
-        });
-
 
 
         btnSave.setOnClickListener(new View.OnClickListener() {
