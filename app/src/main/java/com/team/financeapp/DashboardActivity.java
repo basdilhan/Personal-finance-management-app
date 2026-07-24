@@ -76,6 +76,7 @@ public class DashboardActivity extends AppCompatActivity {
     private MaterialButton btnLogout;
     private MaterialButton buttonToggleBalanceVisibility;
     private View actionAddExpense, actionAddIncome, actionAddBill, actionAddGoal;
+    private ImageView btnSyncStatus;
     private View btnNotifications;
     private View notificationBadge;
     private TextView buttonViewAllBills;
@@ -124,6 +125,12 @@ public class DashboardActivity extends AppCompatActivity {
     private ExpenseRepository expenseRepository;
     private IncomeRepository incomeRepository;
     private GoalRepository goalRepository;
+
+    private View containerBills;
+    private View emptyStateExpenses;
+    private View emptyStateIncomes;
+    private View emptyStateGoals;
+    private View emptyStateBills;
 
     private List<Bill> latestBills = new ArrayList<>();
     private List<Expense> latestExpenses = new ArrayList<>();
@@ -215,6 +222,12 @@ public class DashboardActivity extends AppCompatActivity {
         cardBill1 = findViewById(R.id.card_bill_electricity);
         cardBill2 = findViewById(R.id.card_bill_water);
         cardBill3 = findViewById(R.id.card_bill_internet);
+
+        containerBills = findViewById(R.id.container_bills);
+        emptyStateExpenses = findViewById(R.id.empty_state_expenses);
+        emptyStateIncomes = findViewById(R.id.empty_state_incomes);
+        emptyStateGoals = findViewById(R.id.empty_state_goals);
+        emptyStateBills = findViewById(R.id.empty_state_bills);
         imageBill1Icon = findViewById(R.id.image_bill_1_icon);
         imageBill2Icon = findViewById(R.id.image_bill_2_icon);
         imageBill3Icon = findViewById(R.id.image_bill_3_icon);
@@ -257,6 +270,7 @@ public class DashboardActivity extends AppCompatActivity {
         }
 
         btnNotifications = findViewById(R.id.btn_notifications);
+        btnSyncStatus = findViewById(R.id.btn_sync_status);
         notificationBadge = findViewById(R.id.notification_badge);
     }
 
@@ -311,10 +325,48 @@ public class DashboardActivity extends AppCompatActivity {
         }
 
         bindUserHeader();
+        
+        // Reset counter just in case
+        pendingNetworkRequests = 0;
+        
         loadBills(userId);
         loadExpenses(userId);
         loadGoals(userId);
         loadIncome(userId);
+    }
+
+    private int pendingNetworkRequests = 0;
+
+    private void setNetworkLoading(boolean isLoading) {
+        runOnUiThread(() -> {
+            if (btnSyncStatus == null) return;
+            if (isLoading) {
+                pendingNetworkRequests++;
+                if (pendingNetworkRequests == 1) {
+                    btnSyncStatus.setImageResource(R.drawable.ic_sync);
+                    btnSyncStatus.setColorFilter(getColorCompat(R.color.accent));
+                    ObjectAnimator rotation = ObjectAnimator.ofFloat(btnSyncStatus, "rotation", 0f, 360f);
+                    rotation.setDuration(1000);
+                    rotation.setRepeatCount(ObjectAnimator.INFINITE);
+                    rotation.setInterpolator(new android.view.animation.LinearInterpolator());
+                    rotation.start();
+                    btnSyncStatus.setTag(rotation);
+                }
+            } else {
+                pendingNetworkRequests--;
+                if (pendingNetworkRequests <= 0) {
+                    pendingNetworkRequests = 0;
+                    ObjectAnimator rotation = (ObjectAnimator) btnSyncStatus.getTag();
+                    if (rotation != null) {
+                        rotation.cancel();
+                        btnSyncStatus.setTag(null);
+                    }
+                    btnSyncStatus.setRotation(0f);
+                    btnSyncStatus.setImageResource(R.drawable.ic_check);
+                    btnSyncStatus.setColorFilter(getColorCompat(R.color.success));
+                }
+            }
+        });
     }
 
     private void ensureNotificationPermission() {
@@ -410,9 +462,11 @@ public class DashboardActivity extends AppCompatActivity {
     }
 
     private void loadBills(String userId) {
+        setNetworkLoading(true);
         billRepository.loadBills(userId, new BillRepository.LoadBillsCallback() {
             @Override
             public void onBillsLoaded(List<Bill> bills) {
+                setNetworkLoading(false);
                 latestBills = new ArrayList<>(bills);
                 updateUpcomingBills();
                 updateBillsChartFromData();
@@ -421,15 +475,18 @@ public class DashboardActivity extends AppCompatActivity {
 
             @Override
             public void onError(String message) {
+                setNetworkLoading(false);
                 Toast.makeText(DashboardActivity.this, message, Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private void loadExpenses(String userId) {
+        setNetworkLoading(true);
         expenseRepository.loadExpenses(userId, new ExpenseRepository.LoadExpensesCallback() {
             @Override
             public void onExpensesLoaded(List<Expense> expenses) {
+                setNetworkLoading(false);
                 latestExpenses = new ArrayList<>(expenses);
                 updateExpenseChartFromData();
                 updateDashboardTotalsAndInsight();
@@ -437,15 +494,18 @@ public class DashboardActivity extends AppCompatActivity {
 
             @Override
             public void onError(String message) {
+                setNetworkLoading(false);
                 Toast.makeText(DashboardActivity.this, message, Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private void loadGoals(String userId) {
+        setNetworkLoading(true);
         goalRepository.loadGoals(userId, new GoalRepository.LoadGoalsCallback() {
             @Override
             public void onGoalsLoaded(List<Goal> loadedGoals) {
+                setNetworkLoading(false);
                 List<GoalSummary> goals = new ArrayList<>();
                 for (Goal g : loadedGoals) {
                     goals.add(new GoalSummary(
@@ -464,6 +524,7 @@ public class DashboardActivity extends AppCompatActivity {
 
             @Override
             public void onError(String message) {
+                setNetworkLoading(false);
                 latestGoals = Collections.emptyList();
                 updateGoalCard();
                 updateDashboardTotalsAndInsight();
@@ -472,9 +533,11 @@ public class DashboardActivity extends AppCompatActivity {
     }
 
     private void loadIncome(String userId) {
+        setNetworkLoading(true);
         incomeRepository.loadIncome(userId, new IncomeRepository.LoadIncomeCallback() {
             @Override
             public void onIncomeLoaded(List<IncomeEntry> incomes) {
+                setNetworkLoading(false);
                 latestIncomes = new ArrayList<>(incomes);
                 updateIncomeChartFromData();
                 updateDashboardTotalsAndInsight();
@@ -482,6 +545,7 @@ public class DashboardActivity extends AppCompatActivity {
 
             @Override
             public void onError(String message) {
+                setNetworkLoading(false);
                 Toast.makeText(DashboardActivity.this, message, Toast.LENGTH_SHORT).show();
             }
         });
@@ -593,7 +657,17 @@ public class DashboardActivity extends AppCompatActivity {
 
         if (total <= 0.0d) {
             chartExpense.clear();
+            findViewById(R.id.card_expense_chart).setVisibility(View.GONE);
+            if (emptyStateExpenses != null) {
+                emptyStateExpenses.setVisibility(View.VISIBLE);
+                ((TextView) emptyStateExpenses.findViewById(R.id.text_empty_title)).setText("No Expenses Yet");
+                ((TextView) emptyStateExpenses.findViewById(R.id.text_empty_message)).setText("Your expenses will appear here once you start spending.");
+                ((ImageView) emptyStateExpenses.findViewById(R.id.image_empty_state)).setImageResource(R.drawable.ic_expenses);
+            }
             return;
+        } else {
+            findViewById(R.id.card_expense_chart).setVisibility(View.VISIBLE);
+            if (emptyStateExpenses != null) emptyStateExpenses.setVisibility(View.GONE);
         }
 
         String[] order = new String[]{"Housing", "Food", "Transport", "Entertainment", "Other"};
@@ -637,7 +711,17 @@ public class DashboardActivity extends AppCompatActivity {
 
         if (total <= 0.0d) {
             chartIncome.clear();
+            findViewById(R.id.card_income_chart).setVisibility(View.GONE);
+            if (emptyStateIncomes != null) {
+                emptyStateIncomes.setVisibility(View.VISIBLE);
+                ((TextView) emptyStateIncomes.findViewById(R.id.text_empty_title)).setText("No Income Yet");
+                ((TextView) emptyStateIncomes.findViewById(R.id.text_empty_message)).setText("Your incomes will be visualized here.");
+                ((ImageView) emptyStateIncomes.findViewById(R.id.image_empty_state)).setImageResource(R.drawable.ic_wallet);
+            }
             return;
+        } else {
+            findViewById(R.id.card_income_chart).setVisibility(View.VISIBLE);
+            if (emptyStateIncomes != null) emptyStateIncomes.setVisibility(View.GONE);
         }
 
         String[] order = new String[]{"Salary", "Business", "Freelance", "Other"};
@@ -691,13 +775,17 @@ public class DashboardActivity extends AppCompatActivity {
         }
 
         if (latestGoals.isEmpty()) {
-            textGoalName.setText("No savings goals yet");
-            textGoalDeadline.setText("Create a goal to track progress");
-            textGoalPercentage.setText("0%");
-            textGoalCurrent.setText(formatMoney(0.0d));
-            textGoalTarget.setText(formatMoney(0.0d));
-            setGoalProgressWidth(0);
+            cardGoal.setVisibility(View.GONE);
+            if (emptyStateGoals != null) {
+                emptyStateGoals.setVisibility(View.VISIBLE);
+                ((TextView) emptyStateGoals.findViewById(R.id.text_empty_title)).setText("No Savings Goals");
+                ((TextView) emptyStateGoals.findViewById(R.id.text_empty_message)).setText("Create a goal to start tracking your savings.");
+                ((ImageView) emptyStateGoals.findViewById(R.id.image_empty_state)).setImageResource(R.drawable.ic_target);
+            }
             return;
+        } else {
+            cardGoal.setVisibility(View.VISIBLE);
+            if (emptyStateGoals != null) emptyStateGoals.setVisibility(View.GONE);
         }
 
         GoalSummary topGoal = latestGoals.get(0);
@@ -741,9 +829,21 @@ public class DashboardActivity extends AppCompatActivity {
         }
         sortedUpcoming.sort(Comparator.comparingLong(Bill::getDueDate));
 
-        bindBillCard(cardBill1, imageBill1Icon, textBill1Name, textBill1Due, textBill1Amount, sortedUpcoming, 0);
-        bindBillCard(cardBill2, imageBill2Icon, textBill2Name, textBill2Due, textBill2Amount, sortedUpcoming, 1);
-        bindBillCard(cardBill3, imageBill3Icon, textBill3Name, textBill3Due, textBill3Amount, sortedUpcoming, 2);
+        if (sortedUpcoming.isEmpty()) {
+            if (containerBills != null) containerBills.setVisibility(View.GONE);
+            if (emptyStateBills != null) {
+                emptyStateBills.setVisibility(View.VISIBLE);
+                ((TextView) emptyStateBills.findViewById(R.id.text_empty_title)).setText("No Upcoming Bills");
+                ((TextView) emptyStateBills.findViewById(R.id.text_empty_message)).setText("You are all caught up! Enjoy your peace of mind.");
+                ((ImageView) emptyStateBills.findViewById(R.id.image_empty_state)).setImageResource(R.drawable.ic_electricity);
+            }
+        } else {
+            if (containerBills != null) containerBills.setVisibility(View.VISIBLE);
+            if (emptyStateBills != null) emptyStateBills.setVisibility(View.GONE);
+            bindBillCard(cardBill1, imageBill1Icon, textBill1Name, textBill1Due, textBill1Amount, sortedUpcoming, 0);
+            bindBillCard(cardBill2, imageBill2Icon, textBill2Name, textBill2Due, textBill2Amount, sortedUpcoming, 1);
+            bindBillCard(cardBill3, imageBill3Icon, textBill3Name, textBill3Due, textBill3Amount, sortedUpcoming, 2);
+        }
     }
 
     private void bindBillCard(View card, ImageView iconView, TextView nameView, TextView dueView, TextView amountView,
