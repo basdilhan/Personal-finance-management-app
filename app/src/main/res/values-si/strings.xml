@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App Name -->
+    <string name="app_name">DreamSaver</string>
+
+    <!-- Home Screen -->
+    <string name="home_title">DreamSaver</string>
+    <string name="home_subtitle">ඔබේ නවීන මුදල් සහකරු</string>
+    <string name="home_features">DreamSaver සමඟ ඔබට කළ හැකි දේ:\n• බිල්පත් ලුහුබැඳීම සහ ගෙවීම් දින කිසිවිටෙකත් මඟ නොහරින්න\n• ඉලක්ක සාදා ප්‍රගතිය නිරීක්ෂණය කරන්න\n• සරල තොරතුරු සමඟ මුදල් ප්‍රවාහය තේරුම් ගන්න\n• ඔබේ වියදම් එකම තැනක සංවිධානාත්මකව තබා ගන්න\n\nආරම්භ කරන්න මත තට්ටු කර ඔබේ මුදල් පාලනය කරන්න.</string>
+    <string name="btn_get_started">ආරම්භ කරන්න</string>
+
+    <!-- Login Screen -->
+    <string name="login_title">DreamSaver වෙත නැවත සාදරයෙන් පිළිගනිමු</string>
+    <string name="login_subtitle">පුරනය වී ඔබගේ DreamSaver ගමන ඉදිරියට ගෙන යන්න</string>
+    <string name="hint_email">විද්‍යුත් තැපැල් ලිපිනය</string>
+    <string name="hint_password">මුරපදය</string>
+    <string name="btn_login">පුරනය වන්න</string>
+    <string name="btn_google_sign_in">Google හරහා ඉදිරියට යන්න</string>
+    <string name="text_forgot_password">මුරපදය අමතකද?</string>
+    <string name="text_register">ගිණුමක් නැද්ද? &lt;b&gt;ලියාපදිංචි වන්න&lt;/b&gt;</string>
+
+    <!-- Dashboard Screen -->
+    <string name="btn_logout">පිටවීම</string>
+    <string name="menu_my_profile">මගේ ගිණුම</string>
+    <string name="menu_logout">පිටවීම</string>
+    <string name="btn_add_bill">බිල්පතක් එක් කරන්න</string>
+    <string name="btn_add_savings">ඉතුරුම් ඉලක්කයක් එක් කරන්න</string>
+    <string name="btn_add_expense">වියදමක් එක් කරන්න</string>
+
+    <!-- Dashboard privacy -->
+    <string name="dashboard_hide_amounts">සඟවන්න</string>
+    <string name="dashboard_show_amounts">පෙන්වන්න</string>
+    <string name="dashboard_amounts_hidden">සැඟවී ඇත</string>
+    <string name="dashboard_welcome_back">නැවත සාදරයෙන් පිළිගනිමු,</string>
+    <string name="dashboard_total_balance_title">මුළු ශේෂය</string>
+    <string name="dashboard_income_label">ආදායම් (මෙම මාසයේ)</string>
+    <string name="dashboard_expense_label">වියදම් (මෙම මාසයේ)</string>
+    <string name="dashboard_quick_actions_title">ක්‍රියාකාරකම්</string>
+    <string name="dashboard_action_expense">වියදම්</string>
+    <string name="dashboard_action_income">ආදායම්</string>
+    <string name="dashboard_action_bill">බිල්පත්</string>
+    <string name="dashboard_action_goal">ඉලක්ක</string>
+</resources>

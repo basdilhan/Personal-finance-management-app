@@ -54,10 +54,12 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import com.team.financeapp.IncomeEntry;
 
 /**
  * Dashboard activity displaying user's financial overview.
@@ -266,6 +268,13 @@ public class DashboardActivity extends AppCompatActivity {
         if (fabChatbot != null) {
             fabChatbot.setOnClickListener(v -> {
                 startActivity(new Intent(DashboardActivity.this, com.team.financeapp.chatbot.ChatbotActivity.class));
+            });
+        }
+        
+        View cardEducation = findViewById(R.id.card_education);
+        if (cardEducation != null) {
+            cardEducation.setOnClickListener(v -> {
+                startActivity(new Intent(DashboardActivity.this, EducationActivity.class));
             });
         }
 
@@ -692,6 +701,37 @@ public class DashboardActivity extends AppCompatActivity {
         }
 
         setupPieChart(chartExpense, entries, colors, "Expenses");
+
+        chartExpense.setOnChartValueSelectedListener(new com.github.mikephil.charting.listener.OnChartValueSelectedListener() {
+            @Override
+            public void onValueSelected(com.github.mikephil.charting.data.Entry e, com.github.mikephil.charting.highlight.Highlight h) {
+                if (e instanceof PieEntry) {
+                    String category = ((PieEntry) e).getLabel();
+                    showCategoryTransactionsDialog(category);
+                }
+            }
+            @Override
+            public void onNothingSelected() {}
+        });
+    }
+
+    private void showCategoryTransactionsDialog(String category) {
+        List<String> items = new ArrayList<>();
+        double total = 0.0;
+        for (Expense e : latestExpenses) {
+            if (normalizeExpenseCategory(e.getCategory()).equals(category)) {
+                String dateStr = new java.text.SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(new Date((long)e.getDate()));
+                String desc = (e.getDescription() != null && !e.getDescription().trim().isEmpty()) ? " - " + e.getDescription() : "";
+                items.add(String.format(Locale.getDefault(), "%s%s: %s", dateStr, desc, formatMoney(e.getAmount())));
+                total += e.getAmount();
+            }
+        }
+        
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle(category + " Expenses (" + formatMoney(total) + ")")
+            .setItems(items.toArray(new String[0]), null)
+            .setPositiveButton("Close", null)
+            .show();
     }
 
     private void updateIncomeChartFromData() {
@@ -745,6 +785,36 @@ public class DashboardActivity extends AppCompatActivity {
         }
 
         setupPieChart(chartIncome, entries, colors, "Income");
+
+        chartIncome.setOnChartValueSelectedListener(new com.github.mikephil.charting.listener.OnChartValueSelectedListener() {
+            @Override
+            public void onValueSelected(com.github.mikephil.charting.data.Entry e, com.github.mikephil.charting.highlight.Highlight h) {
+                if (e instanceof PieEntry) {
+                    String category = ((PieEntry) e).getLabel();
+                    showIncomeCategoryDialog(category);
+                }
+            }
+            @Override
+            public void onNothingSelected() {}
+        });
+    }
+
+    private void showIncomeCategoryDialog(String category) {
+        List<String> items = new ArrayList<>();
+        double total = 0.0;
+        for (IncomeEntry i : latestIncomes) {
+            if (i.getSource().equals(category)) {
+                String dateStr = new java.text.SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(new Date((long)i.getDate()));
+                items.add(String.format(Locale.getDefault(), "%s: %s", dateStr, formatMoney(i.getAmount())));
+                total += i.getAmount();
+            }
+        }
+        
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle(category + " Income (" + formatMoney(total) + ")")
+            .setItems(items.toArray(new String[0]), null)
+            .setPositiveButton("Close", null)
+            .show();
     }
 
     private void setupPieChart(PieChart chart, List<PieEntry> entries, List<Integer> colors, String label) {

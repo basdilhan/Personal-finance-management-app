@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { ShieldCheck, TrendingUp } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -39,7 +40,13 @@ export default function Login() {
   }
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', width: '100vw', background: 'var(--bg-primary)' }}>
+    <motion.div 
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: 20 }}
+      transition={{ duration: 0.3 }}
+      style={{ display: 'flex', minHeight: '100vh', width: '100vw', background: 'var(--bg-primary)' }}
+    >
       
       {/* Left Branding Panel */}
       <div style={{ 
@@ -169,6 +176,6 @@ export default function Login() {
         </div>
       </div>
 
-    </div>
+    </motion.div>
   );
 }

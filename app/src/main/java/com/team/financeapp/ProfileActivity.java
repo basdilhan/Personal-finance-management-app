@@ -79,6 +79,30 @@ public class ProfileActivity extends AppCompatActivity {
         btnAppLock = findViewById(R.id.button_app_lock);
         btnBack = findViewById(R.id.button_back);
         switchDarkTheme = findViewById(R.id.switch_dark_theme);
+        
+        View cardLanguage = findViewById(R.id.card_language);
+        if (cardLanguage != null) {
+            TextView textCurrentLanguage = findViewById(R.id.text_current_language);
+            androidx.core.os.LocaleListCompat currentLocale = androidx.appcompat.app.AppCompatDelegate.getApplicationLocales();
+            if (currentLocale.isEmpty() || currentLocale.get(0).getLanguage().equals("en")) {
+                textCurrentLanguage.setText("English");
+            } else {
+                textCurrentLanguage.setText("සිංහල (Sinhala)");
+            }
+            
+            cardLanguage.setOnClickListener(v -> {
+                String[] languages = {"English", "සිංහල (Sinhala)"};
+                new androidx.appcompat.app.AlertDialog.Builder(ProfileActivity.this)
+                    .setTitle("Select Language")
+                    .setItems(languages, (dialog, which) -> {
+                        String langCode = (which == 0) ? "en" : "si";
+                        androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(
+                            androidx.core.os.LocaleListCompat.forLanguageTags(langCode)
+                        );
+                    })
+                    .show();
+            });
+        }
     }
 
     /**

@@ -1,12 +1,14 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import { useLanguage } from '../context/LanguageContext';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, MessageSquare, BookOpen, LogOut, BrainCircuit, Moon, Sun, User, Activity } from 'lucide-react';
+import { LayoutDashboard, MessageSquare, BookOpen, LogOut, BrainCircuit, Moon, Sun, User, Activity, Globe } from 'lucide-react';
 
 export default function Sidebar() {
   const { currentUser, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const { language, toggleLanguage, t } = useLanguage();
   const navigate = useNavigate();
 
   async function handleLogout() {
@@ -19,12 +21,13 @@ export default function Sidebar() {
   }
 
   const navItems = [
-    { name: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard size={20} /> },
-    { name: 'Reports & Analytics', path: '/reports', icon: <Activity size={20} /> },
-    { name: 'My Profile', path: '/profile', icon: <User size={20} /> },
-    { name: 'AI Insights', path: '/ai-insights', icon: <BrainCircuit size={20} /> },
-    { name: 'DreamSaver AI', path: '/chatbot', icon: <MessageSquare size={20} /> },
-    { name: 'Financial Hub', path: '/blogs', icon: <BookOpen size={20} /> },
+    { name: t('dashboard'), path: '/dashboard', icon: <LayoutDashboard size={20} /> },
+    { name: t('reports'), path: '/reports', icon: <Activity size={20} /> },
+    { name: t('profile'), path: '/profile', icon: <User size={20} /> },
+    { name: t('aiInsights'), path: '/ai-insights', icon: <BrainCircuit size={20} /> },
+    { name: t('chatbot'), path: '/chatbot', icon: <MessageSquare size={20} /> },
+    { name: t('blogs'), path: '/blogs', icon: <BookOpen size={20} /> },
+    { name: t('learn'), path: '/learn', icon: <BookOpen size={20} /> },
   ];
 
   return (
@@ -73,6 +76,14 @@ export default function Sidebar() {
 
       {/* User Profile Footer */}
       <div style={{ padding: '0 24px', marginTop: 'auto' }}>
+        
+        <button 
+          onClick={toggleLanguage}
+          style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', marginBottom: '16px', fontSize: '14px', fontWeight: 500 }}
+        >
+          <Globe size={16} />
+          {language === 'en' ? 'සිංහල' : 'English'}
+        </button>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '16px 0', borderTop: '1px solid var(--border-light)' }}>
           <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--accent-blue)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600 }}>
