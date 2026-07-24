@@ -20,4 +20,21 @@ apiClient.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+apiClient.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (error.response && error.response.status === 401) {
+      console.warn("Unauthorized access detected. Signing out...");
+      try {
+        await auth.signOut();
+        // The AuthContext will notice currentUser is gone,
+        // and PrivateRoute will redirect to /login automatically.
+      } catch (err) {
+        console.error("Error signing out after 401:", err);
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default apiClient;
