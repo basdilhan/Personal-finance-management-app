@@ -10,10 +10,10 @@ import java.util.Map;
  */
 public class ForecastResult {
     public final String forecastMonth;
-    public final double predictedExpense;
+    public double predictedExpense;
     public final double predictedIncome;
     public final double predictedBills;
-    public final double netCashFlow;
+    public double netCashFlow;
     public final Map<String, Double> categoryBreakdown;
     public final int monthsOfData; // How many months of history were used
 

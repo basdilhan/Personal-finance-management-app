@@ -25,6 +25,13 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import com.team.financeapp.data.remote.ApiClient;
+import com.team.financeapp.data.remote.ForecastApiService;
+import com.team.financeapp.data.remote.dto.MlForecastResponse;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class ForecastActivity extends AppCompatActivity {
 
     private TextView tvForecastMonth, tvDataMonths;
@@ -70,9 +77,32 @@ public class ForecastActivity extends AppCompatActivity {
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         ForecastEngine engine = new ForecastEngine(this);
 
+        // 1. Calculate local baseline for Income, Bills, and Categories
         IO.execute(() -> {
-            ForecastResult result = engine.calculateForecast(userId);
-            runOnUiThread(() -> displayResult(result));
+            ForecastResult localResult = engine.calculateForecast(userId);
+            
+            // 2. Fetch the advanced ML prediction for Expenses from the backend
+            ForecastApiService apiService = ApiClient.getClient().create(ForecastApiService.class);
+            apiService.getMlForecast().enqueue(new Callback<MlForecastResponse>() {
+                @Override
+                public void onResponse(Call<MlForecastResponse> call, Response<MlForecastResponse> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        double mlExpense = response.body().predictedNextMonthExpense;
+                        localResult.predictedExpense = mlExpense;
+                        localResult.netCashFlow = localResult.predictedIncome - mlExpense - localResult.predictedBills;
+                    }
+                    runOnUiThread(() -> displayResult(localResult));
+                }
+
+                @Override
+                public void onFailure(Call<MlForecastResponse> call, Throwable t) {
+                    // Fallback to local average if API fails
+                    runOnUiThread(() -> {
+                        Toast.makeText(ForecastActivity.this, "Using local forecast. ML backend unavailable.", Toast.LENGTH_SHORT).show();
+                        displayResult(localResult);
+                    });
+                }
+            });
         });
     }
 
