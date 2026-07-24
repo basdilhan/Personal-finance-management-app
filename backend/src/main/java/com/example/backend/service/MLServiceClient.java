@@ -10,6 +10,8 @@ import org.springframework.web.client.RestTemplate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.time.Duration;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 
 /**
  * Acts as the internal client that communicates securely with the Python FastAPI ML backend.
@@ -25,8 +27,11 @@ public class MLServiceClient {
     @Value("${ml.service.api.key}")
     private String mlServiceApiKey;
 
-    public MLServiceClient() {
-        this.restTemplate = new RestTemplate();
+    public MLServiceClient(RestTemplateBuilder restTemplateBuilder) {
+        this.restTemplate = restTemplateBuilder
+                .setConnectTimeout(Duration.ofSeconds(5))
+                .setReadTimeout(Duration.ofSeconds(15))
+                .build();
     }
 
     /**

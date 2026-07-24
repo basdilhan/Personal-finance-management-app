@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { FinanceService } from '../services/FinanceService';
 import { formatDateShort, getMonthName } from '../utils/dateUtils';
@@ -36,14 +36,13 @@ export default function Dashboard() {
     fetchData();
   }, []);
 
-  // Calculate KPIs
-  const paidBillsTotal = bills.filter(b => b.status === 'paid').reduce((acc, curr) => acc + curr.amount, 0);
-  const totalExpenses = expenses.reduce((acc, curr) => acc + curr.amount, 0) + paidBillsTotal;
-  const totalIncome = incomes.reduce((acc, curr) => acc + curr.amount, 0);
-  const balance = totalIncome - totalExpenses;
+  // Calculate KPIs and Process data for charts
+  const { totalExpenses, totalIncome, balance, chartData } = useMemo(() => {
+    const paidBillsTotal = bills.filter(b => b.status === 'paid').reduce((acc, curr) => acc + curr.amount, 0);
+    const calculatedTotalExpenses = expenses.reduce((acc, curr) => acc + curr.amount, 0) + paidBillsTotal;
+    const calculatedTotalIncome = incomes.reduce((acc, curr) => acc + curr.amount, 0);
+    const calculatedBalance = calculatedTotalIncome - calculatedTotalExpenses;
 
-  // Process data for charts
-  const getMonthlyData = () => {
     const data = {};
     
     expenses.forEach(e => {
@@ -64,10 +63,13 @@ export default function Dashboard() {
       data[month].Income += i.amount;
     });
     
-    return Object.values(data);
-  };
-
-  const chartData = getMonthlyData();
+    return {
+      totalExpenses: calculatedTotalExpenses,
+      totalIncome: calculatedTotalIncome,
+      balance: calculatedBalance,
+      chartData: Object.values(data)
+    };
+  }, [expenses, incomes, bills]);
 
   const exportPDF = () => {
     const doc = new jsPDF();

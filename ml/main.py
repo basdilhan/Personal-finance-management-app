@@ -132,7 +132,7 @@ async def forecast_endpoint(req: ForecastRequest):
 import requests
 
 @app.post("/api/ml/categorize", dependencies=[Depends(verify_api_key)])
-async def auto_categorize(req: CategorizeRequest):
+def auto_categorize(req: CategorizeRequest):
     API_URL = "https://api-inference.huggingface.co/models/samudu123/srilanka-transaction-classifier"
     
     HF_TOKEN = os.getenv("HF_API_TOKEN", "")

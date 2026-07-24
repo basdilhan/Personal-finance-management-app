@@ -124,9 +124,13 @@ public class PendingSyncWorker extends Worker {
             } else if (bill.deleted) {
                 Response<Void> deleteResponse = apiService.deleteBill(backendId).execute();
                 if (deleteResponse.isSuccessful()) {
-                    bill.syncState = SyncState.SYNCED;
-                    bill.updatedAt = System.currentTimeMillis();
-                    AppDatabase.getInstance(getApplicationContext()).billDao().update(bill);
+                    com.team.financeapp.data.local.dao.BillDao billDao = AppDatabase.getInstance(getApplicationContext()).billDao();
+                    BillEntity currentDbBill = billDao.getByLocalId(bill.localId);
+                    if (currentDbBill != null && currentDbBill.updatedAt == bill.updatedAt) {
+                        currentDbBill.syncState = SyncState.SYNCED;
+                        currentDbBill.updatedAt = System.currentTimeMillis();
+                        billDao.update(currentDbBill);
+                    }
                     return true;
                 }
                 return false;
@@ -135,10 +139,14 @@ public class PendingSyncWorker extends Worker {
             }
 
             if (response.isSuccessful() && response.body() != null) {
-                bill.syncState = SyncState.SYNCED;
-                bill.updatedAt = System.currentTimeMillis();
-                bill.remoteId = String.valueOf(response.body().localId);
-                AppDatabase.getInstance(getApplicationContext()).billDao().update(bill);
+                com.team.financeapp.data.local.dao.BillDao billDao = AppDatabase.getInstance(getApplicationContext()).billDao();
+                BillEntity currentDbBill = billDao.getByLocalId(bill.localId);
+                if (currentDbBill != null && currentDbBill.updatedAt == bill.updatedAt) {
+                    currentDbBill.syncState = SyncState.SYNCED;
+                    currentDbBill.updatedAt = System.currentTimeMillis();
+                    currentDbBill.remoteId = String.valueOf(response.body().localId);
+                    billDao.update(currentDbBill);
+                }
                 return true;
             }
             return false;
@@ -161,9 +169,13 @@ public class PendingSyncWorker extends Worker {
             } else if (expense.deleted) {
                 Response<Void> deleteResponse = apiService.deleteExpense(backendId).execute();
                 if (deleteResponse.isSuccessful()) {
-                    expense.syncState = SyncState.SYNCED;
-                    expense.updatedAt = System.currentTimeMillis();
-                    AppDatabase.getInstance(getApplicationContext()).expenseDao().update(expense);
+                    com.team.financeapp.data.local.dao.ExpenseDao expenseDao = AppDatabase.getInstance(getApplicationContext()).expenseDao();
+                    ExpenseEntity currentDbExpense = expenseDao.getByLocalId(expense.localId);
+                    if (currentDbExpense != null && currentDbExpense.updatedAt == expense.updatedAt) {
+                        currentDbExpense.syncState = SyncState.SYNCED;
+                        currentDbExpense.updatedAt = System.currentTimeMillis();
+                        expenseDao.update(currentDbExpense);
+                    }
                     return true;
                 }
                 return false;
@@ -172,10 +184,14 @@ public class PendingSyncWorker extends Worker {
             }
 
             if (response.isSuccessful() && response.body() != null) {
-                expense.syncState = SyncState.SYNCED;
-                expense.updatedAt = System.currentTimeMillis();
-                expense.remoteId = String.valueOf(response.body().localId);
-                AppDatabase.getInstance(getApplicationContext()).expenseDao().update(expense);
+                com.team.financeapp.data.local.dao.ExpenseDao expenseDao = AppDatabase.getInstance(getApplicationContext()).expenseDao();
+                ExpenseEntity currentDbExpense = expenseDao.getByLocalId(expense.localId);
+                if (currentDbExpense != null && currentDbExpense.updatedAt == expense.updatedAt) {
+                    currentDbExpense.syncState = SyncState.SYNCED;
+                    currentDbExpense.updatedAt = System.currentTimeMillis();
+                    currentDbExpense.remoteId = String.valueOf(response.body().localId);
+                    expenseDao.update(currentDbExpense);
+                }
                 return true;
             }
             return false;
@@ -198,9 +214,13 @@ public class PendingSyncWorker extends Worker {
             } else if (income.deleted) {
                 Response<Void> deleteResponse = apiService.deleteIncome(backendId).execute();
                 if (deleteResponse.isSuccessful()) {
-                    income.syncState = SyncState.SYNCED;
-                    income.updatedAt = System.currentTimeMillis();
-                    AppDatabase.getInstance(getApplicationContext()).incomeDao().update(income);
+                    com.team.financeapp.data.local.dao.IncomeDao incomeDao = AppDatabase.getInstance(getApplicationContext()).incomeDao();
+                    IncomeEntity currentDbIncome = incomeDao.getByLocalId(income.localId);
+                    if (currentDbIncome != null && currentDbIncome.updatedAt == income.updatedAt) {
+                        currentDbIncome.syncState = SyncState.SYNCED;
+                        currentDbIncome.updatedAt = System.currentTimeMillis();
+                        incomeDao.update(currentDbIncome);
+                    }
                     return true;
                 }
                 return false;
@@ -209,10 +229,14 @@ public class PendingSyncWorker extends Worker {
             }
 
             if (response.isSuccessful() && response.body() != null) {
-                income.syncState = SyncState.SYNCED;
-                income.updatedAt = System.currentTimeMillis();
-                income.remoteId = String.valueOf(response.body().localId);
-                AppDatabase.getInstance(getApplicationContext()).incomeDao().update(income);
+                com.team.financeapp.data.local.dao.IncomeDao incomeDao = AppDatabase.getInstance(getApplicationContext()).incomeDao();
+                IncomeEntity currentDbIncome = incomeDao.getByLocalId(income.localId);
+                if (currentDbIncome != null && currentDbIncome.updatedAt == income.updatedAt) {
+                    currentDbIncome.syncState = SyncState.SYNCED;
+                    currentDbIncome.updatedAt = System.currentTimeMillis();
+                    currentDbIncome.remoteId = String.valueOf(response.body().localId);
+                    incomeDao.update(currentDbIncome);
+                }
                 return true;
             }
             return false;
