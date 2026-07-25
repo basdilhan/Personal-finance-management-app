@@ -16,6 +16,11 @@ export default function Dashboard() {
   const [bills, setBills] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const [selectedMonth, setSelectedMonth] = useState(() => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+  });
+
   useEffect(() => {
     async function fetchData() {
       try {
@@ -37,39 +42,67 @@ export default function Dashboard() {
   }, []);
 
   // Calculate KPIs and Process data for charts
-  const { totalExpenses, totalIncome, balance, chartData } = useMemo(() => {
-    const paidBillsTotal = bills.filter(b => b.status === 'paid').reduce((acc, curr) => acc + curr.amount, 0);
-    const calculatedTotalExpenses = expenses.reduce((acc, curr) => acc + curr.amount, 0) + paidBillsTotal;
-    const calculatedTotalIncome = incomes.reduce((acc, curr) => acc + curr.amount, 0);
-    const calculatedBalance = calculatedTotalIncome - calculatedTotalExpenses;
-
+  const { availableMonths, totalExpenses, totalIncome, balance, chartData } = useMemo(() => {
     const data = {};
+    const monthsSet = new Set();
+    
+    const now = new Date();
+    monthsSet.add(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`);
+
+    const getYYYYMM = (timestamp) => {
+      if (!timestamp) return null;
+      const epoch = (typeof timestamp === 'number' && timestamp < 10000000000) ? timestamp * 1000 : timestamp;
+      const d = new Date(epoch);
+      if (isNaN(d.getTime())) return null;
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    };
+
+    let calculatedTotalExpenses = 0;
+    let calculatedTotalIncome = 0;
     
     expenses.forEach(e => {
+      const ym = getYYYYMM(e.date);
+      if (ym) monthsSet.add(ym);
+
       const month = getMonthName(e.date);
       if (!data[month]) data[month] = { name: month, Expenses: 0, Income: 0 };
       data[month].Expenses += e.amount;
+      
+      if (ym === selectedMonth) calculatedTotalExpenses += e.amount;
     });
 
-    bills.filter(b => b.status === 'paid').forEach(b => {
+    bills.filter(b => b.status === 'paid' || b.status === 'Paid').forEach(b => {
+      const ym = getYYYYMM(b.dueDate);
+      if (ym) monthsSet.add(ym);
+
       const month = getMonthName(b.dueDate);
       if (!data[month]) data[month] = { name: month, Expenses: 0, Income: 0 };
       data[month].Expenses += b.amount;
+      
+      if (ym === selectedMonth) calculatedTotalExpenses += b.amount;
     });
 
     incomes.forEach(i => {
+      const ym = getYYYYMM(i.date);
+      if (ym) monthsSet.add(ym);
+
       const month = getMonthName(i.date);
       if (!data[month]) data[month] = { name: month, Expenses: 0, Income: 0 };
       data[month].Income += i.amount;
+      
+      if (ym === selectedMonth) calculatedTotalIncome += i.amount;
     });
     
+    const sortedMonths = Array.from(monthsSet).sort((a, b) => b.localeCompare(a));
+    
     return {
+      availableMonths: sortedMonths,
       totalExpenses: calculatedTotalExpenses,
       totalIncome: calculatedTotalIncome,
-      balance: calculatedBalance,
+      balance: calculatedTotalIncome - calculatedTotalExpenses,
       chartData: Object.values(data)
     };
-  }, [expenses, incomes, bills]);
+  }, [expenses, incomes, bills, selectedMonth]);
 
   const exportPDF = () => {
     const doc = new jsPDF();
@@ -109,9 +142,24 @@ export default function Dashboard() {
           <h1 style={{ fontSize: '32px', marginBottom: '8px' }}>Dashboard Overview</h1>
           <p className="text-muted">Welcome back, {currentUser?.displayName || currentUser?.email}</p>
         </div>
-        <button className="btn-primary" onClick={exportPDF} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Download size={18} /> Export PDF Report
-        </button>
+        <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+          <select 
+            value={selectedMonth} 
+            onChange={(e) => setSelectedMonth(e.target.value)}
+            className="input-field"
+            style={{ width: 'auto', minWidth: '150px', margin: 0, cursor: 'pointer' }}
+          >
+            {availableMonths.map(ym => {
+              const [y, m] = ym.split('-');
+              const dateObj = new Date(y, m - 1, 1);
+              const label = dateObj.toLocaleString('default', { month: 'long', year: 'numeric' });
+              return <option key={ym} value={ym}>{label}</option>;
+            })}
+          </select>
+          <button className="btn-primary" onClick={exportPDF} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Download size={18} /> Export PDF Report
+          </button>
+        </div>
       </div>
 
       {/* KPI Cards */}
