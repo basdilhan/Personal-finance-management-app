@@ -32,8 +32,6 @@ public class ForecastEntity {
     @Column(name = "net_cash_flow", precision = 12, scale = 2)
     private BigDecimal netCashFlow = BigDecimal.ZERO;
 
-    @Column(name = "category_breakdown", columnDefinition = "jsonb")
-    private String categoryBreakdown = "{}";
 
     @Column(name = "model_version")
     private String modelVersion = "chronos-t5-small";
@@ -68,8 +66,6 @@ public class ForecastEntity {
     public BigDecimal getNetCashFlow() { return netCashFlow; }
     public void setNetCashFlow(BigDecimal netCashFlow) { this.netCashFlow = netCashFlow; }
 
-    public String getCategoryBreakdown() { return categoryBreakdown; }
-    public void setCategoryBreakdown(String categoryBreakdown) { this.categoryBreakdown = categoryBreakdown; }
 
     public String getModelVersion() { return modelVersion; }
     public void setModelVersion(String modelVersion) { this.modelVersion = modelVersion; }
