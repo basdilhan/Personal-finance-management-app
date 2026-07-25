@@ -1,12 +1,14 @@
 package com.example.backend.controller;
 
+import com.example.backend.entity.BillEntity;
 import com.example.backend.entity.ExpenseEntity;
 import com.example.backend.entity.ForecastEntity;
+import com.example.backend.entity.IncomeEntity;
+import com.example.backend.repository.BillRepository;
 import com.example.backend.repository.ExpenseRepository;
 import com.example.backend.repository.ForecastRepository;
-import com.example.backend.service.MLServiceClient;
-import com.example.backend.entity.IncomeEntity;
 import com.example.backend.repository.IncomeRepository;
+import com.example.backend.service.MLServiceClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,12 +26,14 @@ public class ForecastController {
     private final ForecastRepository forecastRepository;
     private final ExpenseRepository expenseRepository;
     private final IncomeRepository incomeRepository;
+    private final BillRepository billRepository;
     private final MLServiceClient mlServiceClient;
 
-    public ForecastController(ForecastRepository forecastRepository, ExpenseRepository expenseRepository, IncomeRepository incomeRepository, MLServiceClient mlServiceClient) {
+    public ForecastController(ForecastRepository forecastRepository, ExpenseRepository expenseRepository, IncomeRepository incomeRepository, BillRepository billRepository, MLServiceClient mlServiceClient) {
         this.forecastRepository = forecastRepository;
         this.expenseRepository = expenseRepository;
         this.incomeRepository = incomeRepository;
+        this.billRepository = billRepository;
         this.mlServiceClient = mlServiceClient;
     }
 
@@ -100,6 +104,34 @@ public class ForecastController {
                 newForecast.setUserId(userId);
                 newForecast.setForecastMonth(monthString);
                 newForecast.setPredictedExpense(BigDecimal.valueOf(predictedNextMonthExpense));
+
+                // Populate other fields for the database
+                long monthStart = currentMonth.atDay(1).atStartOfDay(ZoneId.of("Asia/Colombo")).toInstant().toEpochMilli();
+                long monthEnd = currentMonth.atEndOfMonth().atTime(23, 59, 59).atZone(ZoneId.of("Asia/Colombo")).toInstant().toEpochMilli();
+                
+                List<IncomeEntity> allIncomes = incomeRepository.findByUserIdAndIsDeletedFalseOrderByDateDesc(userId);
+                BigDecimal monthlyIncome = allIncomes.stream()
+                        .filter(i -> {
+                            long epochMs = i.getDate() < 10000000000L ? i.getDate() * 1000L : i.getDate();
+                            return epochMs >= monthStart && epochMs <= monthEnd;
+                        })
+                        .map(IncomeEntity::getAmount)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+                newForecast.setPredictedIncome(monthlyIncome);
+                
+                List<BillEntity> allBills = billRepository.findByUserIdAndIsDeletedFalseOrderByDueDateAsc(userId);
+                BigDecimal monthlyBills = allBills.stream()
+                        .filter(b -> {
+                            long epochMs = b.getDueDate() < 10000000000L ? b.getDueDate() * 1000L : b.getDueDate();
+                            return epochMs >= monthStart && epochMs <= monthEnd;
+                        })
+                        .map(BillEntity::getAmount)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+                newForecast.setPredictedBills(monthlyBills);
+                
+                BigDecimal netCashFlow = monthlyIncome.subtract(BigDecimal.valueOf(predictedNextMonthExpense)).subtract(monthlyBills);
+                newForecast.setNetCashFlow(netCashFlow);
+
                 try {
                     forecastRepository.save(newForecast);
                 } catch (Exception dbErr) {

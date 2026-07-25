@@ -28,8 +28,8 @@ public class MLServiceClient {
 
     public MLServiceClient() {
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
-        factory.setConnectTimeout(5000);
-        factory.setReadTimeout(15000);
+        factory.setConnectTimeout(10000); // 10 seconds
+        factory.setReadTimeout(120000); // 120 seconds to allow Chronos ML to run on free CPU
         this.restTemplate = new RestTemplate(factory);
     }
 
