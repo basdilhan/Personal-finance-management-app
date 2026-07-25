@@ -103,6 +103,14 @@ public class ChatController {
                     Collectors.reducing(BigDecimal.ZERO, ExpenseEntity::getAmount, BigDecimal::add)
                 ));
 
+            // Merge paid bills into monthlyAggregates for ML history
+            allBills.stream()
+                .filter(b -> "paid".equalsIgnoreCase(b.getStatus()))
+                .forEach(b -> {
+                    YearMonth ym = YearMonth.from(java.time.Instant.ofEpochMilli(b.getDueDate() < 10000000000L ? b.getDueDate() * 1000L : b.getDueDate()).atZone(ZoneId.of("Asia/Colombo")).toLocalDate());
+                    monthlyAggregates.merge(ym, b.getAmount(), BigDecimal::add);
+                });
+
             // Generate historical data array for Chronos ML (last 6 months)
             List<Double> historicalData = new java.util.ArrayList<>();
             for (int i = 5; i >= 0; i--) {
@@ -183,7 +191,7 @@ public class ChatController {
                 "Remaining balance: LKR %s.\n" +
                 "Highest spending category: %s.\n" +
                 "Forecasted Expenses for Next Month: LKR %.2f.\n" +
-                "Instructions: Present the next month's forecast figure naturally to the user. %s",
+                "Instructions: Present the next month's forecast figure naturally to the user. Make sure to mention that the predicted/total expenses include their paid bills. %s",
                 monthlyIncome.toPlainString(),
                 monthlyExpenses.toPlainString(),
                 monthlyIncome.subtract(monthlyExpenses).toPlainString(),
