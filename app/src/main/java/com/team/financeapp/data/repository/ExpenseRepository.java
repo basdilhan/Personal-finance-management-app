@@ -13,6 +13,7 @@ import com.team.financeapp.data.local.dao.ExpenseDao;
 import com.team.financeapp.data.local.entity.ExpenseEntity;
 import com.team.financeapp.data.remote.ApiClient;
 import com.team.financeapp.data.remote.ExpenseApiService;
+import com.team.financeapp.notifications.FinancialReminderScheduler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,8 +47,10 @@ public class ExpenseRepository {
     private final ExpenseDao expenseDao;
     private final ExpenseApiService apiService;
     private final Handler mainHandler;
+    private final Context appContext;
 
     public ExpenseRepository(@NonNull Context context) {
+        this.appContext = context.getApplicationContext();
         this.expenseDao = AppDatabase.getInstance(context).expenseDao();
         this.apiService = ApiClient.getClient().create(ExpenseApiService.class);
         this.mainHandler = new Handler(Looper.getMainLooper());
@@ -76,6 +79,7 @@ public class ExpenseRepository {
             // Save locally immediately
             long localId = expenseDao.insert(entity);
             entity.localId = localId;
+            FinancialReminderScheduler.scheduleExpenseAddedReminder(appContext, entity);
             mainHandler.post(callback::onSuccess);
             
             // Push to Spring Boot backend

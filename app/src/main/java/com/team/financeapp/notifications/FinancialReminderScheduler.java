@@ -18,6 +18,7 @@ import com.team.financeapp.data.local.dao.BillDao;
 import com.team.financeapp.data.local.dao.GoalDao;
 import com.team.financeapp.data.local.entity.BillEntity;
 import com.team.financeapp.data.local.entity.GoalEntity;
+import com.team.financeapp.data.local.entity.ExpenseEntity;
 
 import java.text.DateFormat;
 import java.util.Calendar;
@@ -73,6 +74,32 @@ public final class FinancialReminderScheduler {
                 bill.localId,
             "Bill Added",
             message
+        );
+    }
+
+    public static void scheduleBillPaidReminder(@NonNull Context context, @NonNull BillEntity bill) {
+        if (bill.deleted) return;
+        scheduleAddedReminder(
+                context,
+                FinancialReminderWorker.TYPE_BILL,
+                bill.remoteId,
+                bill.localId,
+                "Bill Paid Successfully 🎉",
+                String.format(Locale.getDefault(), "You have successfully paid %s (LKR %.2f).", bill.name, bill.amount)
+        );
+    }
+
+    public static void scheduleExpenseAddedReminder(@NonNull Context context, @NonNull ExpenseEntity expense) {
+        if (expense.deleted) return;
+        scheduleAddedReminder(
+                context,
+                "expense",
+                expense.remoteId,
+                expense.localId,
+                "Expense Logged 💸",
+                String.format(Locale.getDefault(), "Added new expense: %s (LKR %.2f).", 
+                    expense.description == null || expense.description.trim().isEmpty() ? expense.category : expense.description, 
+                    expense.amount)
         );
     }
 

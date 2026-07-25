@@ -97,6 +97,7 @@ public class BillRepository {
             existing.dueDate = bill.getDueDate();
             existing.category = bill.getCategory();
             existing.categoryIcon = bill.getCategoryIcon();
+            boolean justPaid = "paid".equalsIgnoreCase(bill.getStatus()) && !"paid".equalsIgnoreCase(existing.status);
             existing.status = bill.getStatus();
             existing.indicatorColor = bill.getIndicatorColor();
             existing.deleted = false;
@@ -105,6 +106,9 @@ public class BillRepository {
 
             billDao.update(existing);
             FinancialReminderScheduler.scheduleBillReminder(appContext, existing);
+            if (justPaid) {
+                FinancialReminderScheduler.scheduleBillPaidReminder(appContext, existing);
+            }
             mainHandler.post(callback::onSuccess);
             updateBillInRemote(existing, callback);
         });
