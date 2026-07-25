@@ -66,7 +66,11 @@ public class ForecastController {
                 newForecast.setUserId(userId);
                 newForecast.setForecastMonth(monthString);
                 newForecast.setPredictedExpense(BigDecimal.valueOf(predictedNextMonthExpense));
-                forecastRepository.save(newForecast);
+                try {
+                    forecastRepository.save(newForecast);
+                } catch (Exception dbErr) {
+                    System.err.println("Failed to save forecast to DB: " + dbErr.getMessage());
+                }
             }
 
             return ResponseEntity.ok(Map.of(
