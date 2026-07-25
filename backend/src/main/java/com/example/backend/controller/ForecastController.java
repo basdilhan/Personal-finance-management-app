@@ -5,6 +5,8 @@ import com.example.backend.entity.ForecastEntity;
 import com.example.backend.repository.ExpenseRepository;
 import com.example.backend.repository.ForecastRepository;
 import com.example.backend.service.MLServiceClient;
+import com.example.backend.entity.IncomeEntity;
+import com.example.backend.repository.IncomeRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,11 +23,13 @@ public class ForecastController {
 
     private final ForecastRepository forecastRepository;
     private final ExpenseRepository expenseRepository;
+    private final IncomeRepository incomeRepository;
     private final MLServiceClient mlServiceClient;
 
-    public ForecastController(ForecastRepository forecastRepository, ExpenseRepository expenseRepository, MLServiceClient mlServiceClient) {
+    public ForecastController(ForecastRepository forecastRepository, ExpenseRepository expenseRepository, IncomeRepository incomeRepository, MLServiceClient mlServiceClient) {
         this.forecastRepository = forecastRepository;
         this.expenseRepository = expenseRepository;
+        this.incomeRepository = incomeRepository;
         this.mlServiceClient = mlServiceClient;
     }
 
@@ -56,11 +60,41 @@ public class ForecastController {
             String monthString = currentMonth.toString();
             java.util.Optional<ForecastEntity> existing = forecastRepository.findByUserIdAndForecastMonth(userId, monthString);
 
-            if (existing.isPresent()) {
+            if (existing.isPresent() && existing.get().getPredictedExpense() != null && existing.get().getPredictedExpense().doubleValue() > 0) {
                 predictedNextMonthExpense = existing.get().getPredictedExpense().doubleValue();
             } else {
                 predictedNextMonthExpense = mlServiceClient.generateForecast(userId, historicalData);
-                if (predictedNextMonthExpense == null) predictedNextMonthExpense = 0.0;
+                if (predictedNextMonthExpense == null || predictedNextMonthExpense <= 0.0) {
+                    long monthStart = currentMonth.atDay(1).atStartOfDay(ZoneId.of("Asia/Colombo")).toInstant().toEpochMilli();
+                    long monthEnd = currentMonth.atEndOfMonth().atTime(23, 59, 59).atZone(ZoneId.of("Asia/Colombo")).toInstant().toEpochMilli();
+                    
+                    BigDecimal monthlyExpenses = allExpenses.stream()
+                            .filter(e -> {
+                                long epochMs = e.getDate() < 10000000000L ? e.getDate() * 1000L : e.getDate();
+                                return epochMs >= monthStart && epochMs <= monthEnd;
+                            })
+                            .map(ExpenseEntity::getAmount)
+                            .reduce(BigDecimal.ZERO, BigDecimal::add);
+                            
+                    if (monthlyExpenses.compareTo(BigDecimal.ZERO) > 0) {
+                        predictedNextMonthExpense = monthlyExpenses.doubleValue() * 1.05;
+                    } else {
+                        List<IncomeEntity> allIncomes = incomeRepository.findByUserIdAndIsDeletedFalseOrderByDateDesc(userId);
+                        BigDecimal monthlyIncome = allIncomes.stream()
+                                .filter(i -> {
+                                    long epochMs = i.getDate() < 10000000000L ? i.getDate() * 1000L : i.getDate();
+                                    return epochMs >= monthStart && epochMs <= monthEnd;
+                                })
+                                .map(IncomeEntity::getAmount)
+                                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                                
+                        if (monthlyIncome.compareTo(BigDecimal.ZERO) > 0) {
+                            predictedNextMonthExpense = monthlyIncome.doubleValue() * 0.40;
+                        } else {
+                            predictedNextMonthExpense = 15000.0;
+                        }
+                    }
+                }
                 
                 ForecastEntity newForecast = new ForecastEntity();
                 newForecast.setUserId(userId);
