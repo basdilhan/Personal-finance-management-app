@@ -47,12 +47,21 @@ public class ForecastController {
         try {
             YearMonth currentMonth = YearMonth.now(ZoneId.of("Asia/Colombo"));
             List<ExpenseEntity> allExpenses = expenseRepository.findByUserIdAndIsDeletedFalseOrderByDateDesc(userId);
+            List<BillEntity> allBills = billRepository.findByUserIdAndIsDeletedFalseOrderByDueDateAsc(userId);
 
             Map<YearMonth, BigDecimal> monthlyAggregates = allExpenses.stream()
                 .collect(Collectors.groupingBy(
                     e -> YearMonth.from(java.time.Instant.ofEpochMilli(e.getDate() < 10000000000L ? e.getDate() * 1000L : e.getDate()).atZone(ZoneId.of("Asia/Colombo")).toLocalDate()),
                     Collectors.reducing(BigDecimal.ZERO, ExpenseEntity::getAmount, BigDecimal::add)
                 ));
+
+            // Merge paid bills into monthlyAggregates
+            allBills.stream()
+                .filter(b -> "paid".equalsIgnoreCase(b.getStatus()))
+                .forEach(b -> {
+                    YearMonth ym = YearMonth.from(java.time.Instant.ofEpochMilli(b.getDueDate() < 10000000000L ? b.getDueDate() * 1000L : b.getDueDate()).atZone(ZoneId.of("Asia/Colombo")).toLocalDate());
+                    monthlyAggregates.merge(ym, b.getAmount(), BigDecimal::add);
+                });
 
             List<Double> historicalData = new java.util.ArrayList<>();
             for (int i = 5; i >= 0; i--) {
@@ -119,7 +128,6 @@ public class ForecastController {
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
                 newForecast.setPredictedIncome(monthlyIncome);
                 
-                List<BillEntity> allBills = billRepository.findByUserIdAndIsDeletedFalseOrderByDueDateAsc(userId);
                 BigDecimal monthlyBills = allBills.stream()
                         .filter(b -> {
                             long epochMs = b.getDueDate() < 10000000000L ? b.getDueDate() * 1000L : b.getDueDate();

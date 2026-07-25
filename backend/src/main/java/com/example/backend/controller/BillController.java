@@ -3,8 +3,13 @@ package com.example.backend.controller;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.example.backend.entity.BillEntity;
 import com.example.backend.repository.BillRepository;
+import com.example.backend.repository.ForecastRepository;
+import com.example.backend.entity.ForecastEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.time.YearMonth;
+import java.time.ZoneId;
+import java.util.Optional;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -14,11 +19,19 @@ import java.util.List;
 public class BillController {
 
     private final BillRepository billRepository;
+    private final ForecastRepository forecastRepository;
     private final com.example.backend.service.AuditService auditService;
 
-    public BillController(BillRepository billRepository, com.example.backend.service.AuditService auditService) {
+    public BillController(BillRepository billRepository, ForecastRepository forecastRepository, com.example.backend.service.AuditService auditService) {
         this.billRepository = billRepository;
+        this.forecastRepository = forecastRepository;
         this.auditService = auditService;
+    }
+
+    private void invalidateCurrentMonthForecast(String userId) {
+        String currentMonth = YearMonth.now(ZoneId.of("Asia/Colombo")).toString();
+        Optional<ForecastEntity> existing = forecastRepository.findByUserIdAndForecastMonth(userId, currentMonth);
+        existing.ifPresent(forecastRepository::delete);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -61,6 +74,7 @@ public class BillController {
         bill.setIsDeleted(false);
 
         BillEntity saved = billRepository.save(bill);
+        invalidateCurrentMonthForecast(userId);
         auditService.logAction(userId, "BILL", "CREATED", String.valueOf(saved.getId()), "Created bill: " + saved.getName());
         return ResponseEntity.ok(saved);
     }
@@ -82,6 +96,7 @@ public class BillController {
                     if (req.indicatorColor != null) existing.setIndicatorColor(req.indicatorColor);
                     if (req.isRecurring != null) existing.setIsRecurring(req.isRecurring);
                     BillEntity saved = billRepository.save(existing);
+                    invalidateCurrentMonthForecast(userId);
                     auditService.logAction(userId, "BILL", "UPDATED", String.valueOf(saved.getId()), "Updated bill: " + saved.getName());
                     return ResponseEntity.ok(saved);
                 })
@@ -96,6 +111,7 @@ public class BillController {
                 .map(existing -> {
                     existing.setIsDeleted(true);
                     billRepository.save(existing);
+                    invalidateCurrentMonthForecast(userId);
                     auditService.logAction(userId, "BILL", "DELETED", String.valueOf(existing.getId()), "Deleted bill");
                     return ResponseEntity.ok().<Void>build();
                 })
