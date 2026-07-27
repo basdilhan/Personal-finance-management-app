@@ -14,7 +14,25 @@ import jakarta.annotation.PostConstruct;
 @Service
 public class NotificationService {
 
+    @Value("classpath:firebase-service-account.json")
+    private Resource firebaseConfig;
+
     public NotificationService() {}
+
+    @PostConstruct
+    public void initialize() {
+        try {
+            if (FirebaseApp.getApps().isEmpty()) {
+                FirebaseOptions options = FirebaseOptions.builder()
+                        .setCredentials(GoogleCredentials.fromStream(firebaseConfig.getInputStream()))
+                        .build();
+                FirebaseApp.initializeApp(options);
+                System.out.println("Firebase App initialized successfully.");
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to initialize Firebase: " + e.getMessage());
+        }
+    }
 
     public void sendPushNotification(String userToken, String title, String body) {
         if (FirebaseApp.getApps().isEmpty()) {

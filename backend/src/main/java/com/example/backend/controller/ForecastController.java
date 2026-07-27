@@ -40,6 +40,9 @@ public class ForecastController {
             return ResponseEntity.ok(Map.of(
                 "historical_data",               result.historicalData,
                 "predicted_next_month_expense",  result.predictedExpense,
+                "predicted_income",              result.predictedIncome,
+                "predicted_bills",               result.predictedBills,
+                "net_cash_flow",                 result.netCashFlow,
                 "is_fallback",                   result.isFallback
             ));
         } catch (Exception e) {

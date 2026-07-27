@@ -13,6 +13,10 @@ import java.util.Optional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import com.example.backend.repository.BudgetLimitRepository;
+import com.example.backend.entity.BudgetLimitEntity;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 @RestController
 @RequestMapping("/api/expenses")
@@ -22,12 +26,24 @@ public class ExpenseController {
     private final ForecastRepository forecastRepository;
     private final com.example.backend.service.MLServiceClient mlServiceClient;
     private final com.example.backend.service.AuditService auditService;
+    private final BudgetLimitRepository budgetLimitRepository;
+    private final com.example.backend.repository.UserRepository userRepository;
+    private final com.example.backend.service.NotificationService notificationService;
 
-    public ExpenseController(ExpenseRepository expenseRepository, ForecastRepository forecastRepository, com.example.backend.service.MLServiceClient mlServiceClient, com.example.backend.service.AuditService auditService) {
+    public ExpenseController(ExpenseRepository expenseRepository, 
+                             ForecastRepository forecastRepository, 
+                             com.example.backend.service.MLServiceClient mlServiceClient, 
+                             com.example.backend.service.AuditService auditService,
+                             BudgetLimitRepository budgetLimitRepository,
+                             com.example.backend.repository.UserRepository userRepository,
+                             com.example.backend.service.NotificationService notificationService) {
         this.expenseRepository = expenseRepository;
         this.forecastRepository = forecastRepository;
         this.mlServiceClient = mlServiceClient;
         this.auditService = auditService;
+        this.budgetLimitRepository = budgetLimitRepository;
+        this.userRepository = userRepository;
+        this.notificationService = notificationService;
     }
 
     private void invalidateCurrentMonthForecast(String userId) {
@@ -72,7 +88,43 @@ public class ExpenseController {
         ExpenseEntity saved = expenseRepository.save(expense);
         invalidateCurrentMonthForecast(userId);
         auditService.logAction(userId, "EXPENSE", "CREATED", String.valueOf(saved.getId()), "Created expense: " + saved.getAmount() + " in " + saved.getCategory());
+
+        // Real-time budget check
+        checkBudgetAndNotify(userId, saved.getCategory());
+
         return ResponseEntity.ok(saved);
+    }
+
+    private void checkBudgetAndNotify(String userId, String category) {
+        String currentMonthYear = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM"));
+        List<BudgetLimitEntity> activeBudgets = budgetLimitRepository.findByMonthYear(currentMonthYear);
+        
+        Optional<BudgetLimitEntity> budgetOpt = activeBudgets.stream()
+                .filter(b -> b.getUserId().equals(userId) && b.getCategory().equals(category))
+                .findFirst();
+
+        if (budgetOpt.isPresent()) {
+            BudgetLimitEntity budget = budgetOpt.get();
+            LocalDate start = LocalDate.now().withDayOfMonth(1);
+            LocalDate end = start.plusMonths(1).minusDays(1);
+            long startMillis = start.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+            long endMillis = end.atTime(23, 59, 59).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+
+            BigDecimal totalSpent = expenseRepository.sumByCategoryAndDateBetween(
+                    userId, category, startMillis, endMillis);
+
+            if (totalSpent != null && totalSpent.compareTo(budget.getLimitAmount()) >= 0) {
+                userRepository.findById(userId).ifPresent(u -> {
+                    if (u.getFcmToken() != null && !u.getFcmToken().isEmpty()) {
+                        notificationService.sendPushNotification(
+                            u.getFcmToken(),
+                            "Budget Exceeded! 🚨",
+                            "You have exceeded your " + category + " budget for this month."
+                        );
+                    }
+                });
+            }
+        }
     }
 
     @PutMapping("/{id}")

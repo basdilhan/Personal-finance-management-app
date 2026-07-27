@@ -87,9 +87,11 @@ public class ForecastActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(Call<MlForecastResponse> call, Response<MlForecastResponse> response) {
                     if (response.isSuccessful() && response.body() != null) {
-                        double mlExpense = response.body().predictedNextMonthExpense;
-                        localResult.predictedExpense = mlExpense;
-                        localResult.netCashFlow = localResult.predictedIncome - mlExpense - localResult.predictedBills;
+                        MlForecastResponse body = response.body();
+                        localResult.predictedExpense = body.predictedNextMonthExpense;
+                        localResult.predictedIncome = body.predictedIncome;
+                        localResult.predictedBills = body.predictedBills;
+                        localResult.netCashFlow = body.netCashFlow;
                     }
                     runOnUiThread(() -> displayResult(localResult));
                 }
