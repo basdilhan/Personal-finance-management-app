@@ -284,6 +284,45 @@
                                 </LinearLayout>
                             </LinearLayout>
 
+                            <!-- Month Switcher Row -->
+                            <LinearLayout
+                                android:id="@+id/layout_month_switcher"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                android:layout_marginBottom="12dp">
+
+                                <ImageView
+                                    android:id="@+id/btn_prev_month"
+                                    android:layout_width="32dp"
+                                    android:layout_height="32dp"
+                                    android:padding="4dp"
+                                    android:src="@drawable/ic_back"
+                                    app:tint="@color/text_secondary"
+                                    android:background="?attr/selectableItemBackgroundBorderless" />
+
+                                <TextView
+                                    android:id="@+id/text_selected_month"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:gravity="center"
+                                    android:text="July 2026"
+                                    android:textColor="@color/text_primary"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold" />
+
+                                <ImageView
+                                    android:id="@+id/btn_next_month"
+                                    android:layout_width="32dp"
+                                    android:layout_height="32dp"
+                                    android:padding="4dp"
+                                    android:src="@drawable/ic_chevron_right"
+                                    app:tint="@color/text_secondary"
+                                    android:background="?attr/selectableItemBackgroundBorderless" />
+                            </LinearLayout>
+
                             <!-- Divider with Gradient -->
                             <View
                                 android:layout_width="match_parent"

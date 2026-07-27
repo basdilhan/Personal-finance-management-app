@@ -143,6 +143,13 @@ public class DashboardActivity extends AppCompatActivity {
     private double currentTotalExpenses = 0.0d;
     private boolean isBalanceVisible = true;
 
+    // Month switcher state
+    private int selectedYear;
+    private int selectedMonth; // 0-based (Calendar.MONTH)
+    private TextView textSelectedMonth;
+    private View btnPrevMonth;
+    private View btnNextMonth;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -243,6 +250,21 @@ public class DashboardActivity extends AppCompatActivity {
         textBill3Due = findViewById(R.id.text_bill_3_due);
         textBill3Amount = findViewById(R.id.text_bill_3_amount);
         textBill3Amount = findViewById(R.id.text_bill_3_amount);
+
+        // Month switcher
+        Calendar now = Calendar.getInstance();
+        selectedYear = now.get(Calendar.YEAR);
+        selectedMonth = now.get(Calendar.MONTH);
+        textSelectedMonth = findViewById(R.id.text_selected_month);
+        btnPrevMonth = findViewById(R.id.btn_prev_month);
+        btnNextMonth = findViewById(R.id.btn_next_month);
+        updateMonthLabel();
+        if (btnPrevMonth != null) {
+            btnPrevMonth.setOnClickListener(v -> navigateMonth(-1));
+        }
+        if (btnNextMonth != null) {
+            btnNextMonth.setOnClickListener(v -> navigateMonth(1));
+        }
 
         // Quick Action buttons
         actionAddExpense = findViewById(R.id.action_add_expense);
@@ -560,18 +582,48 @@ public class DashboardActivity extends AppCompatActivity {
         });
     }
 
-    private void updateDashboardTotalsAndInsight() {
-        Calendar now = Calendar.getInstance();
-        int currentYear = now.get(Calendar.YEAR);
-        int currentMonth = now.get(Calendar.MONTH);
+    private void navigateMonth(int delta) {
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.YEAR, selectedYear);
+        cal.set(Calendar.MONTH, selectedMonth);
+        cal.add(Calendar.MONTH, delta);
+        selectedYear = cal.get(Calendar.YEAR);
+        selectedMonth = cal.get(Calendar.MONTH);
+        updateMonthLabel();
+        updateDashboardTotalsAndInsight();
+    }
 
-        double monthlyIncome = sumIncomeForMonth(currentYear, currentMonth);
-        double monthlyExpenses = sumExpensesForMonth(currentYear, currentMonth);
-        
+    private void updateMonthLabel() {
+        if (textSelectedMonth == null) return;
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.YEAR, selectedYear);
+        cal.set(Calendar.MONTH, selectedMonth);
+        String label = new java.text.SimpleDateFormat("MMMM yyyy", Locale.getDefault()).format(cal.getTime());
+        textSelectedMonth.setText(label);
+        // Disable next-month button if we're already at the current month
+        Calendar now = Calendar.getInstance();
+        boolean isCurrentOrFuture = (selectedYear > now.get(Calendar.YEAR)) ||
+                (selectedYear == now.get(Calendar.YEAR) && selectedMonth >= now.get(Calendar.MONTH));
+        if (btnNextMonth != null) btnNextMonth.setAlpha(isCurrentOrFuture ? 0.3f : 1.0f);
+        if (btnNextMonth != null) btnNextMonth.setEnabled(!isCurrentOrFuture);
+    }
+
+    private void updateDashboardTotalsAndInsight() {
+        double monthlyIncome = sumIncomeForMonth(selectedYear, selectedMonth);
+        double monthlyExpenses = sumExpensesForMonth(selectedYear, selectedMonth);
+
+        // Filter paid bills for the selected month
         double monthlyPaidBills = 0.0d;
         for (Bill bill : latestBills) {
             if ("paid".equalsIgnoreCase(bill.getStatus())) {
-                monthlyPaidBills += bill.getAmount();
+                long normalizedDate = normalizeEpochMillis(bill.getDueDate());
+                if (normalizedDate > 0L) {
+                    Calendar cal = Calendar.getInstance();
+                    cal.setTimeInMillis(normalizedDate);
+                    if (cal.get(Calendar.YEAR) == selectedYear && cal.get(Calendar.MONTH) == selectedMonth) {
+                        monthlyPaidBills += bill.getAmount();
+                    }
+                }
             }
         }
 
@@ -579,14 +631,18 @@ public class DashboardActivity extends AppCompatActivity {
         currentTotalExpenses = totalCashOut;
         currentMonthIncome = monthlyIncome;
 
-        // Portfolio balance follows: income - (expenses + paid bills)
+        // Balance = income - (expenses + paid bills)
         double totalBalance = currentMonthIncome - currentTotalExpenses;
         currentTotalBalance = totalBalance;
         applyBalancePrivacyState();
 
+        // Balance trend is always vs the month before the selected month
         updateBalanceTrend(totalBalance);
 
-        double dueBillsTotal = sumDueBills();
+        // Insight uses due (unpaid) bills only for the current month
+        Calendar now = Calendar.getInstance();
+        boolean viewingCurrentMonth = (selectedYear == now.get(Calendar.YEAR) && selectedMonth == now.get(Calendar.MONTH));
+        double dueBillsTotal = viewingCurrentMonth ? sumDueBills() : 0.0d;
         double insightBalance = currentMonthIncome - totalCashOut - dueBillsTotal;
         if (textInsightAmount != null) {
             if (isBalanceVisible) {
@@ -629,7 +685,10 @@ public class DashboardActivity extends AppCompatActivity {
             return;
         }
 
+        // Compare vs the month before the currently selected month
         Calendar previous = Calendar.getInstance();
+        previous.set(Calendar.YEAR, selectedYear);
+        previous.set(Calendar.MONTH, selectedMonth);
         previous.add(Calendar.MONTH, -1);
         int prevYear = previous.get(Calendar.YEAR);
         int prevMonth = previous.get(Calendar.MONTH);
