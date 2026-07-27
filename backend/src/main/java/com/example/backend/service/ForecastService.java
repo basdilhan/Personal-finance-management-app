@@ -60,11 +60,17 @@ public class ForecastService {
      */
     public static class ForecastResult {
         public final double predictedExpense;
+        public final double predictedIncome;
+        public final double predictedBills;
+        public final double netCashFlow;
         public final boolean isFallback;
         public final List<Double> historicalData;
 
-        public ForecastResult(double predictedExpense, boolean isFallback, List<Double> historicalData) {
+        public ForecastResult(double predictedExpense, double predictedIncome, double predictedBills, double netCashFlow, boolean isFallback, List<Double> historicalData) {
             this.predictedExpense = predictedExpense;
+            this.predictedIncome = predictedIncome;
+            this.predictedBills = predictedBills;
+            this.netCashFlow = netCashFlow;
             this.isFallback = isFallback;
             this.historicalData = historicalData;
         }
@@ -116,7 +122,15 @@ public class ForecastService {
                 && existing.get().getPredictedExpense() != null
                 && existing.get().getPredictedExpense().doubleValue() > 0) {
             // Valid cached value — return immediately, no ML call needed
-            return new ForecastResult(existing.get().getPredictedExpense().doubleValue(), false, historicalData);
+            ForecastEntity e = existing.get();
+            return new ForecastResult(
+                e.getPredictedExpense().doubleValue(),
+                e.getPredictedIncome() != null ? e.getPredictedIncome().doubleValue() : 0.0,
+                e.getPredictedBills() != null ? e.getPredictedBills().doubleValue() : 0.0,
+                e.getNetCashFlow() != null ? e.getNetCashFlow().doubleValue() : 0.0,
+                false, 
+                historicalData
+            );
         }
 
         // ── Step 2: Call ML service ──
@@ -192,7 +206,14 @@ public class ForecastService {
             System.err.println("[ForecastService] Failed to persist forecast: " + dbErr.getMessage());
         }
 
-        return new ForecastResult(predicted, isFallback, historicalData);
+        return new ForecastResult(
+            predicted, 
+            monthlyIncome.doubleValue(), 
+            monthlyBills.doubleValue(), 
+            netCashFlow.doubleValue(), 
+            isFallback, 
+            historicalData
+        );
     }
 
     /** Normalise epoch: if it looks like seconds, convert to ms. */

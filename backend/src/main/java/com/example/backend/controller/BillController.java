@@ -21,11 +21,19 @@ public class BillController {
     private final BillRepository billRepository;
     private final ForecastRepository forecastRepository;
     private final com.example.backend.service.AuditService auditService;
+    private final com.example.backend.repository.UserRepository userRepository;
+    private final com.example.backend.service.NotificationService notificationService;
 
-    public BillController(BillRepository billRepository, ForecastRepository forecastRepository, com.example.backend.service.AuditService auditService) {
+    public BillController(BillRepository billRepository, 
+                          ForecastRepository forecastRepository, 
+                          com.example.backend.service.AuditService auditService,
+                          com.example.backend.repository.UserRepository userRepository,
+                          com.example.backend.service.NotificationService notificationService) {
         this.billRepository = billRepository;
         this.forecastRepository = forecastRepository;
         this.auditService = auditService;
+        this.userRepository = userRepository;
+        this.notificationService = notificationService;
     }
 
     private void invalidateCurrentMonthForecast(String userId) {
@@ -92,11 +100,29 @@ public class BillController {
                     if (req.dueDate != null) existing.setDueDate(req.dueDate);
                     if (req.category != null) existing.setCategory(req.category);
                     if (req.categoryIcon != null) existing.setCategoryIcon(req.categoryIcon);
-                    if (req.status != null) existing.setStatus(req.status);
+                    boolean newlyPaid = false;
+                    if (req.status != null) {
+                        if ("paid".equalsIgnoreCase(req.status) && !"paid".equalsIgnoreCase(existing.getStatus())) {
+                            newlyPaid = true;
+                        }
+                        existing.setStatus(req.status);
+                    }
                     if (req.indicatorColor != null) existing.setIndicatorColor(req.indicatorColor);
                     if (req.isRecurring != null) existing.setIsRecurring(req.isRecurring);
                     BillEntity saved = billRepository.save(existing);
                     invalidateCurrentMonthForecast(userId);
+                    
+                    if (newlyPaid) {
+                        userRepository.findById(userId).ifPresent(u -> {
+                            if (u.getFcmToken() != null && !u.getFcmToken().isEmpty()) {
+                                notificationService.sendPushNotification(
+                                    u.getFcmToken(),
+                                    "Bill Paid! ✅",
+                                    "You successfully paid your bill: " + saved.getName()
+                                );
+                            }
+                        });
+                    }
                     auditService.logAction(userId, "BILL", "UPDATED", String.valueOf(saved.getId()), "Updated bill: " + saved.getName());
                     return ResponseEntity.ok(saved);
                 })
