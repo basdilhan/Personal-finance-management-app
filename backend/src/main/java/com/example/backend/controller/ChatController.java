@@ -7,9 +7,7 @@ import com.example.backend.repository.BillRepository;
 import com.example.backend.repository.BudgetLimitRepository;
 import com.example.backend.repository.ExpenseRepository;
 import com.example.backend.repository.IncomeRepository;
-import com.example.backend.repository.ForecastRepository;
-import com.example.backend.entity.ForecastEntity;
-import com.example.backend.service.MLServiceClient;
+import com.example.backend.service.ForecastService;
 import com.example.backend.service.GeminiService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,28 +23,25 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/chat")
 public class ChatController {
 
-    private final MLServiceClient mlServiceClient;
     private final GeminiService geminiService;
     private final ExpenseRepository expenseRepository;
     private final IncomeRepository incomeRepository;
     private final BudgetLimitRepository budgetLimitRepository;
     private final BillRepository billRepository;
-    private final ForecastRepository forecastRepository;
+    private final ForecastService forecastService;
 
-    public ChatController(MLServiceClient mlServiceClient,
-                          GeminiService geminiService,
+    public ChatController(GeminiService geminiService,
                           ExpenseRepository expenseRepository,
                           IncomeRepository incomeRepository,
                           BudgetLimitRepository budgetLimitRepository,
                           BillRepository billRepository,
-                          ForecastRepository forecastRepository) {
-        this.mlServiceClient = mlServiceClient;
+                          ForecastService forecastService) {
         this.geminiService = geminiService;
         this.expenseRepository = expenseRepository;
         this.incomeRepository = incomeRepository;
         this.budgetLimitRepository = budgetLimitRepository;
         this.billRepository = billRepository;
-        this.forecastRepository = forecastRepository;
+        this.forecastService = forecastService;
     }
 
     @PostMapping
@@ -95,28 +90,6 @@ public class ChatController {
             List<IncomeEntity> allIncomes = incomeRepository.findByUserIdAndIsDeletedFalseOrderByDateDesc(userId);
             List<BillEntity> allBills = billRepository.findByUserIdAndIsDeletedFalseOrderByDueDateAsc(userId);
 
-            // Fetch ML Forecast
-            // Get the last 6 months of historical expenses (aggregated by month)
-            Map<YearMonth, BigDecimal> monthlyAggregates = allExpenses.stream()
-                .collect(Collectors.groupingBy(
-                    e -> YearMonth.from(java.time.Instant.ofEpochMilli(e.getDate() < 10000000000L ? e.getDate() * 1000L : e.getDate()).atZone(ZoneId.of("Asia/Colombo")).toLocalDate()),
-                    Collectors.reducing(BigDecimal.ZERO, ExpenseEntity::getAmount, BigDecimal::add)
-                ));
-
-            // Merge paid bills into monthlyAggregates for ML history
-            allBills.stream()
-                .filter(b -> "paid".equalsIgnoreCase(b.getStatus()))
-                .forEach(b -> {
-                    YearMonth ym = YearMonth.from(java.time.Instant.ofEpochMilli(b.getDueDate() < 10000000000L ? b.getDueDate() * 1000L : b.getDueDate()).atZone(ZoneId.of("Asia/Colombo")).toLocalDate());
-                    monthlyAggregates.merge(ym, b.getAmount(), BigDecimal::add);
-                });
-
-            // Generate historical data array for Chronos ML (last 6 months)
-            List<Double> historicalData = new java.util.ArrayList<>();
-            for (int i = 5; i >= 0; i--) {
-                YearMonth ym = currentMonth.minusMonths(i);
-                historicalData.add(monthlyAggregates.getOrDefault(ym, BigDecimal.ZERO).doubleValue());
-            }
 
             // Monthly totals for current month
             BigDecimal monthlyExpenses = allExpenses.stream()
@@ -146,29 +119,12 @@ public class ChatController {
                     .map(IncomeEntity::getAmount)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-            boolean isFallback = false;
-            Double predictedNextMonthExpense = null;
-            
-            java.util.Optional<ForecastEntity> existingForecast = forecastRepository.findByUserIdAndForecastMonth(userId, currentMonth.toString());
-            if (existingForecast.isPresent()) {
-                predictedNextMonthExpense = existingForecast.get().getPredictedExpense().doubleValue();
-            }
-            
-            if (predictedNextMonthExpense == null || predictedNextMonthExpense <= 0.0) {
-                // If it doesn't exist yet, we can ask the ML service or use a fallback
-                predictedNextMonthExpense = mlServiceClient.generateForecast(userId, historicalData);
-                
-                if (predictedNextMonthExpense == null || predictedNextMonthExpense <= 0.0) {
-                    isFallback = true;
-                    if (monthlyExpenses.compareTo(BigDecimal.ZERO) > 0) {
-                        predictedNextMonthExpense = monthlyExpenses.doubleValue() * 1.05;
-                    } else if (monthlyIncome.compareTo(BigDecimal.ZERO) > 0) {
-                        predictedNextMonthExpense = monthlyIncome.doubleValue() * 0.40;
-                    } else {
-                        predictedNextMonthExpense = 15000.0;
-                    }
-                }
-            }
+            // ── Forecast: delegate entirely to ForecastService ──
+            // This guarantees the chatbot always returns the same prediction
+            // as the Web App and Mobile Forecast screen (shared DB cache).
+            ForecastService.ForecastResult forecastResult = forecastService.getOrCreateForecast(userId);
+            double predictedNextMonthExpense = forecastResult.predictedExpense;
+            boolean isFallback = forecastResult.isFallback;
 
             // Top spending categories this month
             Map<String, BigDecimal> byCategory = allExpenses.stream()
