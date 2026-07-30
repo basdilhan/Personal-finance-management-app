@@ -118,7 +118,8 @@ public class BillController {
                                 notificationService.sendPushNotification(
                                     u.getFcmToken(),
                                     "Bill Paid! ✅",
-                                    "You successfully paid your bill: " + saved.getName()
+                                    "You successfully paid your bill: " + saved.getName(),
+                                    userId, "bill_reminder"
                                 );
                             }
                         });
