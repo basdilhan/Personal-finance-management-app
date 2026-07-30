@@ -119,7 +119,8 @@ public class ExpenseController {
                         notificationService.sendPushNotification(
                             u.getFcmToken(),
                             "Budget Exceeded! 🚨",
-                            "You have exceeded your " + category + " budget for this month."
+                            "You have exceeded your " + category + " budget for this month.",
+                            userId, "budget_alert"
                         );
                     }
                 });

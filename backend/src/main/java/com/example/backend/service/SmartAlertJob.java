@@ -67,11 +67,13 @@ public class SmartAlertJob {
             if (totalSpent.compareTo(budget.getLimitAmount()) >= 0) {
                 notificationService.sendPushNotification(fcmToken,
                         "Budget Exceeded! \uD83D\uDEA8",
-                        "You have exceeded your " + budget.getCategory() + " budget for this month.");
+                        "You have exceeded your " + budget.getCategory() + " budget for this month.",
+                        budget.getUserId(), "budget_alert");
             } else if (totalSpent.compareTo(budget.getLimitAmount().multiply(new BigDecimal("0.8"))) >= 0) {
                 notificationService.sendPushNotification(fcmToken,
                         "Budget Warning \u26A0\uFE0F",
-                        "You have spent 80% of your " + budget.getCategory() + " budget.");
+                        "You have spent 80% of your " + budget.getCategory() + " budget.",
+                        budget.getUserId(), "budget_alert");
             }
         }
     }
@@ -95,7 +97,8 @@ public class SmartAlertJob {
                 if (fcmToken != null && !fcmToken.isEmpty()) {
                     notificationService.sendPushNotification(fcmToken,
                             "Weekly Spending Summary \uD83D\uDCCA",
-                            "You spent $" + weeklyTotal.toString() + " over the last 7 days.");
+                            "You spent $" + weeklyTotal.toString() + " over the last 7 days.",
+                            userId, "general");
                 }
             }
         }
@@ -119,7 +122,8 @@ public class SmartAlertJob {
                 String dayText = daysUntilDue == 0 ? "today" : "in " + daysUntilDue + " day(s)";
                 notificationService.sendPushNotification(fcmToken,
                         "Upcoming Bill Due! \u23F3",
-                        "Your bill '" + bill.getName() + "' for $" + bill.getAmount() + " is due " + dayText + ".");
+                        "Your bill '" + bill.getName() + "' for $" + bill.getAmount() + " is due " + dayText + ".",
+                        bill.getUserId(), "bill_reminder");
             }
         });
     }
@@ -145,7 +149,8 @@ public class SmartAlertJob {
                         String dayText = daysUntilDue == 0 ? "due today" : "due in " + daysUntilDue + " day(s)";
                         notificationService.sendPushNotification(fcmToken,
                                 "Savings Goal Reminder \uD83C\uDFAF",
-                                "If you want to reach '" + goal.getName() + "', you still need to save LKR " + needed.toPlainString() + ". Target date is " + dayText + ".");
+                                "If you want to reach '" + goal.getName() + "', you still need to save LKR " + needed.toPlainString() + ". Target date is " + dayText + ".",
+                                goal.getUserId(), "goal_reminder");
                     }
                 });
     }

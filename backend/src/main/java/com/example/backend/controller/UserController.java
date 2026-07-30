@@ -96,7 +96,8 @@ public class UserController {
                     }
                     notificationService.sendPushNotification(fcmToken,
                             "Test Server Notification 🚀",
-                            "Your Spring Boot backend successfully sent this FCM message!");
+                            "Your Spring Boot backend successfully sent this FCM message!",
+                            userId, "general");
                     return ResponseEntity.ok("Test push notification sent successfully.");
                 })
                 .orElse(ResponseEntity.notFound().build());
