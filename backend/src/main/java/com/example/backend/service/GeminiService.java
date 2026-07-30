@@ -46,25 +46,31 @@ public class GeminiService {
         // Adding a system instruction part if needed, but simple prompt works well:
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
 
-        try {
-            Map response = restTemplate.postForObject(url, request, Map.class);
-            if (response != null && response.containsKey("candidates")) {
-                List<Map<String, Object>> candidates = (List<Map<String, Object>>) response.get("candidates");
-                if (!candidates.isEmpty()) {
-                    Map<String, Object> candidate = candidates.get(0);
-                    Map<String, Object> contentMap = (Map<String, Object>) candidate.get("content");
-                    List<Map<String, Object>> parts = (List<Map<String, Object>>) contentMap.get("parts");
-                    if (!parts.isEmpty()) {
-                        return (String) parts.get(0).get("text");
+        // Try up to 2 times (handles transient 503 errors from Google)
+        for (int attempt = 1; attempt <= 2; attempt++) {
+            try {
+                Map response = restTemplate.postForObject(url, request, Map.class);
+                if (response != null && response.containsKey("candidates")) {
+                    List<Map<String, Object>> candidates = (List<Map<String, Object>>) response.get("candidates");
+                    if (!candidates.isEmpty()) {
+                        Map<String, Object> candidate = candidates.get(0);
+                        Map<String, Object> contentMap = (Map<String, Object>) candidate.get("content");
+                        List<Map<String, Object>> parts = (List<Map<String, Object>>) contentMap.get("parts");
+                        if (!parts.isEmpty()) {
+                            return (String) parts.get(0).get("text");
+                        }
                     }
                 }
+                break; // If no candidates but no error, don't retry
+            } catch (Exception e) {
+                System.err.println("Gemini API Error (attempt " + attempt + "): " + e.getMessage());
+                if (attempt < 2) {
+                    try { Thread.sleep(2000); } catch (InterruptedException ignored) {}
+                }
             }
-        } catch (Exception e) {
-            System.err.println("Gemini API Error: " + e.getMessage());
-            return "Debug Error: " + e.getMessage();
         }
         
-        return "Sorry, I couldn't understand that.";
+        return "I'm temporarily unable to process your request. The AI service is experiencing high demand — please try again in a moment.";
     }
 
     public String autoCategorize(String description) {
@@ -75,7 +81,7 @@ public class GeminiService {
                         "Return ONLY the exact category name with no other text.";
         
         String response = generateChatResponse(prompt);
-        if (response.startsWith("Debug Error:") || response.startsWith("Sorry,")) {
+        if (response.startsWith("I'm temporarily") || response.startsWith("Sorry,")) {
             return "Other";
         }
         return response.trim();
