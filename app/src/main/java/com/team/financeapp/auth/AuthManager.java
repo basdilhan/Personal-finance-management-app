@@ -123,7 +123,11 @@ public class AuthManager {
         String userId = getCurrentUserId();
         if (!TextUtils.isEmpty(userId)) {
             FinancialReminderScheduler.cancelAllForUser(context.getApplicationContext(), userId);
+            // Clear FCM token from backend so this user stops receiving notifications on this device
+            com.team.financeapp.notifications.FcmTokenUploader.clearTokenFromBackend(context, userId);
         }
+        // Clear local token cache so the next user login forces a fresh upload
+        com.team.financeapp.notifications.FcmTokenUploader.clearTokenCache(context);
         firebaseAuth.signOut();
         getGoogleSignInClient(context).signOut();
     }

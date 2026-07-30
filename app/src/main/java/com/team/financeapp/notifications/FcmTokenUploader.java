@@ -45,6 +45,47 @@ public class FcmTokenUploader {
         sendTokenToBackend(context, userId, token, prefs, token);
     }
 
+    /**
+     * Clears the cached token so the next login will force a re-upload.
+     * Must be called during logout before FirebaseAuth.signOut().
+     */
+    public static void clearTokenCache(Context context) {
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+                .edit().remove(PREF_UPLOADED_TOKEN).apply();
+        Log.d(TAG, "FCM token cache cleared.");
+    }
+
+    /**
+     * Tells the backend to remove the FCM token for this user.
+     * Prevents the old user from receiving notifications on this device after logout.
+     */
+    public static void clearTokenFromBackend(Context context, String userId) {
+        new Thread(() -> {
+            try {
+                String baseUrl = com.team.financeapp.BuildConfig.BASE_URL;
+                if (baseUrl.endsWith("/")) {
+                    baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
+                }
+                java.net.URL url = new java.net.URL(baseUrl + "/api/users/fcm-token");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("DELETE");
+                conn.setRequestProperty("X-User-Id", userId);
+                conn.setConnectTimeout(10000);
+                conn.setReadTimeout(10000);
+
+                int code = conn.getResponseCode();
+                if (code == 200) {
+                    Log.d(TAG, "FCM token cleared from backend for user: " + userId);
+                } else {
+                    Log.w(TAG, "FCM token clear failed with code: " + code);
+                }
+                conn.disconnect();
+            } catch (Exception e) {
+                Log.e(TAG, "Error clearing FCM token from backend: " + e.getMessage());
+            }
+        }).start();
+    }
+
     private static void sendTokenToBackend(Context context, String userId, String token,
                                             SharedPreferences prefs, String rawToken) {
         new Thread(() -> {
