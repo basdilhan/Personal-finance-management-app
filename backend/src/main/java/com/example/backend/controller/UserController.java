@@ -68,6 +68,22 @@ public class UserController {
     }
 
     /**
+     * Clears the FCM device token for a user on logout.
+     * This prevents notifications intended for User A from reaching 
+     * User B if they share the same phone.
+     */
+    @DeleteMapping("/fcm-token")
+    public ResponseEntity<Void> clearFcmToken(@RequestHeader("X-User-Id") String userId) {
+        return userRepository.findById(userId)
+                .map(user -> {
+                    user.setFcmToken(null);
+                    userRepository.save(user);
+                    return ResponseEntity.ok().<Void>build();
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    /**
      * Endpoint to immediately test FCM server-side notifications.
      */
     @PostMapping("/test-notification")
