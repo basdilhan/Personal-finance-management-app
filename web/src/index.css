@@ -313,3 +313,16 @@ h1, h2, h3, h4, h5, h6 {
     -webkit-overflow-scrolling: touch;
   }
 }
+
+/* Login Mobile overrides */
+@media (max-width: 768px) {
+  .login-container {
+    flex-direction: column !important;
+  }
+  .login-branding {
+    display: none !important;
+  }
+  .login-form-wrapper {
+    padding: 20px !important;
+  }
+}
