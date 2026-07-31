@@ -28,9 +28,9 @@ public class GeminiService {
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         if (geminiApiKey == null || geminiApiKey.trim().isEmpty() || geminiApiKey.equals("PLACEHOLDER_KEY")) {
-            url = "https://generativelanguage.googleapis.com/v1/models/gemini-3.5-flash:generateContent";
+            url = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent";
         } else {
-            url = "https://generativelanguage.googleapis.com/v1/models/gemini-3.5-flash:generateContent?key=" + geminiApiKey;
+            url = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=" + geminiApiKey;
         }
 
         // Build Gemini request body
@@ -46,8 +46,8 @@ public class GeminiService {
         // Adding a system instruction part if needed, but simple prompt works well:
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
 
-        // Try up to 2 times (handles transient 503 errors from Google)
-        for (int attempt = 1; attempt <= 2; attempt++) {
+        // Try up to 4 times with exponential backoff (handles transient 503 errors from Google)
+        for (int attempt = 1; attempt <= 4; attempt++) {
             try {
                 Map response = restTemplate.postForObject(url, request, Map.class);
                 if (response != null && response.containsKey("candidates")) {
@@ -64,8 +64,8 @@ public class GeminiService {
                 break; // If no candidates but no error, don't retry
             } catch (Exception e) {
                 System.err.println("Gemini API Error (attempt " + attempt + "): " + e.getMessage());
-                if (attempt < 2) {
-                    try { Thread.sleep(2000); } catch (InterruptedException ignored) {}
+                if (attempt < 4) {
+                    try { Thread.sleep(2000 * attempt); } catch (InterruptedException ignored) {}
                 }
             }
         }
