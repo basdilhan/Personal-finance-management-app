@@ -43,10 +43,14 @@ public class NotificationsActivity extends AppCompatActivity {
     private final List<NotificationItem> notifications = new ArrayList<>();
     private NotificationAdapter adapter;
 
+    private com.team.financeapp.data.repository.NotificationRepository repository;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notifications);
+
+        repository = new com.team.financeapp.data.repository.NotificationRepository(this);
 
         btnBack = findViewById(R.id.btn_back);
         btnClearAll = findViewById(R.id.btn_clear_all_notifications);
@@ -60,8 +64,18 @@ public class NotificationsActivity extends AppCompatActivity {
         adapter = new NotificationAdapter(notifications, new NotificationAdapter.NotificationActionListener() {
             @Override
             public void onMarkedRead(NotificationItem item, int position) {
-                NotificationCenterStore.markRead(NotificationsActivity.this, item.getId());
-                updateUnreadBadge();
+                repository.markAsRead(item.getId(), new com.team.financeapp.data.repository.NotificationRepository.ActionCallback() {
+                    @Override
+                    public void onSuccess() {
+                        item.setUnread(false);
+                        adapter.notifyItemChanged(position);
+                        updateUnreadBadge();
+                    }
+                    @Override
+                    public void onError(String message) {
+                        Toast.makeText(NotificationsActivity.this, message, Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
 
             @Override
@@ -98,9 +112,19 @@ public class NotificationsActivity extends AppCompatActivity {
     }
 
     private void loadNotifications() {
-        notifications.clear();
-        notifications.addAll(NotificationCenterStore.getAll(this));
-        renderNotifications();
+        repository.loadNotifications(new com.team.financeapp.data.repository.NotificationRepository.LoadNotificationsCallback() {
+            @Override
+            public void onNotificationsLoaded(List<NotificationItem> loaded) {
+                notifications.clear();
+                notifications.addAll(loaded);
+                renderNotifications();
+            }
+
+            @Override
+            public void onError(String message) {
+                Toast.makeText(NotificationsActivity.this, message, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void renderNotifications() {
@@ -113,7 +137,7 @@ public class NotificationsActivity extends AppCompatActivity {
             return;
         }
 
-        btnClearAll.setVisibility(View.VISIBLE);
+        btnClearAll.setVisibility(View.GONE); // Hidden since we don't have clear all API
         tvEmptyState.setVisibility(View.GONE);
         rvNotifications.setVisibility(View.VISIBLE);
         adapter.notifyDataSetChanged();
@@ -210,18 +234,24 @@ public class NotificationsActivity extends AppCompatActivity {
     }
 
     private void deleteNotification(NotificationItem item, int position) {
-        NotificationCenterStore.delete(this, item.getId());
-        NotificationManagerCompat.from(this).cancel(item.getNotificationId());
-        notifications.remove(position);
-        renderNotifications();
+        repository.deleteNotification(item.getId(), new com.team.financeapp.data.repository.NotificationRepository.ActionCallback() {
+            @Override
+            public void onSuccess() {
+                NotificationManagerCompat.from(NotificationsActivity.this).cancel(item.getNotificationId());
+                notifications.remove(position);
+                renderNotifications();
+            }
+
+            @Override
+            public void onError(String message) {
+                Toast.makeText(NotificationsActivity.this, message, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void clearAllNotifications() {
-        NotificationCenterStore.clearAll(this);
-        NotificationManagerCompat.from(this).cancelAll();
-        notifications.clear();
-        renderNotifications();
-        Toast.makeText(this, R.string.notifications_cleared, Toast.LENGTH_SHORT).show();
+        // Not supported with backend yet.
+        Toast.makeText(this, "Clear all not supported.", Toast.LENGTH_SHORT).show();
     }
 
     private void sendTestNotification() {
