@@ -123,22 +123,29 @@ public class ForecastService {
                 && existing.get().getPredictedExpense().doubleValue() > 0) {
             // Valid cached value — return immediately, no ML call needed
             ForecastEntity e = existing.get();
+            boolean cachedIsFallback = e.getModelVersion() != null && e.getModelVersion().contains("fallback");
+            if (!cachedIsFallback) {
+                long nonZeroCount = historicalData.stream().filter(v -> v > 0).count();
+                if (nonZeroCount < 2) cachedIsFallback = true;
+            }
+
             return new ForecastResult(
                 e.getPredictedExpense().doubleValue(),
                 e.getPredictedIncome() != null ? e.getPredictedIncome().doubleValue() : 0.0,
                 e.getPredictedBills() != null ? e.getPredictedBills().doubleValue() : 0.0,
                 e.getNetCashFlow() != null ? e.getNetCashFlow().doubleValue() : 0.0,
-                false, 
+                cachedIsFallback, 
                 historicalData
             );
         }
 
         // ── Step 2: Call ML service ──
+        long nonZeroCount = historicalData.stream().filter(v -> v > 0).count();
         boolean isFallback = false;
         Double predicted = mlServiceClient.generateForecast(userId, historicalData);
 
-        // ── Step 3: Math fallback if ML returns ≤ 0 ──
-        if (predicted == null || predicted <= 0.0) {
+        // ── Step 3: Math fallback if ML returns ≤ 0 OR user lacks data ──
+        if (predicted == null || predicted <= 0.0 || nonZeroCount < 2) {
             isFallback = true;
             long monthStart = currentMonth.atDay(1).atStartOfDay(ZoneId.of("Asia/Colombo")).toInstant().toEpochMilli();
             long monthEnd   = currentMonth.atEndOfMonth().atTime(23, 59, 59).atZone(ZoneId.of("Asia/Colombo")).toInstant().toEpochMilli();
