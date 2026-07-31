@@ -66,7 +66,8 @@ public class FcmTokenUploader {
                 if (baseUrl.endsWith("/")) {
                     baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
                 }
-                java.net.URL url = new java.net.URL(baseUrl + "/api/users/fcm-token");
+                // BASE_URL already contains /api
+                java.net.URL url = new java.net.URL(baseUrl + "/users/fcm-token");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("DELETE");
                 conn.setRequestProperty("X-User-Id", userId);
@@ -94,7 +95,8 @@ public class FcmTokenUploader {
                 if (baseUrl.endsWith("/")) {
                     baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
                 }
-                URL url = new URL(baseUrl + "/api/users/fcm-token");
+                // BASE_URL already contains /api
+                URL url = new URL(baseUrl + "/users/fcm-token");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("PUT");
                 conn.setRequestProperty("Content-Type", "application/json");
