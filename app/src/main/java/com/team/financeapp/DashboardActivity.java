@@ -584,6 +584,7 @@ public class DashboardActivity extends AppCompatActivity {
 
     private void navigateMonth(int delta) {
         Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.DAY_OF_MONTH, 1);
         cal.set(Calendar.YEAR, selectedYear);
         cal.set(Calendar.MONTH, selectedMonth);
         cal.add(Calendar.MONTH, delta);
@@ -591,11 +592,14 @@ public class DashboardActivity extends AppCompatActivity {
         selectedMonth = cal.get(Calendar.MONTH);
         updateMonthLabel();
         updateDashboardTotalsAndInsight();
+        updateExpenseChartFromData();
+        updateIncomeChartFromData();
     }
 
     private void updateMonthLabel() {
         if (textSelectedMonth == null) return;
         Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.DAY_OF_MONTH, 1);
         cal.set(Calendar.YEAR, selectedYear);
         cal.set(Calendar.MONTH, selectedMonth);
         String label = new java.text.SimpleDateFormat("MMMM yyyy", Locale.getDefault()).format(cal.getTime());
@@ -631,7 +635,7 @@ public class DashboardActivity extends AppCompatActivity {
         currentTotalExpenses = totalCashOut;
         currentMonthIncome = monthlyIncome;
 
-        // Balance = income - (expenses + paid bills)
+        // Balance = income - (expenses + paid bills) for the selected month
         double totalBalance = currentMonthIncome - currentTotalExpenses;
         currentTotalBalance = totalBalance;
         applyBalancePrivacyState();
@@ -687,6 +691,7 @@ public class DashboardActivity extends AppCompatActivity {
 
         // Compare vs the month before the currently selected month
         Calendar previous = Calendar.getInstance();
+        previous.set(Calendar.DAY_OF_MONTH, 1);
         previous.set(Calendar.YEAR, selectedYear);
         previous.set(Calendar.MONTH, selectedMonth);
         previous.add(Calendar.MONTH, -1);
@@ -733,6 +738,8 @@ public class DashboardActivity extends AppCompatActivity {
         Map<String, Double> grouped = new HashMap<>();
         double total = 0.0d;
         for (Expense expense : latestExpenses) {
+            if (!isDateInSelectedMonth(expense.getDate(), selectedYear, selectedMonth)) continue;
+            
             String key = normalizeExpenseCategory(expense.getCategory());
             double amount = expense.getAmount();
             grouped.put(key, grouped.getOrDefault(key, 0.0d) + amount);
@@ -815,8 +822,7 @@ public class DashboardActivity extends AppCompatActivity {
         Map<String, Double> grouped = new HashMap<>();
         double total = 0.0d;
         for (IncomeEntry entry : latestIncomes) {
-            long normalizedDate = com.team.financeapp.utils.DateUtils.normalizeEpochMillis(entry.getDate());
-            if (normalizedDate <= 0L) continue;
+            if (!isDateInSelectedMonth(entry.getDate(), selectedYear, selectedMonth)) continue;
             
             String key = normalizeIncomeSource(entry.getSource());
             double amount = entry.getAmount();
@@ -1148,6 +1154,14 @@ public class DashboardActivity extends AppCompatActivity {
             }
         }
         return sum;
+    }
+
+    private boolean isDateInSelectedMonth(long millis, int targetYear, int targetMonth) {
+        long normalized = normalizeEpochMillis(millis);
+        if (normalized <= 0) return false;
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(normalized);
+        return cal.get(Calendar.YEAR) == targetYear && cal.get(Calendar.MONTH) == targetMonth;
     }
 
     private double sumGoalAddedSavings() {
