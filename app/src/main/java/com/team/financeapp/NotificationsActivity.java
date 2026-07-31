@@ -64,7 +64,7 @@ public class NotificationsActivity extends AppCompatActivity {
         adapter = new NotificationAdapter(notifications, new NotificationAdapter.NotificationActionListener() {
             @Override
             public void onMarkedRead(NotificationItem item, int position) {
-                repository.markAsRead(item.getId(), new com.team.financeapp.data.repository.NotificationRepository.ActionCallback() {
+                repository.markAsRead(Integer.parseInt(item.getId()), new com.team.financeapp.data.repository.NotificationRepository.ActionCallback() {
                     @Override
                     public void onSuccess() {
                         item.setUnread(false);
@@ -234,7 +234,7 @@ public class NotificationsActivity extends AppCompatActivity {
     }
 
     private void deleteNotification(NotificationItem item, int position) {
-        repository.deleteNotification(item.getId(), new com.team.financeapp.data.repository.NotificationRepository.ActionCallback() {
+        repository.deleteNotification(Integer.parseInt(item.getId()), new com.team.financeapp.data.repository.NotificationRepository.ActionCallback() {
             @Override
             public void onSuccess() {
                 NotificationManagerCompat.from(NotificationsActivity.this).cancel(item.getNotificationId());

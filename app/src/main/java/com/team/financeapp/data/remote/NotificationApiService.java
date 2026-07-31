@@ -12,15 +12,15 @@ import retrofit2.http.Path;
 
 public interface NotificationApiService {
 
-    @GET("api/notifications")
+    @GET("notifications")
     Call<List<NotificationDto>> getNotifications();
 
-    @GET("api/notifications/unread")
+    @GET("notifications/unread")
     Call<List<NotificationDto>> getUnreadNotifications();
 
-    @PATCH("api/notifications/{id}/read")
+    @PATCH("notifications/{id}/read")
     Call<NotificationDto> markAsRead(@Path("id") int id);
 
-    @DELETE("api/notifications/{id}")
+    @DELETE("notifications/{id}")
     Call<Void> deleteNotification(@Path("id") int id);
 }
