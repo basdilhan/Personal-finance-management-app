@@ -3,6 +3,7 @@ package com.example.backend.controller;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.example.backend.entity.BudgetLimitEntity;
 import com.example.backend.repository.BudgetLimitRepository;
+import com.example.backend.service.AuditService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,9 +16,11 @@ import java.util.Optional;
 public class BudgetController {
 
     private final BudgetLimitRepository budgetLimitRepository;
+    private final AuditService auditService;
 
-    public BudgetController(BudgetLimitRepository budgetLimitRepository) {
+    public BudgetController(BudgetLimitRepository budgetLimitRepository, AuditService auditService) {
         this.budgetLimitRepository = budgetLimitRepository;
+        this.auditService = auditService;
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -44,17 +47,28 @@ public class BudgetController {
         Optional<BudgetLimitEntity> existingOpt = budgetLimitRepository.findByUserIdAndCategoryAndMonthYear(userId, req.category, req.monthYear);
 
         BudgetLimitEntity budget;
+        String actionType;
         if (existingOpt.isPresent()) {
             budget = existingOpt.get();
             budget.setLimitAmount(req.limitAmount);
+            actionType = "UPDATED";
         } else {
             budget = new BudgetLimitEntity();
             budget.setUserId(userId);
             budget.setCategory(req.category);
             budget.setLimitAmount(req.limitAmount);
             budget.setMonthYear(req.monthYear);
+            actionType = "CREATED";
         }
 
-        return ResponseEntity.ok(budgetLimitRepository.save(budget));
+        BudgetLimitEntity saved = budgetLimitRepository.save(budget);
+        
+        auditService.logAction(userId, "BUDGET", actionType, String.valueOf(saved.getId()), 
+            actionType.equals("CREATED") 
+                ? "Created budget: " + saved.getLimitAmount() + " for " + saved.getCategory() 
+                : "Updated budget: " + saved.getLimitAmount() + " for " + saved.getCategory()
+        );
+
+        return ResponseEntity.ok(saved);
     }
 }
