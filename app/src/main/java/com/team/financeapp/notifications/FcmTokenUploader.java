@@ -13,6 +13,10 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.auth.GetTokenResult;
+
 /**
  * Uploads the FCM device token to our backend.
  * Called on first launch and whenever the token is refreshed.
@@ -71,6 +75,14 @@ public class FcmTokenUploader {
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("DELETE");
                 conn.setRequestProperty("X-User-Id", userId);
+                
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                if (user != null) {
+                    Task<GetTokenResult> task = user.getIdToken(false);
+                    Tasks.await(task);
+                    conn.setRequestProperty("Authorization", "Bearer " + task.getResult().getToken());
+                }
+                
                 conn.setConnectTimeout(10000);
                 conn.setReadTimeout(10000);
 
@@ -101,6 +113,14 @@ public class FcmTokenUploader {
                 conn.setRequestMethod("PUT");
                 conn.setRequestProperty("Content-Type", "application/json");
                 conn.setRequestProperty("X-User-Id", userId);
+                
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                if (user != null) {
+                    Task<GetTokenResult> task = user.getIdToken(false);
+                    Tasks.await(task);
+                    conn.setRequestProperty("Authorization", "Bearer " + task.getResult().getToken());
+                }
+                
                 conn.setDoOutput(true);
                 conn.setConnectTimeout(10000);
                 conn.setReadTimeout(10000);
