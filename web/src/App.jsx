@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 
 // Components
 import Sidebar from './components/Sidebar';
+import { Menu } from 'lucide-react';
 
 // Pages
 import Login from './pages/Login';
@@ -21,13 +22,34 @@ import Reports from './pages/Reports';
 // Protected Route Wrapper
 const PrivateRoute = ({ children }) => {
   const { currentUser, loading } = useAuth();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
   
   if (loading) return <div style={{ padding: '40px' }}>Loading DreamSaver...</div>;
   if (!currentUser) return <Navigate to="/login" />;
   
   return (
     <div className="layout-container">
-      <Sidebar />
+      {/* Mobile Header */}
+      <div className="mobile-header">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <img src="/logo.svg" alt="Dream Saver Logo" style={{ width: '32px', height: '32px', borderRadius: '6px' }} />
+          <span style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)' }}>DreamSaver</span>
+        </div>
+        <button 
+          onClick={() => setIsMobileMenuOpen(true)}
+          style={{ background: 'none', border: 'none', color: 'var(--text-primary)', cursor: 'pointer' }}
+        >
+          <Menu size={24} />
+        </button>
+      </div>
+
+      {/* Sidebar Overlay */}
+      <div 
+        className={`mobile-overlay ${isMobileMenuOpen ? 'open' : ''}`}
+        onClick={() => setIsMobileMenuOpen(false)}
+      ></div>
+
+      <Sidebar isOpen={isMobileMenuOpen} setIsOpen={setIsMobileMenuOpen} />
       <div className="main-content">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

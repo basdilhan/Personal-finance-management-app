@@ -101,7 +101,7 @@ export default function Profile() {
         <p className="text-muted">Manage your personal details and view your personalized financial assessment.</p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+      <div className="grid-1-1">
         
         {/* Profile Details Panel */}
         <div className="dashboard-panel">
@@ -143,7 +143,7 @@ export default function Profile() {
               />
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <div className="grid-1-1" style={{ gap: '16px' }}>
               <div>
                 <label style={{ display: 'block', fontSize: '14px', marginBottom: '8px', color: 'var(--text-secondary)' }}>
                   <Phone size={14} style={{ marginRight: '4px', verticalAlign: 'text-bottom' }}/> Phone Number

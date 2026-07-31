@@ -41,7 +41,7 @@ export default function Blogs() {
         <p className="text-muted">Expert articles to help you make smarter financial decisions.</p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '24px' }}>
+      <div className="grid-auto-fill">
         {blogs.map(blog => (
           <div key={blog.id} className="dashboard-panel" style={{ padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
             <div style={{ height: '200px', width: '100%', overflow: 'hidden' }}>

@@ -163,7 +163,7 @@ export default function Dashboard() {
       </div>
 
       {/* KPI Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px', marginBottom: '32px' }}>
+      <div className="grid-auto-fit">
         
         <div className="dashboard-panel">
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
@@ -197,7 +197,7 @@ export default function Dashboard() {
       </div>
 
       {/* Charts Section */}
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px', marginBottom: '32px' }}>
+      <div className="grid-2-1" style={{ marginBottom: '32px' }}>
         <div className="dashboard-panel">
           <h3 style={{ marginBottom: '24px' }}>Cash Flow Trend</h3>
           <div style={{ height: '300px' }}>
@@ -241,7 +241,7 @@ export default function Dashboard() {
       </div>
 
       {/* Bottom Section: Transactions & Bills */}
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px' }}>
+      <div className="grid-2-1">
         
         {/* Recent Transactions List */}
         <div className="dashboard-panel">
@@ -249,38 +249,40 @@ export default function Dashboard() {
           {expenses.length === 0 && bills.filter(b => b.status === 'paid').length === 0 ? (
             <EmptyState title="No transactions yet" message="Start adding expenses in the mobile app to see them here!" />
           ) : (
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-              <thead>
-                <tr style={{ borderBottom: '2px solid var(--border-light)', textAlign: 'left' }}>
-                  <th style={{ padding: '12px', color: 'var(--text-secondary)', fontWeight: 500 }}>Date</th>
-                  <th style={{ padding: '12px', color: 'var(--text-secondary)', fontWeight: 500 }}>Category</th>
-                  <th style={{ padding: '12px', color: 'var(--text-secondary)', fontWeight: 500, textAlign: 'right' }}>Amount</th>
-                </tr>
-              </thead>
-              <tbody>
-                {[...expenses, ...bills.filter(b => b.status === 'paid').map(b => ({
-                  date: b.dueDate,
-                  category: b.name + ' (Bill)',
-                  amount: b.amount,
-                  description: 'Paid Bill'
-                }))]
-                .sort((a, b) => new Date(b.date) - new Date(a.date))
-                .slice(0, 5)
-                .map((tx, idx) => (
-                  <tr key={idx} style={{ borderBottom: '1px solid var(--border-light)' }}>
-                    <td style={{ padding: '16px 12px' }}>{formatDateShort(tx.date)}</td>
-                    <td style={{ padding: '16px 12px' }}>
-                      <span style={{ background: 'var(--bg-tertiary)', padding: '4px 12px', borderRadius: '100px', fontSize: '12px', fontWeight: 500 }}>
-                        {tx.category}
-                      </span>
-                    </td>
-                    <td style={{ padding: '16px 12px', textAlign: 'right', fontWeight: 600, color: 'var(--danger)' }}>
-                      - LKR {tx.amount.toLocaleString()}
-                    </td>
+            <div className="table-responsive">
+              <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '400px' }}>
+                <thead>
+                  <tr style={{ borderBottom: '2px solid var(--border-light)', textAlign: 'left' }}>
+                    <th style={{ padding: '12px', color: 'var(--text-secondary)', fontWeight: 500 }}>Date</th>
+                    <th style={{ padding: '12px', color: 'var(--text-secondary)', fontWeight: 500 }}>Category</th>
+                    <th style={{ padding: '12px', color: 'var(--text-secondary)', fontWeight: 500, textAlign: 'right' }}>Amount</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {[...expenses, ...bills.filter(b => b.status === 'paid').map(b => ({
+                    date: b.dueDate,
+                    category: b.name + ' (Bill)',
+                    amount: b.amount,
+                    description: 'Paid Bill'
+                  }))]
+                  .sort((a, b) => new Date(b.date) - new Date(a.date))
+                  .slice(0, 5)
+                  .map((tx, idx) => (
+                    <tr key={idx} style={{ borderBottom: '1px solid var(--border-light)' }}>
+                      <td style={{ padding: '16px 12px' }}>{formatDateShort(tx.date)}</td>
+                      <td style={{ padding: '16px 12px' }}>
+                        <span style={{ background: 'var(--bg-tertiary)', padding: '4px 12px', borderRadius: '100px', fontSize: '12px', fontWeight: 500 }}>
+                          {tx.category}
+                        </span>
+                      </td>
+                      <td style={{ padding: '16px 12px', textAlign: 'right', fontWeight: 600, color: 'var(--danger)' }}>
+                        - LKR {tx.amount.toLocaleString()}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
 
