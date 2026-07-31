@@ -26,9 +26,9 @@ public class ReceiptParserService {
         headers.set("Content-Type", "application/json");
 
         if (apiKey == null || apiKey.trim().isEmpty() || apiKey.equals("PLACEHOLDER_KEY")) {
-            url = "https://generativelanguage.googleapis.com/v1/models/gemini-3.5-flash:generateContent";
+            url = "https://generativelanguage.googleapis.com/v1/models/gemini-3.5-flash-lite:generateContent";
         } else {
-            url = "https://generativelanguage.googleapis.com/v1/models/gemini-3.5-flash:generateContent?key=" + apiKey;
+            url = "https://generativelanguage.googleapis.com/v1/models/gemini-3.5-flash-lite:generateContent?key=" + apiKey;
         }
 
         Map<String, Object> requestBody = new HashMap<>();
