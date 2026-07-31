@@ -8,4 +8,5 @@ public interface BillRepository extends JpaRepository<BillEntity, Integer> {
     List<BillEntity> findByUserIdAndIsDeletedFalseOrderByDueDateAsc(String userId);
     List<BillEntity> findByUserIdAndStatusAndIsDeletedFalse(String userId, String status);
     List<BillEntity> findByStatusIgnoreCaseAndIsDeletedFalseAndDueDateBetween(String status, Long startDate, Long endDate);
+    List<BillEntity> findByIsDeletedFalseAndDueDateBetween(Long startDate, Long endDate);
 }

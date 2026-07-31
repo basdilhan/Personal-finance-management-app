@@ -14,6 +14,7 @@ import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.team.financeapp.DashboardActivity;
 import com.team.financeapp.R;
+import com.team.financeapp.notifications.NotificationCenterStore;
 
 /**
  * Handles incoming FCM push notifications and token refreshes.
@@ -90,6 +91,10 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setContentIntent(pendingIntent);
 
-        manager.notify((int) System.currentTimeMillis(), builder.build());
+        int notificationId = (int) System.currentTimeMillis();
+        manager.notify(notificationId, builder.build());
+        
+        // Save to in-app notification center
+        NotificationCenterStore.add(this, notificationId, title, body);
     }
 }
