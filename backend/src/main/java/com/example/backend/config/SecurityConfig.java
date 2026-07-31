@@ -45,7 +45,8 @@ public class SecurityConfig {
             "http://10.0.2.2:*",
             "https://*.onrender.com",
             "https://*.firebaseapp.com",
-            "https://*.web.app"
+            "https://*.web.app",
+            "https://*.vercel.app"
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
