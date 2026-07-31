@@ -128,6 +128,7 @@ public class AuthManager {
         }
         // Clear local token cache so the next user login forces a fresh upload
         com.team.financeapp.notifications.FcmTokenUploader.clearTokenCache(context);
+        com.team.financeapp.notifications.NotificationCenterStore.clearAll(context);
         firebaseAuth.signOut();
         getGoogleSignInClient(context).signOut();
     }
