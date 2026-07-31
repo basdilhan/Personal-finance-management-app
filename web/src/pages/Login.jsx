@@ -45,11 +45,12 @@ export default function Login() {
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: 20 }}
       transition={{ duration: 0.3 }}
+      className="login-container"
       style={{ display: 'flex', minHeight: '100vh', width: '100vw', background: 'var(--bg-primary)' }}
     >
       
       {/* Left Branding Panel */}
-      <div style={{ 
+      <div className="login-branding" style={{ 
         flex: 1, 
         background: 'linear-gradient(135deg, #000000 0%, #0a192f 100%)',
         position: 'relative',
@@ -104,7 +105,7 @@ export default function Login() {
       </div>
 
       {/* Right Login Panel */}
-      <div style={{ 
+      <div className="login-form-wrapper" style={{ 
         flex: 1, 
         display: 'flex', 
         alignItems: 'center', 
