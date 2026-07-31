@@ -5,7 +5,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, MessageSquare, BookOpen, LogOut, BrainCircuit, Moon, Sun, User, Activity, Globe } from 'lucide-react';
 
-export default function Sidebar() {
+export default function Sidebar({ isOpen, setIsOpen }) {
   const { currentUser, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { language, toggleLanguage, t } = useLanguage();
@@ -31,7 +31,7 @@ export default function Sidebar() {
   ];
 
   return (
-    <div className="sidebar-glass" style={{
+    <div className={`sidebar-glass ${isOpen ? 'open' : ''}`} style={{
       width: '260px',
       height: '100vh',
       position: 'fixed',
@@ -55,6 +55,7 @@ export default function Sidebar() {
           <NavLink 
             key={item.path} 
             to={item.path}
+            onClick={() => setIsOpen && setIsOpen(false)}
             className={({ isActive }) => isActive ? 'nav-item-active' : ''}
             style={{
               display: 'flex',

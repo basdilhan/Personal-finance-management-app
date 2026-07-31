@@ -85,7 +85,7 @@ export default function MLInsights() {
         <p className="text-muted">Advanced machine learning analytics powered by DreamSaver AI.</p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '32px' }}>
+      <div className="grid-1-1" style={{ marginBottom: '32px' }}>
         
         {/* Cold Start ML Clustering */}
         <div className="dashboard-panel">
