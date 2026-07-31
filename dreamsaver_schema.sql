@@ -1,6 +1,6 @@
 -- ================================================================
 -- DreamSaver Personal Finance App — PostgreSQL Schema
--- Version: Final (8 Tables)
+-- Version: Final (9 Tables)
 -- ================================================================
 
 -- ==================================
@@ -243,3 +243,23 @@ LEFT JOIN expenses e ON e.user_id = bl.user_id
     AND TO_CHAR(TO_TIMESTAMP(e.date / 1000.0), 'YYYY-MM') = bl.month_year
     AND e.is_deleted = FALSE
 GROUP BY bl.id, bl.user_id, bl.month_year, bl.category, bl.limit_amount;
+
+
+-- ==================================
+-- TABLE 9: AUDIT LOGS
+-- ==================================
+CREATE TABLE IF NOT EXISTS audit_logs (
+    id          SERIAL       PRIMARY KEY,
+    user_id     TEXT         NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    entity_type VARCHAR(50)  NOT NULL,
+    action      VARCHAR(50)  NOT NULL,
+    entity_id   VARCHAR(255),
+    details     TEXT,
+    timestamp   TIMESTAMP    NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_audit_logs_user ON audit_logs(user_id, timestamp DESC);
+
+-- Enable RLS to secure the table from public API access
+ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Deny All" ON audit_logs FOR ALL TO public USING (false);
