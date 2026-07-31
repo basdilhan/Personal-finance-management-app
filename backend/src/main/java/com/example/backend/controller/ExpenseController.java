@@ -91,6 +91,17 @@ public class ExpenseController {
 
         // Real-time budget check
         checkBudgetAndNotify(userId, saved.getCategory());
+        
+        userRepository.findById(userId).ifPresent(u -> {
+            if (u.getFcmToken() != null && !u.getFcmToken().isEmpty()) {
+                notificationService.sendPushNotification(
+                    u.getFcmToken(),
+                    "Expense Logged 💸",
+                    "Added new expense: LKR " + saved.getAmount(),
+                    userId, "general"
+                );
+            }
+        });
 
         return ResponseEntity.ok(saved);
     }

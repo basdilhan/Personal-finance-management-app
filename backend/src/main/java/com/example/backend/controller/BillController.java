@@ -84,6 +84,18 @@ public class BillController {
         BillEntity saved = billRepository.save(bill);
         invalidateCurrentMonthForecast(userId);
         auditService.logAction(userId, "BILL", "CREATED", String.valueOf(saved.getId()), "Created bill: " + saved.getName());
+        
+        userRepository.findById(userId).ifPresent(u -> {
+            if (u.getFcmToken() != null && !u.getFcmToken().isEmpty()) {
+                notificationService.sendPushNotification(
+                    u.getFcmToken(),
+                    "Bill Added",
+                    "Added new bill: " + saved.getName() + " (LKR " + saved.getAmount() + ")",
+                    userId, "general"
+                );
+            }
+        });
+        
         return ResponseEntity.ok(saved);
     }
 

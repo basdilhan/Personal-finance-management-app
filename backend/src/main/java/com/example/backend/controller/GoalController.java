@@ -15,10 +15,17 @@ public class GoalController {
 
     private final GoalRepository goalRepository;
     private final com.example.backend.service.AuditService auditService;
+    private final com.example.backend.repository.UserRepository userRepository;
+    private final com.example.backend.service.NotificationService notificationService;
 
-    public GoalController(GoalRepository goalRepository, com.example.backend.service.AuditService auditService) {
+    public GoalController(GoalRepository goalRepository, 
+                          com.example.backend.service.AuditService auditService,
+                          com.example.backend.repository.UserRepository userRepository,
+                          com.example.backend.service.NotificationService notificationService) {
         this.goalRepository = goalRepository;
         this.auditService = auditService;
+        this.userRepository = userRepository;
+        this.notificationService = notificationService;
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -62,6 +69,18 @@ public class GoalController {
 
         GoalEntity saved = goalRepository.save(goal);
         auditService.logAction(userId, "GOAL", "CREATED", String.valueOf(saved.getId()), "Created goal: " + saved.getName());
+        
+        userRepository.findById(userId).ifPresent(u -> {
+            if (u.getFcmToken() != null && !u.getFcmToken().isEmpty()) {
+                notificationService.sendPushNotification(
+                    u.getFcmToken(),
+                    "Goal Set 🎯",
+                    "New savings goal added: " + saved.getName(),
+                    userId, "general"
+                );
+            }
+        });
+        
         return ResponseEntity.ok(saved);
     }
 
