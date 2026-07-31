@@ -18,7 +18,14 @@ public final class FinancialReminderScheduler {
     public static void scheduleBillAddedReminder(@NonNull Context context, @NonNull BillEntity bill) {}
     public static void scheduleBillPaidReminder(@NonNull Context context, @NonNull BillEntity bill) {}
     public static void scheduleExpenseAddedReminder(@NonNull Context context, @NonNull ExpenseEntity expense) {}
-    public static void scheduleGoalReminder(@NonNull Context context, @NonNull GoalEntity goal) {}
+    public static void scheduleGoalReminder(@androidx.annotation.NonNull Context context, @androidx.annotation.NonNull com.team.financeapp.data.local.entity.GoalEntity goal) {
+        // Disabled
+    }
+
+    public static boolean isReminderStale(long currentTime, long dueMillis, int offsetDays, int timeSlot) {
+        return true; // Disabled local reminders, always stale
+    }
+
     public static void scheduleGoalAddedReminder(@NonNull Context context, @NonNull GoalEntity goal) {}
     public static void cancelBillReminder(@NonNull Context context, @NonNull String remoteId) {}
     public static void cancelBillDueReminders(@NonNull Context context, @NonNull String remoteId) {}

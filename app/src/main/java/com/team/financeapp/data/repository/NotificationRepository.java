@@ -41,12 +41,13 @@ public class NotificationRepository {
                     List<NotificationItem> items = new ArrayList<>();
                     for (NotificationDto dto : response.body()) {
                         items.add(new NotificationItem(
-                                dto.getId(),
-                                dto.getId(), // use backend ID as notification ID too
+                                String.valueOf(dto.getId()),
                                 dto.getTitle(),
                                 dto.getMessage(),
                                 parseTimeLabel(dto.getCreatedAt()),
                                 getIconForType(dto.getType()),
+                                System.currentTimeMillis(), // We can use current time since backend doesn't give us epoch
+                                dto.getId(), // notificationId
                                 !dto.isRead()
                         ));
                     }
