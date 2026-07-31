@@ -695,7 +695,23 @@ public class DashboardActivity extends AppCompatActivity {
 
         double previousIncome = sumIncomeForMonth(prevYear, prevMonth);
         double previousExpenses = sumExpensesForMonth(prevYear, prevMonth);
-        double previousNet = previousIncome - previousExpenses;
+        
+        // Also subtract paid bills for previous month
+        double previousPaidBills = 0.0d;
+        for (Bill bill : latestBills) {
+            if ("paid".equalsIgnoreCase(bill.getStatus())) {
+                long normalizedDate = normalizeEpochMillis(bill.getDueDate());
+                if (normalizedDate > 0L) {
+                    Calendar cal = Calendar.getInstance();
+                    cal.setTimeInMillis(normalizedDate);
+                    if (cal.get(Calendar.YEAR) == prevYear && cal.get(Calendar.MONTH) == prevMonth) {
+                        previousPaidBills += bill.getAmount();
+                    }
+                }
+            }
+        }
+
+        double previousNet = previousIncome - (previousExpenses + previousPaidBills);
 
         if (Math.abs(previousNet) < 0.01d) {
             textBalanceTrend.setText("--");
