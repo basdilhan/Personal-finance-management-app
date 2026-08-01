@@ -49,4 +49,13 @@ public class ForecastController {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
+
+    @GetMapping("/history")
+    public ResponseEntity<List<Map<String, Object>>> getForecastHistory(@RequestHeader("X-User-Id") String userId) {
+        try {
+            return ResponseEntity.ok(forecastService.getForecastAccuracyHistory(userId));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }

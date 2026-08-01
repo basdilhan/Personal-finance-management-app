@@ -6,6 +6,7 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 export default function MLInsights() {
   const [profile, setProfile] = useState(null);
   const [forecast, setForecast] = useState(null);
+  const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // Form State for Cold Start
@@ -19,8 +20,12 @@ export default function MLInsights() {
 
   async function fetchForecast() {
     try {
-      const res = await apiClient.get('/forecasts/ml-predict');
-      setForecast(res.data);
+      const [forecastRes, historyRes] = await Promise.all([
+        apiClient.get('/forecasts/ml-predict'),
+        apiClient.get('/forecasts/history').catch(() => ({ data: [] }))
+      ]);
+      setForecast(forecastRes.data);
+      setHistory(historyRes.data || []);
     } catch (err) {
       console.error("Failed to load forecast:", err);
     }
@@ -178,6 +183,49 @@ export default function MLInsights() {
           ) : (
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
               <Loader2 className="lucide-spin" size={32} color="var(--text-secondary)" />
+            </div>
+          )}
+        </div>
+
+        {/* Forecast Accuracy Comparison */}
+        <div className="dashboard-panel" style={{ gridColumn: '1 / -1' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
+            <div style={{ background: 'rgba(239, 68, 68, 0.1)', padding: '10px', borderRadius: '12px' }}>
+              <Target size={24} color="var(--danger)" />
+            </div>
+            <div>
+              <h3 style={{ margin: 0 }}>Model Accuracy</h3>
+              <p className="text-muted" style={{ fontSize: '14px', margin: 0 }}>Predicted vs Actual Past Expenses</p>
+            </div>
+          </div>
+
+          {history && history.length > 0 ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+              <div style={{ display: 'flex', gap: '16px' }}>
+                <div style={{ flex: 1, background: 'var(--bg-primary)', padding: '20px', borderRadius: '12px', border: '1px solid var(--border-light)' }}>
+                  <span className="text-muted" style={{ fontSize: '14px' }}>Average Accuracy</span>
+                  <h2 style={{ fontSize: '32px', color: 'var(--accent-blue)' }}>
+                    {Math.round(history.reduce((sum, h) => sum + h.accuracy, 0) / history.length)}%
+                  </h2>
+                </div>
+              </div>
+              
+              <div style={{ height: '300px' }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={history}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-light)" />
+                    <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{fill: 'var(--text-secondary)'}} />
+                    <YAxis axisLine={false} tickLine={false} tick={{fill: 'var(--text-secondary)'}} />
+                    <Tooltip contentStyle={{ borderRadius: '8px', border: '1px solid var(--border-light)', background: 'var(--bg-primary)', color: 'var(--text-primary)' }} />
+                    <Area type="monotone" dataKey="actual" name="Actual Spent" stroke="var(--danger)" fillOpacity={0.1} fill="var(--danger)" strokeWidth={2} />
+                    <Area type="monotone" dataKey="predicted" name="AI Predicted" stroke="var(--accent-blue)" fillOpacity={0.1} fill="var(--accent-blue)" strokeWidth={2} strokeDasharray="5 5" />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          ) : (
+            <div style={{ padding: '40px', textAlign: 'center' }}>
+              <p className="text-muted">No historical forecasts available yet. Check back next month!</p>
             </div>
           )}
         </div>

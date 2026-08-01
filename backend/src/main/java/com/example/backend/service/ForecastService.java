@@ -111,7 +111,8 @@ public class ForecastService {
             });
 
         List<Double> historicalData = new ArrayList<>();
-        for (int i = 5; i >= 0; i--) {
+        // FIX: Feed the 6 most recent COMPLETED months to avoid the 'poisoned sequence' of an incomplete current month
+        for (int i = 6; i >= 1; i--) {
             YearMonth ym = currentMonth.minusMonths(i);
             historicalData.add(monthlyAggregates.getOrDefault(ym, BigDecimal.ZERO).doubleValue());
         }
@@ -226,5 +227,66 @@ public class ForecastService {
     /** Normalise epoch: if it looks like seconds, convert to ms. */
     private long normalizeMs(long raw) {
         return raw < 10_000_000_000L ? raw * 1000L : raw;
+    }
+
+    /**
+     * Calculates the historical accuracy by comparing past predictions with actuals.
+     */
+    public List<Map<String, Object>> getForecastAccuracyHistory(String userId) {
+        YearMonth currentMonth = YearMonth.now(ZoneId.of("Asia/Colombo"));
+        
+        List<ForecastEntity> history = forecastRepository.findByUserIdOrderByForecastMonthDesc(userId)
+            .stream()
+            .filter(f -> {
+                try {
+                    YearMonth ym = YearMonth.parse(f.getForecastMonth());
+                    return ym.isBefore(currentMonth); // Only evaluate completed months
+                } catch (Exception e) { return false; }
+            })
+            .collect(Collectors.toList());
+
+        List<ExpenseEntity> allExpenses = expenseRepository.findByUserIdAndIsDeletedFalseOrderByDateDesc(userId);
+        List<BillEntity> allBills = billRepository.findByUserIdAndIsDeletedFalseOrderByDueDateAsc(userId);
+
+        List<Map<String, Object>> accuracyData = new ArrayList<>();
+
+        for (ForecastEntity f : history) {
+            YearMonth ym = YearMonth.parse(f.getForecastMonth());
+            long monthStart = ym.atDay(1).atStartOfDay(ZoneId.of("Asia/Colombo")).toInstant().toEpochMilli();
+            long monthEnd = ym.atEndOfMonth().atTime(23, 59, 59).atZone(ZoneId.of("Asia/Colombo")).toInstant().toEpochMilli();
+
+            double actualExpenses = allExpenses.stream()
+                .filter(e -> { long ms = normalizeMs(e.getDate()); return ms >= monthStart && ms <= monthEnd; })
+                .mapToDouble(e -> e.getAmount().doubleValue())
+                .sum();
+
+            double actualBills = allBills.stream()
+                .filter(b -> "paid".equalsIgnoreCase(b.getStatus()))
+                .filter(b -> { long ms = normalizeMs(b.getDueDate()); return ms >= monthStart && ms <= monthEnd; })
+                .mapToDouble(b -> b.getAmount().doubleValue())
+                .sum();
+
+            double totalActual = actualExpenses + actualBills;
+            double predicted = f.getPredictedExpense() != null ? f.getPredictedExpense().doubleValue() : 0.0;
+            
+            double accuracy = 0;
+            if (totalActual > 0) {
+                double diff = Math.abs(predicted - totalActual);
+                accuracy = Math.max(0, 100.0 - ((diff / totalActual) * 100.0));
+            }
+
+            Map<String, Object> data = new HashMap<>();
+            data.put("month", ym.toString());
+            data.put("predicted", predicted);
+            data.put("actual", totalActual);
+            data.put("accuracy", Math.round(accuracy * 10.0) / 10.0);
+            data.put("is_fallback", f.getModelVersion() != null && f.getModelVersion().contains("fallback"));
+            
+            accuracyData.add(data);
+        }
+
+        // Return chronological (oldest to newest)
+        Collections.reverse(accuracyData);
+        return accuracyData;
     }
 }
