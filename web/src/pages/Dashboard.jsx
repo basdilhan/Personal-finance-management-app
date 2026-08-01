@@ -231,7 +231,7 @@ export default function Dashboard() {
               <BarChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-light)" />
                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: 'var(--text-secondary)'}} />
-                <Tooltip cursor={{fill: 'rgba(255,255,255,0.05)'}} contentStyle={{ borderRadius: '8px', border: '1px solid var(--border-light)', background: 'var(--bg-primary)', color: 'var(--text-primary)' }} />
+                <Tooltip cursor={{fill: 'var(--border-light)'}} contentStyle={{ borderRadius: '8px', border: '1px solid var(--border-light)', background: 'var(--bg-primary)', color: 'var(--text-primary)' }} />
                 <Bar dataKey="Income" fill="var(--success)" radius={[4, 4, 0, 0]} />
                 <Bar dataKey="Expenses" fill="var(--danger)" radius={[4, 4, 0, 0]} />
               </BarChart>
