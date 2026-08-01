@@ -113,11 +113,35 @@ public class ForecastService {
             });
 
         List<Double> historicalData = new ArrayList<>();
-        // FIX: Feed the 6 most recent COMPLETED months to avoid the 'poisoned sequence' of an incomplete current month
         for (int i = 6; i >= 1; i--) {
             YearMonth ym = currentMonth.minusMonths(i);
             historicalData.add(monthlyAggregates.getOrDefault(ym, BigDecimal.ZERO).doubleValue());
         }
+
+        // --- NEW LOGIC: Live Current Month Data Integration (Weighted Bayesian Smoothing) ---
+        double currentMonthActual = monthlyAggregates.getOrDefault(currentMonth, BigDecimal.ZERO).doubleValue();
+        java.time.LocalDate today = java.time.LocalDate.now(ZoneId.of("Asia/Colombo"));
+        int currentDay = Math.max(1, today.getDayOfMonth()); // Avoid div by zero
+        int daysInMonth = currentMonth.lengthOfMonth();
+        
+        // Calculate historical average
+        double sumPast = 0;
+        int activeMonths = 0;
+        for (Double val : historicalData) {
+            if (val > 0) {
+                sumPast += val;
+                activeMonths++;
+            }
+        }
+        double historicalAvg = (activeMonths > 0) ? (sumPast / activeMonths) : currentMonthActual;
+        
+        // Blend live pace with historical average
+        double livePace = (currentMonthActual / currentDay) * daysInMonth;
+        double weight = (double) currentDay / daysInMonth; // e.g., Day 15 = 0.48 weight
+        double blendedProjection = (livePace * weight) + (historicalAvg * (1.0 - weight));
+        
+        // Append the live blended projection so the AI includes the current month!
+        historicalData.add(blendedProjection);
 
         // ── Step 1: Check DB cache ──
         Optional<ForecastEntity> existing = forecastRepository.findByUserIdAndForecastMonth(userId, monthString);
