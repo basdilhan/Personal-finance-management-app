@@ -150,26 +150,16 @@ public class ForecastService {
         // ── Step 3: Math fallback if ML returns ≤ 0 OR user lacks data ──
         if (predicted == null || predicted <= 0.0 || nonZeroCount < 2) {
             isFallback = true;
-            long monthStart = currentMonth.atDay(1).atStartOfDay(ZoneId.of("Asia/Colombo")).toInstant().toEpochMilli();
-            long monthEnd   = currentMonth.atEndOfMonth().atTime(23, 59, 59).atZone(ZoneId.of("Asia/Colombo")).toInstant().toEpochMilli();
-
-            // Total outflow this month (expenses + paid bills)
-            BigDecimal totalOutflow = allExpenses.stream()
-                .filter(e -> { long ms = normalizeMs(e.getDate()); return ms >= monthStart && ms <= monthEnd; })
-                .map(ExpenseEntity::getAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-            BigDecimal paidBillsThisMonth = allBills.stream()
-                .filter(b -> "paid".equalsIgnoreCase(b.getStatus()))
-                .filter(b -> { long ms = normalizeMs(b.getDueDate()); return ms >= monthStart && ms <= monthEnd; })
-                .map(BillEntity::getAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-            totalOutflow = totalOutflow.add(paidBillsThisMonth);
-
-            if (totalOutflow.compareTo(BigDecimal.ZERO) > 0) {
-                predicted = totalOutflow.doubleValue() * 1.05;
+            
+            if (nonZeroCount > 0) {
+                // Base prediction on the average of past active months
+                double sumPast = historicalData.stream().mapToDouble(Double::doubleValue).sum();
+                predicted = (sumPast / nonZeroCount) * 1.05; // 5% buffer on past average
             } else {
+                // If absolutely no past history, fallback to income-based or default
+                long monthStart = currentMonth.atDay(1).atStartOfDay(ZoneId.of("Asia/Colombo")).toInstant().toEpochMilli();
+                long monthEnd   = currentMonth.atEndOfMonth().atTime(23, 59, 59).atZone(ZoneId.of("Asia/Colombo")).toInstant().toEpochMilli();
+                
                 BigDecimal monthlyIncome = allIncomes.stream()
                     .filter(i -> { long ms = normalizeMs(i.getDate()); return ms >= monthStart && ms <= monthEnd; })
                     .map(IncomeEntity::getAmount)
