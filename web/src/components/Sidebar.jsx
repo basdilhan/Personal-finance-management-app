@@ -78,13 +78,23 @@ export default function Sidebar({ isOpen, setIsOpen }) {
       {/* User Profile Footer */}
       <div style={{ padding: '0 24px', marginTop: 'auto' }}>
         
-        <button 
-          onClick={toggleLanguage}
-          style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', marginBottom: '16px', fontSize: '14px', fontWeight: 500 }}
-        >
-          <Globe size={16} />
-          {language === 'en' ? 'සිංහල' : 'English'}
-        </button>
+        <div style={{ display: 'flex', gap: '16px', marginBottom: '16px' }}>
+          <button 
+            onClick={toggleLanguage}
+            style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '14px', fontWeight: 500 }}
+          >
+            <Globe size={16} />
+            {language === 'en' ? 'සිංහල' : 'English'}
+          </button>
+
+          <button 
+            onClick={toggleTheme}
+            style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '14px', fontWeight: 500 }}
+          >
+            {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+            {theme === 'dark' ? t('lightMode') || 'Light Mode' : t('darkMode') || 'Dark Mode'}
+          </button>
+        </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '16px 0', borderTop: '1px solid var(--border-light)' }}>
           <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--accent-blue)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600 }}>
