@@ -112,8 +112,8 @@ async def forecast_endpoint(req: ForecastRequest):
         
         context_tensor = torch.tensor(non_zero_data)
         torch.manual_seed(42) # Force probabilistic model to generate deterministic results for the same input
-        forecast = chronos_pipeline.predict(context_tensor, prediction_length=1)
-        predicted_value = float(forecast[0].median().item())
+        forecast = chronos_pipeline.predict(context_tensor, prediction_length=2)
+        predicted_value = float(torch.median(forecast[0, :, 1]).item())
         
         if predicted_value < 1.0 and len(non_zero_data) > 0:
             avg_expense = sum(non_zero_data) / len(non_zero_data)
