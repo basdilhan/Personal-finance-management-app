@@ -177,8 +177,8 @@ public class ForecastService {
             
             if (nonZeroCount > 0) {
                 // Base prediction on the average of past active months
-                double sumPast = historicalData.stream().mapToDouble(Double::doubleValue).sum();
-                predicted = (sumPast / nonZeroCount) * 1.05; // 5% buffer on past average
+                double fallbackSumPast = historicalData.stream().mapToDouble(Double::doubleValue).sum();
+                predicted = (fallbackSumPast / nonZeroCount) * 1.05; // 5% buffer on past average
             } else {
                 // If absolutely no past history, fallback to income-based or default
                 long monthStart = currentMonth.atDay(1).atStartOfDay(ZoneId.of("Asia/Colombo")).toInstant().toEpochMilli();
