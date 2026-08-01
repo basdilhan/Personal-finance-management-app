@@ -232,7 +232,13 @@ public class ForecastService {
             .filter(f -> {
                 try {
                     YearMonth ym = YearMonth.parse(f.getForecastMonth());
-                    return ym.isBefore(currentMonth); // Only evaluate completed months
+                    // A forecast from "2026-07" predicts "2026-08".
+                    // We can only evaluate its accuracy if "2026-08" is completely over,
+                    // meaning the current month must be "2026-09" or later to get a final score.
+                    // Or we can evaluate it while "2026-08" is active to see current accuracy so far.
+                    // Let's evaluate if the target month is BEFORE OR EQUAL to current month.
+                    YearMonth targetMonth = ym.plusMonths(1);
+                    return targetMonth.isBefore(currentMonth) || targetMonth.equals(currentMonth);
                 } catch (Exception e) { return false; }
             })
             .collect(Collectors.toList());
@@ -244,8 +250,12 @@ public class ForecastService {
 
         for (ForecastEntity f : history) {
             YearMonth ym = YearMonth.parse(f.getForecastMonth());
-            long monthStart = ym.atDay(1).atStartOfDay(ZoneId.of("Asia/Colombo")).toInstant().toEpochMilli();
-            long monthEnd = ym.atEndOfMonth().atTime(23, 59, 59).atZone(ZoneId.of("Asia/Colombo")).toInstant().toEpochMilli();
+            // The forecast saved with month "2026-07" predicts the NEXT month (August 2026).
+            // So we must compare the prediction against the actuals of the TARGET month (M + 1).
+            YearMonth targetMonth = ym.plusMonths(1);
+            
+            long monthStart = targetMonth.atDay(1).atStartOfDay(ZoneId.of("Asia/Colombo")).toInstant().toEpochMilli();
+            long monthEnd = targetMonth.atEndOfMonth().atTime(23, 59, 59).atZone(ZoneId.of("Asia/Colombo")).toInstant().toEpochMilli();
 
             double actualExpenses = allExpenses.stream()
                 .filter(e -> { long ms = normalizeMs(e.getDate()); return ms >= monthStart && ms <= monthEnd; })
@@ -268,7 +278,7 @@ public class ForecastService {
             }
 
             Map<String, Object> data = new HashMap<>();
-            data.put("month", ym.toString());
+            data.put("month", targetMonth.toString()); // Show the target month it predicted for
             data.put("predicted", predicted);
             data.put("actual", totalActual);
             data.put("accuracy", Math.round(accuracy * 10.0) / 10.0);
