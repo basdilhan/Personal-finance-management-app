@@ -10,7 +10,7 @@ export default function Login() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   
-  const { login, loginWithGoogle } = useAuth();
+  const { login, loginWithGoogle, logout } = useAuth();
   const navigate = useNavigate();
 
   async function handleSubmit(e) {
@@ -31,7 +31,19 @@ export default function Login() {
     setError('');
     setLoading(true);
     try {
-      await loginWithGoogle();
+      const userCredential = await loginWithGoogle();
+      
+      // We must check if they are a brand new user using Firebase v9 functions
+      const { getAdditionalUserInfo } = await import('firebase/auth');
+      const additionalInfo = getAdditionalUserInfo(userCredential);
+      
+      if (additionalInfo && additionalInfo.isNewUser) {
+        // Block new users from registering via Web
+        await userCredential.user.delete();
+        await logout();
+        throw new Error('Web registration is disabled. Please register via the Mobile App first!');
+      }
+      
       navigate('/dashboard');
     } catch (err) {
       setError(err.message || 'Failed to authenticate with Google');
