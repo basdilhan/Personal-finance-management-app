@@ -125,6 +125,30 @@ public class BillController {
                     invalidateCurrentMonthForecast(userId);
                     
                     if (newlyPaid) {
+                        if (Boolean.TRUE.equals(existing.getIsRecurring())) {
+                            BillEntity nextMonthBill = new BillEntity();
+                            nextMonthBill.setUserId(userId);
+                            nextMonthBill.setName(existing.getName());
+                            nextMonthBill.setDescription(existing.getDescription());
+                            nextMonthBill.setAmount(existing.getAmount());
+                            
+                            // Exactly +1 Month in future
+                            long nextDueDate = java.time.Instant.ofEpochMilli(existing.getDueDate())
+                                    .atZone(java.time.ZoneId.systemDefault())
+                                    .toLocalDate().plusMonths(1)
+                                    .atStartOfDay(java.time.ZoneId.systemDefault())
+                                    .toInstant().toEpochMilli();
+                            
+                            nextMonthBill.setDueDate(nextDueDate);
+                            nextMonthBill.setCategory(existing.getCategory());
+                            nextMonthBill.setCategoryIcon(existing.getCategoryIcon());
+                            nextMonthBill.setStatus("pending");
+                            nextMonthBill.setIndicatorColor(existing.getIndicatorColor());
+                            nextMonthBill.setIsRecurring(true);
+                            nextMonthBill.setIsDeleted(false);
+                            billRepository.save(nextMonthBill);
+                        }
+
                         userRepository.findById(userId).ifPresent(u -> {
                             if (u.getFcmToken() != null && !u.getFcmToken().isEmpty()) {
                                 notificationService.sendPushNotification(
