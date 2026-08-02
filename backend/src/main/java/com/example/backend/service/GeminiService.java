@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
+
 @Service
 public class GeminiService {
 
@@ -19,7 +21,10 @@ public class GeminiService {
     private String geminiApiKey;
 
     public GeminiService() {
-        this.restTemplate = new RestTemplate();
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(5000); // 5 seconds connection timeout
+        factory.setReadTimeout(10000);   // 10 seconds read timeout
+        this.restTemplate = new RestTemplate(factory);
     }
 
     public String generateChatResponse(String prompt) {
@@ -28,9 +33,9 @@ public class GeminiService {
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         if (geminiApiKey == null || geminiApiKey.trim().isEmpty() || geminiApiKey.equals("PLACEHOLDER_KEY")) {
-            url = "https://generativelanguage.googleapis.com/v1/models/gemini-3.5-flash-lite:generateContent";
+            url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
         } else {
-            url = "https://generativelanguage.googleapis.com/v1/models/gemini-3.5-flash-lite:generateContent?key=" + geminiApiKey;
+            url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + geminiApiKey;
         }
 
         // Build Gemini request body
