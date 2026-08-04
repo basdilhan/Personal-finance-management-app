@@ -1,0 +1,22 @@
+DreamSaver ML - Chronos-T5 Forecasting Evaluation Results
+============================================================
+Timestamp: 2026-08-04 12:00:13
+Random Seed: 42
+Synthetic Users: 50
+Months per User: 12
+Chronos Model: Loaded
+
+History       Chronos MAE   Chronos MAPE   Chronos RMSE   Fallback MAE  Fallback MAPE  Fallback RMSE
+----------------------------------------------------------------------------------------------
+  3 months         6,987           9.7%         7,995         4,210           5.9%         5,425
+  5 months         7,011           8.3%         8,807         8,228           9.7%         9,775
+  7 months         4,833           6.0%         6,099         7,457           8.8%         8,646
+  9 months         5,542           7.1%         7,138         3,957           5.0%         4,886
+ 11 months         4,382           5.9%         5,664         5,262           7.3%         6,196
+
+
+Defense Summary:
+------------------------------------------------------------
+Best Chronos MAPE (with 11 months): 5.9%
+Best Fallback MAPE (with 11 months): 7.3%
+Chronos improvement over fallback: 1.4 percentage points
