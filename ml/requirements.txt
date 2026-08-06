@@ -10,3 +10,4 @@ scikit-learn==1.9.0
 pandas==3.0.3
 joblib==1.5.3
 chronos-forecasting @ git+https://github.com/amazon-science/chronos-forecasting.git@7dc4435706a4454feb79df44ca9f33631f3027bf
+matplotlib==3.10.3

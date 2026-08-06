@@ -1,0 +1,36 @@
+DreamSaver ML - K-Means Evaluation Results
+=======================================================
+Timestamp: 2026-08-04 11:49:20
+Random Seed: 42
+Samples: 1000
+Optimal K: 4
+
+SILHOUETTE SCORE: 0.3808
+Interpretation: MODERATE - Reasonable cluster structure
+
+Per-Cluster Silhouette Averages:
+  Cluster 0 (Conservative Budget (Lowest Income)): 0.4394
+  Cluster 1 (Balanced Budget (Lower-Mid Income)): 0.4316
+  Cluster 2 (Growth Focused (Upper-Mid Income)): 0.2372
+  Cluster 3 (Aggressive Savings (Highest Income)): 0.2518
+
+Elbow Method Inertias:
+  K=2: Inertia=1754.8, Silhouette=0.4747
+  K=3: Inertia=1110.2, Silhouette=0.4026
+  K=4: Inertia=880.5, Silhouette=0.3945
+  K=5: Inertia=725.5, Silhouette=0.3830
+  K=6: Inertia=620.9, Silhouette=0.3402
+  K=7: Inertia=536.9, Silhouette=0.3292
+  K=8: Inertia=487.1, Silhouette=0.3183
+
+PCA Variance Explained:
+  PC1: 0.6289 (62.9%)
+  PC2: 0.3326 (33.3%)
+  Total: 0.9614 (96.1%)
+
+Cluster Centers (Unscaled):
+  Cluster         Age    Income(k)   Savings(k)
+  0              55.1         56.9         10.5
+  1              28.6         69.3         13.2
+  2              51.5        122.5         24.9
+  3              37.4        212.4         46.9
