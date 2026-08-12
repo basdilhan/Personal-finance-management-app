@@ -90,6 +90,8 @@ class ColdStartRequest(BaseModel):
     age: int
     income_bracket: str # e.g. "50000"
     savings_goal: float
+    spending_style: int = 3  # 1=Very Frugal, 2=Careful, 3=Moderate, 4=Generous, 5=Spender
+    risk_tolerance: int = 3  # 1=Very Conservative, 2=Conservative, 3=Moderate, 4=Aggressive, 5=Very Aggressive
 
 # --- Endpoints ---
 
@@ -140,8 +142,13 @@ async def cold_start_profile(req: ColdStartRequest):
         savings_k = 5.0
         actual_income = 50000.0
 
+    # Clamp behavioural features to valid 1-5 range
+    spending_style = max(1, min(5, req.spending_style))
+    risk_tolerance = max(1, min(5, req.risk_tolerance))
+
     if kmeans_model is not None and scaler is not None and label_map is not None:
-        features = np.array([[req.age, income_k, savings_k]])
+        # 5-feature vector: [age, income_k, savings_k, spending_style, risk_tolerance]
+        features = np.array([[req.age, income_k, savings_k, spending_style, risk_tolerance]])
         scaled_features = scaler.transform(features)
         raw_cluster_id = int(kmeans_model.predict(scaled_features)[0])
         cluster_id = label_map[raw_cluster_id]
@@ -150,10 +157,10 @@ async def cold_start_profile(req: ColdStartRequest):
 
     profile = cluster_profiles.get(cluster_id, cluster_profiles[0])
 
-    
     return {
         "assigned_cluster": profile["name"],
         "recommended_monthly_budget": round(actual_income * profile["budget_pct"], 2),
-        "recommended_savings_goal": round(actual_income * profile["savings_pct"], 2)
+        "recommended_savings_goal": round(actual_income * profile["savings_pct"], 2),
+        "features_used": ["age", "income", "savings_goal", "spending_style", "risk_tolerance"]
     }
 
