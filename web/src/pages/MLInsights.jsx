@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import apiClient from '../api/apiClient';
 import { BrainCircuit, LineChart, Target, Sparkles, Loader2 } from 'lucide-react';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, LabelList, Cell, Legend } from 'recharts';
 
 export default function MLInsights() {
   const [profile, setProfile] = useState(null);
@@ -187,7 +187,7 @@ export default function MLInsights() {
           )}
         </div>
 
-        {/* Forecast Accuracy Comparison */}
+        {/* Forecast Accuracy — Per-Month Bar Chart */}
         <div className="dashboard-panel" style={{ gridColumn: '1 / -1' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
             <div style={{ background: 'rgba(239, 68, 68, 0.1)', padding: '10px', borderRadius: '12px' }}>
@@ -195,32 +195,124 @@ export default function MLInsights() {
             </div>
             <div>
               <h3 style={{ margin: 0 }}>Model Accuracy</h3>
-              <p className="text-muted" style={{ fontSize: '14px', margin: 0 }}>Predicted vs Actual Past Expenses</p>
+              <p className="text-muted" style={{ fontSize: '14px', margin: 0 }}>Per-Month Prediction Accuracy (%)</p>
             </div>
           </div>
 
           {history && history.length > 0 ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-              <div style={{ display: 'flex', gap: '16px' }}>
-                <div style={{ flex: 1, background: 'var(--bg-primary)', padding: '20px', borderRadius: '12px', border: '1px solid var(--border-light)' }}>
+              {/* Summary Cards */}
+              <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+                <div style={{ flex: 1, minWidth: '150px', background: 'var(--bg-primary)', padding: '20px', borderRadius: '12px', border: '1px solid var(--border-light)' }}>
                   <span className="text-muted" style={{ fontSize: '14px' }}>Average Accuracy</span>
                   <h2 style={{ fontSize: '32px', color: 'var(--accent-blue)' }}>
                     {Math.round(history.reduce((sum, h) => sum + h.accuracy, 0) / history.length)}%
                   </h2>
                 </div>
+                <div style={{ flex: 1, minWidth: '150px', background: 'var(--bg-primary)', padding: '20px', borderRadius: '12px', border: '1px solid var(--border-light)' }}>
+                  <span className="text-muted" style={{ fontSize: '14px' }}>Best Month</span>
+                  <h2 style={{ fontSize: '32px', color: 'var(--success)' }}>
+                    {Math.round(Math.max(...history.map(h => h.accuracy)))}%
+                  </h2>
+                  <span className="text-muted" style={{ fontSize: '12px' }}>
+                    {history.find(h => h.accuracy === Math.max(...history.map(x => x.accuracy)))?.month}
+                  </span>
+                </div>
+                <div style={{ flex: 1, minWidth: '150px', background: 'var(--bg-primary)', padding: '20px', borderRadius: '12px', border: '1px solid var(--border-light)' }}>
+                  <span className="text-muted" style={{ fontSize: '14px' }}>Months Tracked</span>
+                  <h2 style={{ fontSize: '32px', color: 'var(--text-primary)' }}>
+                    {history.length}
+                  </h2>
+                </div>
               </div>
-              
-              <div style={{ height: '300px' }}>
+
+              {/* Per-Month Accuracy Bar Chart */}
+              <div style={{ height: '320px' }}>
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={history}>
+                  <BarChart data={history} margin={{ top: 25, right: 20, left: 20, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-light)" />
-                    <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{fill: 'var(--text-secondary)'}} />
-                    <YAxis axisLine={false} tickLine={false} tick={{fill: 'var(--text-secondary)'}} />
-                    <Tooltip contentStyle={{ borderRadius: '8px', border: '1px solid var(--border-light)', background: 'var(--bg-primary)', color: 'var(--text-primary)' }} />
-                    <Area type="monotone" dataKey="actual" name="Actual Spent" stroke="var(--danger)" fillOpacity={0.1} fill="var(--danger)" strokeWidth={2} />
-                    <Area type="monotone" dataKey="predicted" name="AI Predicted" stroke="var(--accent-blue)" fillOpacity={0.1} fill="var(--accent-blue)" strokeWidth={2} strokeDasharray="5 5" />
-                  </AreaChart>
+                    <XAxis 
+                      dataKey="month" 
+                      axisLine={false} 
+                      tickLine={false} 
+                      tick={{ fill: 'var(--text-secondary)', fontSize: 13 }}
+                      tickFormatter={(val) => {
+                        const [y, m] = val.split('-');
+                        const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+                        return `${months[parseInt(m)-1]} ${y}`;
+                      }}
+                    />
+                    <YAxis 
+                      domain={[0, 100]} 
+                      axisLine={false} 
+                      tickLine={false} 
+                      tick={{ fill: 'var(--text-secondary)' }}
+                      tickFormatter={(val) => `${val}%`}
+                    />
+                    <Tooltip 
+                      contentStyle={{ borderRadius: '12px', border: '1px solid var(--border-light)', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}
+                      formatter={(value, name) => {
+                        if (name === 'accuracy') return [`${value}%`, 'Accuracy'];
+                        return [value, name];
+                      }}
+                      labelFormatter={(label) => {
+                        const [y, m] = label.split('-');
+                        const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+                        return `${months[parseInt(m)-1]} ${y}`;
+                      }}
+                    />
+                    <ReferenceLine y={80} stroke="var(--success)" strokeDasharray="4 4" strokeOpacity={0.5} label={{ value: 'Good (80%)', fill: 'var(--success)', fontSize: 11, position: 'right' }} />
+                    <Bar dataKey="accuracy" name="accuracy" radius={[8, 8, 0, 0]} maxBarSize={60}>
+                      <LabelList dataKey="accuracy" position="top" formatter={(val) => `${val}%`} style={{ fill: 'var(--text-primary)', fontSize: 13, fontWeight: 600 }} />
+                      {history.map((entry, index) => (
+                        <Cell key={index} fill={entry.accuracy >= 80 ? '#10b981' : entry.accuracy >= 60 ? '#f59e0b' : '#ef4444'} fillOpacity={0.85} />
+                      ))}
+                    </Bar>
+                  </BarChart>
                 </ResponsiveContainer>
+              </div>
+
+              {/* Detailed Per-Month Table */}
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '1px solid var(--border-light)' }}>
+                      <th style={{ padding: '12px 16px', textAlign: 'left', color: 'var(--text-secondary)', fontWeight: 500 }}>Month</th>
+                      <th style={{ padding: '12px 16px', textAlign: 'right', color: 'var(--text-secondary)', fontWeight: 500 }}>AI Predicted (LKR)</th>
+                      <th style={{ padding: '12px 16px', textAlign: 'right', color: 'var(--text-secondary)', fontWeight: 500 }}>Actual Spent (LKR)</th>
+                      <th style={{ padding: '12px 16px', textAlign: 'right', color: 'var(--text-secondary)', fontWeight: 500 }}>Accuracy</th>
+                      <th style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--text-secondary)', fontWeight: 500 }}>Method</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {history.map((h, i) => {
+                      const [y, m] = h.month.split('-');
+                      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+                      const monthLabel = `${months[parseInt(m)-1]} ${y}`;
+                      const accColor = h.accuracy >= 80 ? '#10b981' : h.accuracy >= 60 ? '#f59e0b' : '#ef4444';
+                      return (
+                        <tr key={i} style={{ borderBottom: '1px solid var(--border-light)' }}>
+                          <td style={{ padding: '12px 16px', fontWeight: 600 }}>{monthLabel}</td>
+                          <td style={{ padding: '12px 16px', textAlign: 'right', color: 'var(--accent-blue)' }}>{Number(h.predicted).toLocaleString()}</td>
+                          <td style={{ padding: '12px 16px', textAlign: 'right', color: 'var(--danger)' }}>{Number(h.actual).toLocaleString()}</td>
+                          <td style={{ padding: '12px 16px', textAlign: 'right', fontWeight: 700, color: accColor }}>{h.accuracy}%</td>
+                          <td style={{ padding: '12px 16px', textAlign: 'center' }}>
+                            <span style={{
+                              padding: '4px 10px',
+                              borderRadius: '20px',
+                              fontSize: '12px',
+                              fontWeight: 600,
+                              background: h.is_fallback ? 'rgba(245, 158, 11, 0.15)' : 'rgba(16, 185, 129, 0.15)',
+                              color: h.is_fallback ? '#f59e0b' : '#10b981'
+                            }}>
+                              {h.is_fallback ? 'Math Fallback' : 'Chronos AI'}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               </div>
             </div>
           ) : (
