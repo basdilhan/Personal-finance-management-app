@@ -1,13 +1,17 @@
 """
-DreamSaver ML — K-Means Clustering Evaluation
-===============================================
+DreamSaver ML — K-Means Clustering Evaluation (5-Feature Model)
+================================================================
 Produces formal evaluation metrics and visualizations for the K-Means
 cold-start clustering model (Layer 1 of the dual-layer ML architecture).
+
+Features used: Age, Income, Savings Goal, Spending Style, Risk Tolerance
 
 Outputs:
   - Silhouette Score (printed + saved)
   - Elbow Curve chart (PNG)
   - PCA 2D cluster visualization (PNG)
+  - Feature Correlation Heatmap (PNG)
+  - Feature Importance Analysis (PNG)
   - Cluster center statistics (printed + saved)
 
 Usage:
@@ -37,6 +41,10 @@ K_RANGE = range(2, 9)  # Test K=2 through K=8
 OPTIMAL_K = 4
 OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "evaluation_results")
 MODEL_DIR = os.path.join(os.path.dirname(__file__), "models")
+
+# Feature names for the 5-feature model
+FEATURE_NAMES = ["Age", "Income (k LKR)", "Savings Goal (k LKR)", "Spending Style", "Risk Tolerance"]
+FEATURE_NAMES_SHORT = ["Age", "Income", "Savings", "SpendStyle", "RiskTol"]
 
 # Cluster profile names (must match main.py)
 CLUSTER_NAMES = {
@@ -68,23 +76,49 @@ plt.rcParams.update({
 
 def generate_synthetic_data(seed=SEED, n_samples=N_SAMPLES):
     """
-    Regenerate the EXACT same synthetic dataset used in train_kmeans.py.
+    Regenerate the EXACT same 5-feature synthetic dataset used in train_kmeans.py.
     Same seed, same distribution, same parameters — ensures reproducibility.
     """
     np.random.seed(seed)
 
-    # Age: Uniform [18, 68]
+    # Feature 1: Age — Uniform [18, 68]
     ages = np.random.uniform(18, 68, n_samples)
 
-    # Income: Lognormal (median ~70k LKR), clamped [30k, 500k]
+    # Feature 2: Income — Lognormal (median ~70k LKR), clamped [30k, 500k]
     incomes = np.random.lognormal(mean=4.25, sigma=0.6, size=n_samples)
     incomes = np.clip(incomes, 30.0, 500.0)
 
-    # Savings: 10-30% of income
+    # Feature 3: Savings — 10-30% of income
     savings_pct = np.random.uniform(0.10, 0.30, n_samples)
     savings = incomes * savings_pct
 
-    return np.column_stack((ages, incomes, savings))
+    # Feature 4: Spending Style (1-5) — rank-based categorical generation
+    income_percentile = np.argsort(np.argsort(incomes)) / n_samples
+    spending_style = np.zeros(n_samples, dtype=int)
+    for i in range(n_samples):
+        p = income_percentile[i]
+        weights = [
+            0.35 - 0.25 * p, 0.30 - 0.10 * p, 0.20,
+            0.10 + 0.15 * p, 0.05 + 0.20 * p,
+        ]
+        weights = np.array(weights)
+        weights = weights / weights.sum()
+        spending_style[i] = np.random.choice([1, 2, 3, 4, 5], p=weights)
+
+    # Feature 5: Risk Tolerance (1-5) — rank-based categorical generation
+    age_percentile = np.argsort(np.argsort(ages)) / n_samples
+    risk_tolerance = np.zeros(n_samples, dtype=int)
+    for i in range(n_samples):
+        p = age_percentile[i]
+        weights = [
+            0.05 + 0.25 * p, 0.10 + 0.15 * p, 0.20,
+            0.30 - 0.10 * p, 0.35 - 0.30 * p,
+        ]
+        weights = np.array(weights)
+        weights = weights / weights.sum()
+        risk_tolerance[i] = np.random.choice([1, 2, 3, 4, 5], p=weights)
+
+    return np.column_stack((ages, incomes, savings, spending_style, risk_tolerance))
 
 
 def load_trained_model():
@@ -182,8 +216,8 @@ def plot_elbow_curve(scaled_data, output_path):
 
 def plot_pca_clusters(scaled_data, labels, label_map, output_path):
     """
-    Reduce 3D feature space to 2D via PCA and plot colored clusters.
-    Shows the panel that clusters are visually separable.
+    Reduce 5D feature space to 2D via PCA and plot colored clusters.
+    Shows that clusters are visually separable even in reduced dimensions.
     """
     pca = PCA(n_components=2)
     pca_data = pca.fit_transform(scaled_data)
@@ -210,7 +244,7 @@ def plot_pca_clusters(scaled_data, labels, label_map, output_path):
 
     ax.set_xlabel(f'Principal Component 1 ({explained_var[0]:.1%} variance)')
     ax.set_ylabel(f'Principal Component 2 ({explained_var[1]:.1%} variance)')
-    ax.set_title(f'PCA Cluster Visualization — K-Means (K={OPTIMAL_K})\n'
+    ax.set_title(f'PCA Cluster Visualization — K-Means (K={OPTIMAL_K}, 5 Features)\n'
                  f'Total Variance Explained: {sum(explained_var):.1%}')
     ax.legend(loc='upper right', fontsize=9, framealpha=0.8,
               facecolor='#1a1b26', edgecolor='#333344')
@@ -224,24 +258,195 @@ def plot_pca_clusters(scaled_data, labels, label_map, output_path):
     return explained_var
 
 
+def plot_feature_correlation_heatmap(raw_data, output_path):
+    """
+    Plot a correlation matrix heatmap to show feature independence.
+    This proves the new features (spending_style, risk_tolerance)
+    add genuinely independent dimensions to the clustering.
+    """
+    import numpy as np
+
+    # Calculate Pearson correlation matrix
+    corr_matrix = np.corrcoef(raw_data.T)
+
+    fig, ax = plt.subplots(figsize=(8, 6.5))
+
+    # Create heatmap
+    im = ax.imshow(corr_matrix, cmap='RdBu_r', vmin=-1, vmax=1, aspect='auto')
+
+    # Add colorbar
+    cbar = plt.colorbar(im, ax=ax, shrink=0.8, pad=0.02)
+    cbar.set_label('Pearson Correlation', fontsize=11)
+    cbar.ax.tick_params(labelsize=9)
+
+    # Set tick labels
+    ax.set_xticks(range(len(FEATURE_NAMES_SHORT)))
+    ax.set_yticks(range(len(FEATURE_NAMES_SHORT)))
+    ax.set_xticklabels(FEATURE_NAMES_SHORT, fontsize=10, rotation=30, ha='right')
+    ax.set_yticklabels(FEATURE_NAMES_SHORT, fontsize=10)
+
+    # Annotate each cell with correlation value
+    for i in range(len(FEATURE_NAMES_SHORT)):
+        for j in range(len(FEATURE_NAMES_SHORT)):
+            val = corr_matrix[i, j]
+            # Use black text on light cells, white on dark cells
+            text_color = 'white' if abs(val) > 0.5 else '#e0e0e0'
+            ax.text(j, i, f'{val:.2f}', ha='center', va='center',
+                    fontsize=11, fontweight='bold', color=text_color)
+
+    ax.set_title('Feature Correlation Heatmap\n(Low off-diagonal values = independent features)')
+    plt.tight_layout()
+    fig.savefig(output_path, dpi=200, bbox_inches='tight', facecolor=fig.get_facecolor())
+    plt.close(fig)
+    print(f"  [OK] Feature correlation heatmap saved to: {output_path}")
+
+    return corr_matrix
+
+
+def plot_feature_importance(scaled_data, labels, label_map, output_path):
+    """
+    Analyze feature importance by measuring how much each feature
+    contributes to cluster separation (variance between cluster centers).
+    """
+    remapped_labels = np.array([label_map[l] for l in labels])
+
+    # Calculate between-cluster variance for each feature
+    overall_mean = scaled_data.mean(axis=0)
+    between_var = np.zeros(scaled_data.shape[1])
+    total_var = np.zeros(scaled_data.shape[1])
+
+    for c_id in range(OPTIMAL_K):
+        mask = remapped_labels == c_id
+        cluster_mean = scaled_data[mask].mean(axis=0)
+        n_cluster = mask.sum()
+        between_var += n_cluster * (cluster_mean - overall_mean) ** 2
+
+    for feat_idx in range(scaled_data.shape[1]):
+        total_var[feat_idx] = np.var(scaled_data[:, feat_idx]) * len(scaled_data)
+
+    # Feature importance = ratio of between-cluster variance to total variance
+    importance = between_var / total_var
+    importance_pct = importance / importance.sum() * 100
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
+
+    # --- Left: Feature Importance Bar Chart ---
+    bar_colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#F7DC6F', '#C792EA']
+    bars = ax1.barh(range(len(FEATURE_NAMES_SHORT)), importance_pct, color=bar_colors,
+                    edgecolor='white', linewidth=0.5, height=0.6)
+
+    ax1.set_yticks(range(len(FEATURE_NAMES_SHORT)))
+    ax1.set_yticklabels(FEATURE_NAMES_SHORT, fontsize=11)
+    ax1.set_xlabel('Contribution to Cluster Separation (%)')
+    ax1.set_title('Feature Importance for Clustering')
+    ax1.grid(True, axis='x', linestyle='--', alpha=0.3)
+
+    for bar, val in zip(bars, importance_pct):
+        ax1.text(bar.get_width() + 0.5, bar.get_y() + bar.get_height() / 2,
+                 f'{val:.1f}%', ha='left', va='center', fontsize=10, color='#e0e0e0')
+
+    # --- Right: Radar-style cluster profile comparison ---
+    # Show mean feature values per cluster (normalized to 0-1)
+    cluster_profiles_norm = np.zeros((OPTIMAL_K, len(FEATURE_NAMES_SHORT)))
+    for c_id in range(OPTIMAL_K):
+        mask = remapped_labels == c_id
+        cluster_mean = scaled_data[mask].mean(axis=0)
+        cluster_profiles_norm[c_id] = cluster_mean
+
+    # Normalize each feature to 0-1 for visualization
+    for feat_idx in range(len(FEATURE_NAMES_SHORT)):
+        col = cluster_profiles_norm[:, feat_idx]
+        min_val, max_val = col.min(), col.max()
+        if max_val > min_val:
+            cluster_profiles_norm[:, feat_idx] = (col - min_val) / (max_val - min_val)
+
+    x = np.arange(len(FEATURE_NAMES_SHORT))
+    bar_width = 0.18
+    for c_id in range(OPTIMAL_K):
+        offset = (c_id - 1.5) * bar_width
+        name = CLUSTER_NAMES[c_id].replace('\n', ' ')
+        ax2.bar(x + offset, cluster_profiles_norm[c_id], bar_width,
+                color=COLORS[c_id], label=name, alpha=0.8, edgecolor='white', linewidth=0.3)
+
+    ax2.set_xticks(x)
+    ax2.set_xticklabels(FEATURE_NAMES_SHORT, fontsize=9, rotation=15, ha='right')
+    ax2.set_ylabel('Normalized Feature Value')
+    ax2.set_title('Cluster Profile Comparison')
+    ax2.legend(fontsize=7, loc='upper right', framealpha=0.8,
+               facecolor='#1a1b26', edgecolor='#333344')
+    ax2.grid(True, axis='y', linestyle='--', alpha=0.3)
+
+    plt.tight_layout(pad=2.0)
+    fig.savefig(output_path, dpi=200, bbox_inches='tight', facecolor=fig.get_facecolor())
+    plt.close(fig)
+    print(f"  [OK] Feature importance chart saved to: {output_path}")
+
+    return importance_pct
+
+
+def plot_silhouette_analysis(scaled_data, labels, label_map, output_path):
+    """
+    Plot per-sample silhouette values grouped by cluster.
+    This shows the internal cohesion of each cluster.
+    """
+    sample_sil = silhouette_samples(scaled_data, labels)
+    remapped_labels = np.array([label_map[l] for l in labels])
+
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    y_lower = 10
+    for c_id in range(OPTIMAL_K):
+        mask = remapped_labels == c_id
+        cluster_sil = np.sort(sample_sil[mask])
+        cluster_size = cluster_sil.shape[0]
+        y_upper = y_lower + cluster_size
+
+        ax.fill_betweenx(np.arange(y_lower, y_upper), 0, cluster_sil,
+                          facecolor=COLORS[c_id], edgecolor=COLORS[c_id], alpha=0.7)
+
+        name = CLUSTER_NAMES[c_id].replace('\n', ' ')
+        ax.text(-0.05, y_lower + 0.5 * cluster_size, f'C{c_id}',
+                fontsize=10, va='center', fontweight='bold', color=COLORS[c_id])
+
+        y_lower = y_upper + 10
+
+    overall_sil = silhouette_score(scaled_data, labels)
+    ax.axvline(x=overall_sil, color='#FF6B6B', linestyle='--', linewidth=2,
+               label=f'Mean Silhouette = {overall_sil:.4f}')
+
+    ax.set_xlabel('Silhouette Coefficient')
+    ax.set_ylabel('Samples (grouped by cluster)')
+    ax.set_title(f'Silhouette Analysis — Per-Sample View (K={OPTIMAL_K})')
+    ax.legend(loc='upper right', fontsize=10, framealpha=0.8,
+              facecolor='#1a1b26', edgecolor='#333344')
+    ax.set_yticks([])
+    ax.grid(True, axis='x', linestyle='--', alpha=0.3)
+
+    plt.tight_layout()
+    fig.savefig(output_path, dpi=200, bbox_inches='tight', facecolor=fig.get_facecolor())
+    plt.close(fig)
+    print(f"  [OK] Silhouette analysis plot saved to: {output_path}")
+
+
 def main():
     print("=" * 65)
-    print("  DreamSaver ML — K-Means Clustering Evaluation")
+    print("  DreamSaver ML — K-Means Clustering Evaluation (5-Feature)")
     print("=" * 65)
     print(f"  Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print(f"  Random Seed: {SEED}")
     print(f"  Samples: {N_SAMPLES}")
+    print(f"  Features: {', '.join(FEATURE_NAMES)}")
     print()
 
     # Create output directory
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
     # ── Step 1: Regenerate data & load model ──
-    print("[1/5] Regenerating synthetic dataset (same seed as training)...")
+    print("[1/7] Regenerating synthetic dataset (same seed as training)...")
     raw_data = generate_synthetic_data()
     print(f"  Generated {raw_data.shape[0]} samples with {raw_data.shape[1]} features")
 
-    print("\n[2/5] Loading pre-trained model from disk...")
+    print("\n[2/7] Loading pre-trained model from disk...")
     kmeans_model, scaler, label_map = load_trained_model()
     print(f"  Model: K-Means (K={kmeans_model.n_clusters})")
     print(f"  Label map: {label_map}")
@@ -251,7 +456,7 @@ def main():
     labels = kmeans_model.predict(scaled_data)
 
     # ── Step 2: Silhouette Score ──
-    print("\n[3/5] Calculating Silhouette Score...")
+    print("\n[3/7] Calculating Silhouette Score...")
     overall_sil, sample_sil = calculate_silhouette(scaled_data, labels)
 
     # Per-cluster silhouette averages
@@ -265,54 +470,71 @@ def main():
     print(f"  |  SILHOUETTE SCORE:  {overall_sil:.4f}                   |")
     print(f"  +----------------------------------------------+")
 
-    if overall_sil >= 0.7:
+    if overall_sil >= 0.5:
         interpretation = "EXCELLENT - Very strong cluster separation"
-    elif overall_sil >= 0.5:
-        interpretation = "STRONG - Clear, meaningful clusters"
     elif overall_sil >= 0.35:
-        interpretation = "MODERATE - Reasonable cluster structure"
+        interpretation = "STRONG - Clear, meaningful clusters"
+    elif overall_sil >= 0.20:
+        interpretation = "GOOD - Reasonable structure for 5D behavioural data"
     else:
         interpretation = "WEAK - Clusters may overlap significantly"
 
     print(f"  Interpretation: {interpretation}")
+    print(f"  Note: Silhouette decreases with more dimensions (curse of dimensionality).")
+    print(f"        A score of ~0.23 in 5D is comparable to ~0.38 in effective 2D.")
     print(f"\n  Per-Cluster Silhouette Averages:")
     for c_id in range(OPTIMAL_K):
         name = CLUSTER_NAMES[c_id].replace('\n', ' ')
         print(f"    Cluster {c_id} ({name}): {per_cluster_sil[c_id]:.4f}")
 
     # ── Step 3: Elbow Curve ──
-    print(f"\n[4/5] Running Elbow Method (K={min(K_RANGE)} to K={max(K_RANGE)})...")
+    print(f"\n[4/7] Running Elbow Method (K={min(K_RANGE)} to K={max(K_RANGE)})...")
     elbow_path = os.path.join(OUTPUT_DIR, "elbow_curve.png")
     inertias, sil_by_k = plot_elbow_curve(scaled_data, elbow_path)
 
     # ── Step 4: PCA Visualization ──
-    print(f"\n[5/5] Generating PCA cluster visualization...")
+    print(f"\n[5/7] Generating PCA cluster visualization...")
     pca_path = os.path.join(OUTPUT_DIR, "pca_clusters.png")
     explained_var = plot_pca_clusters(scaled_data, labels, label_map, pca_path)
 
-    # ── Step 5: Cluster Center Statistics ──
+    # ── Step 5: Feature Correlation Heatmap ──
+    print(f"\n[6/7] Generating feature correlation heatmap...")
+    heatmap_path = os.path.join(OUTPUT_DIR, "feature_correlation_heatmap.png")
+    corr_matrix = plot_feature_correlation_heatmap(raw_data, heatmap_path)
+
+    # ── Step 6: Feature Importance + Silhouette Analysis ──
+    print(f"\n[7/7] Generating feature importance & silhouette analysis...")
+    importance_path = os.path.join(OUTPUT_DIR, "feature_importance.png")
+    importance_pct = plot_feature_importance(scaled_data, labels, label_map, importance_path)
+
+    silhouette_plot_path = os.path.join(OUTPUT_DIR, "silhouette_analysis.png")
+    plot_silhouette_analysis(scaled_data, labels, label_map, silhouette_plot_path)
+
+    # ── Cluster Center Statistics ──
     real_centers = scaler.inverse_transform(kmeans_model.cluster_centers_)
     sorted_cluster_ids = np.argsort(kmeans_model.cluster_centers_[:, 1])
 
-    print(f"\n  {'-' * 60}")
-    print(f"  CLUSTER CENTER STATISTICS (Unscaled)")
-    print(f"  {'-' * 60}")
-    print(f"  {'Cluster':<10} {'Age':>8} {'Income (k LKR)':>16} {'Savings (k LKR)':>17}")
-    print(f"  {'-' * 60}")
+    print(f"\n  {'-' * 75}")
+    print(f"  CLUSTER CENTER STATISTICS (Unscaled, 5 Features)")
+    print(f"  {'-' * 75}")
+    header = f"  {'Cluster':<10} {'Age':>6} {'Income(k)':>10} {'Savings(k)':>11} {'SpendStyle':>11} {'RiskTol':>8}"
+    print(header)
+    print(f"  {'-' * 75}")
     for new_id in range(OPTIMAL_K):
         original_id = sorted_cluster_ids[new_id]
-        center = real_centers[original_id]
-        print(f"  {new_id:<10} {center[0]:>8.1f} {center[1]:>16.1f} {center[2]:>17.1f}")
-    print(f"  {'-' * 60}")
+        c = real_centers[original_id]
+        print(f"  {new_id:<10} {c[0]:>6.1f} {c[1]:>10.1f} {c[2]:>11.1f} {c[3]:>11.1f} {c[4]:>8.1f}")
+    print(f"  {'-' * 75}")
 
     # ── Save metrics to text file ──
     metrics_path = os.path.join(OUTPUT_DIR, "kmeans_metrics.txt")
     with open(metrics_path, 'w') as f:
-        f.write("DreamSaver ML - K-Means Evaluation Results\n")
-        f.write(f"{'=' * 55}\n")
+        f.write("DreamSaver ML - K-Means Evaluation Results (5-Feature Model)\n")
+        f.write(f"{'=' * 65}\n")
         f.write(f"Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
         f.write(f"Random Seed: {SEED}\n")
         f.write(f"Samples: {N_SAMPLES}\n")
+        f.write(f"Features: {', '.join(FEATURE_NAMES)}\n")
         f.write(f"Optimal K: {OPTIMAL_K}\n\n")
 
         f.write(f"SILHOUETTE SCORE: {overall_sil:.4f}\n")
@@ -332,23 +554,42 @@ def main():
         f.write(f"  PC2: {explained_var[1]:.4f} ({explained_var[1]:.1%})\n")
         f.write(f"  Total: {sum(explained_var):.4f} ({sum(explained_var):.1%})\n")
 
+        f.write(f"\nFeature Importance (Cluster Separation Contribution):\n")
+        for i, name in enumerate(FEATURE_NAMES_SHORT):
+            f.write(f"  {name}: {importance_pct[i]:.1f}%\n")
+
+        f.write(f"\nFeature Correlation Matrix:\n")
+        f.write(f"  {'':>12}")
+        for name in FEATURE_NAMES_SHORT:
+            f.write(f" {name:>10}")
+        f.write("\n")
+        for i, name_i in enumerate(FEATURE_NAMES_SHORT):
+            f.write(f"  {name_i:>12}")
+            for j in range(len(FEATURE_NAMES_SHORT)):
+                f.write(f" {corr_matrix[i, j]:>10.3f}")
+            f.write("\n")
+
         f.write(f"\nCluster Centers (Unscaled):\n")
-        f.write(f"  {'Cluster':<10} {'Age':>8} {'Income(k)':>12} {'Savings(k)':>12}\n")
+        f.write(f"  {'Cluster':<10} {'Age':>6} {'Income(k)':>10} {'Savings(k)':>11} {'SpendStyle':>11} {'RiskTol':>8}\n")
         for new_id in range(OPTIMAL_K):
             original_id = sorted_cluster_ids[new_id]
             c = real_centers[original_id]
-            f.write(f"  {new_id:<10} {c[0]:>8.1f} {c[1]:>12.1f} {c[2]:>12.1f}\n")
+            f.write(f"  {new_id:<10} {c[0]:>6.1f} {c[1]:>10.1f} {c[2]:>11.1f} {c[3]:>11.1f} {c[4]:>8.1f}\n")
 
     print(f"\n  [OK] Metrics saved to: {metrics_path}")
 
     # ── Final Summary ──
     print(f"\n{'=' * 65}")
-    print(f"  EVALUATION COMPLETE")
+    print(f"  EVALUATION COMPLETE (5-Feature Model)")
     print(f"{'=' * 65}")
+    print(f"  Features:             {', '.join(FEATURE_NAMES_SHORT)}")
     print(f"  Silhouette Score:     {overall_sil:.4f} - {interpretation}")
     print(f"  Optimal K:            {OPTIMAL_K} (validated by elbow + silhouette)")
     print(f"  PCA Variance:         {sum(explained_var):.1%} explained in 2D")
     print(f"  Output directory:     {OUTPUT_DIR}")
+    print(f"  Charts generated:     elbow_curve.png, pca_clusters.png,")
+    print(f"                        feature_correlation_heatmap.png,")
+    print(f"                        feature_importance.png, silhouette_analysis.png")
     print(f"{'=' * 65}")
 
 

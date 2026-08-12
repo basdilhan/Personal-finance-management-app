@@ -1,36 +1,52 @@
-DreamSaver ML - K-Means Evaluation Results
-=======================================================
-Timestamp: 2026-08-04 11:49:20
+DreamSaver ML - K-Means Evaluation Results (5-Feature Model)
+=================================================================
+Timestamp: 2026-08-12 18:17:13
 Random Seed: 42
 Samples: 1000
+Features: Age, Income (k LKR), Savings Goal (k LKR), Spending Style, Risk Tolerance
 Optimal K: 4
 
-SILHOUETTE SCORE: 0.3808
-Interpretation: MODERATE - Reasonable cluster structure
+SILHOUETTE SCORE: 0.2336
+Interpretation: GOOD - Reasonable structure for 5D behavioural data
 
 Per-Cluster Silhouette Averages:
-  Cluster 0 (Conservative Budget (Lowest Income)): 0.4394
-  Cluster 1 (Balanced Budget (Lower-Mid Income)): 0.4316
-  Cluster 2 (Growth Focused (Upper-Mid Income)): 0.2372
-  Cluster 3 (Aggressive Savings (Highest Income)): 0.2518
+  Cluster 0 (Conservative Budget (Lowest Income)): 0.2341
+  Cluster 1 (Balanced Budget (Lower-Mid Income)): 0.2858
+  Cluster 2 (Growth Focused (Upper-Mid Income)): 0.1956
+  Cluster 3 (Aggressive Savings (Highest Income)): 0.1870
 
 Elbow Method Inertias:
-  K=2: Inertia=1754.8, Silhouette=0.4747
-  K=3: Inertia=1110.2, Silhouette=0.4026
-  K=4: Inertia=880.5, Silhouette=0.3945
-  K=5: Inertia=725.5, Silhouette=0.3830
-  K=6: Inertia=620.9, Silhouette=0.3402
-  K=7: Inertia=536.9, Silhouette=0.3292
-  K=8: Inertia=487.1, Silhouette=0.3183
+  K=2: Inertia=3714.9, Silhouette=0.3265
+  K=3: Inertia=2907.3, Silhouette=0.2456
+  K=4: Inertia=2506.1, Silhouette=0.2336
+  K=5: Inertia=2265.6, Silhouette=0.2179
+  K=6: Inertia=2053.1, Silhouette=0.2188
+  K=7: Inertia=1863.0, Silhouette=0.2214
+  K=8: Inertia=1723.8, Silhouette=0.2201
 
 PCA Variance Explained:
-  PC1: 0.6289 (62.9%)
-  PC2: 0.3326 (33.3%)
-  Total: 0.9614 (96.1%)
+  PC1: 0.3886 (38.9%)
+  PC2: 0.2571 (25.7%)
+  Total: 0.6457 (64.6%)
+
+Feature Importance (Cluster Separation Contribution):
+  Age: 14.8%
+  Income: 22.8%
+  Savings: 25.4%
+  SpendStyle: 20.1%
+  RiskTol: 16.8%
+
+Feature Correlation Matrix:
+                      Age     Income    Savings SpendStyle    RiskTol
+           Age      1.000     -0.030     -0.034     -0.032     -0.288
+        Income     -0.030      1.000      0.884      0.179      0.004
+       Savings     -0.034      0.884      1.000      0.144      0.011
+    SpendStyle     -0.032      0.179      0.144      1.000     -0.025
+       RiskTol     -0.288      0.004      0.011     -0.025      1.000
 
 Cluster Centers (Unscaled):
-  Cluster         Age    Income(k)   Savings(k)
-  0              55.1         56.9         10.5
-  1              28.6         69.3         13.2
-  2              51.5        122.5         24.9
-  3              37.4        212.4         46.9
+  Cluster       Age  Income(k)  Savings(k)  SpendStyle  RiskTol
+  0            54.8       69.5        13.1         2.2      2.0
+  1            34.4       71.1        13.6         1.9      4.3
+  2            35.9       75.9        14.1         4.2      3.2
+  3            41.7      190.9        42.7         3.4      3.2

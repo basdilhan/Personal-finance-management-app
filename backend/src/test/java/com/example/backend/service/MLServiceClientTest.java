@@ -51,7 +51,7 @@ class MLServiceClientTest {
         when(restTemplate.postForObject(anyString(), any(HttpEntity.class), eq(Map.class)))
                 .thenThrow(new RestClientException("Service Unavailable"));
 
-        Map<String, Object> response = mlServiceClient.getColdStartProfile("user1", 25, "50k-100k", 5000.0);
+        Map<String, Object> response = mlServiceClient.getColdStartProfile("user1", 25, "50k-100k", 5000.0, 3, 3);
 
         assertTrue(response.isEmpty());
     }
