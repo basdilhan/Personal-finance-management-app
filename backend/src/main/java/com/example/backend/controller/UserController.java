@@ -104,7 +104,8 @@ public class UserController {
     }
 
     /**
-     * Call the ML Pipeline to get a budget profile based on K-Means clustering
+     * Call the ML Pipeline to get a budget profile based on K-Means clustering.
+     * Uses 5 features: age, income, savings_goal, spending_style (1-5), risk_tolerance (1-5)
      */
     @PostMapping("/profile-budget")
     public ResponseEntity<Map<String, Object>> getProfileBudget(@RequestHeader("X-User-Id") String userId,
@@ -113,8 +114,11 @@ public class UserController {
             int age = body.containsKey("age") ? (int) body.get("age") : 30;
             String incomeBracket = body.containsKey("income_bracket") ? (String) body.get("income_bracket") : "50000";
             double savingsGoal = body.containsKey("savings_goal") ? Double.parseDouble(body.get("savings_goal").toString()) : 10000.0;
+            int spendingStyle = body.containsKey("spending_style") ? (int) body.get("spending_style") : 3;
+            int riskTolerance = body.containsKey("risk_tolerance") ? (int) body.get("risk_tolerance") : 3;
             
-            Map<String, Object> profile = mlServiceClient.getColdStartProfile(userId, age, incomeBracket, savingsGoal);
+            Map<String, Object> profile = mlServiceClient.getColdStartProfile(
+                    userId, age, incomeBracket, savingsGoal, spendingStyle, riskTolerance);
             return ResponseEntity.ok(profile);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();

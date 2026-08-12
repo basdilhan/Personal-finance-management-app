@@ -70,8 +70,10 @@ public class MLServiceClient {
 
     /**
      * Call Step 6c Cold Start K-Means endpoint.
+     * Uses 5-feature model: age, income, savings_goal, spending_style (1-5), risk_tolerance (1-5)
      */
-    public Map<String, Object> getColdStartProfile(String userId, int age, String incomeBracket, double savingsGoal) {
+    public Map<String, Object> getColdStartProfile(String userId, int age, String incomeBracket,
+                                                    double savingsGoal, int spendingStyle, int riskTolerance) {
         String url = mlServiceUrl + "/api/ml/cold_start";
         
         Map<String, Object> requestBody = new HashMap<>();
@@ -79,6 +81,8 @@ public class MLServiceClient {
         requestBody.put("age", age);
         requestBody.put("income_bracket", incomeBracket);
         requestBody.put("savings_goal", savingsGoal);
+        requestBody.put("spending_style", spendingStyle);
+        requestBody.put("risk_tolerance", riskTolerance);
 
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, getSecureHeaders());
 
