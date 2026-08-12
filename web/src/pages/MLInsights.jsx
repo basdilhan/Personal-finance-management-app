@@ -13,6 +13,8 @@ export default function MLInsights() {
   const [age, setAge] = useState(30);
   const [income, setIncome] = useState(50000);
   const [goal, setGoal] = useState(10000);
+  const [spendingStyle, setSpendingStyle] = useState(3);
+  const [riskTolerance, setRiskTolerance] = useState(3);
 
   useEffect(() => {
     fetchForecast();
@@ -38,7 +40,9 @@ export default function MLInsights() {
       const res = await apiClient.post('/users/profile-budget', {
         age: Number(age),
         income_bracket: String(income),
-        savings_goal: Number(goal)
+        savings_goal: Number(goal),
+        spending_style: Number(spendingStyle),
+        risk_tolerance: Number(riskTolerance)
       });
       
       if (!res.data || !res.data.assigned_cluster) {
@@ -117,6 +121,26 @@ export default function MLInsights() {
               <div>
                 <label style={{ display: 'block', fontSize: '14px', marginBottom: '8px' }}>Monthly Savings Goal (LKR)</label>
                 <input type="number" className="input-field" value={goal} onChange={e => setGoal(e.target.value)} required />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '14px', marginBottom: '8px' }}>Spending Style</label>
+                <select className="input-field" value={spendingStyle} onChange={e => setSpendingStyle(e.target.value)} style={{ cursor: 'pointer' }}>
+                  <option value={1}>1 — Very Frugal</option>
+                  <option value={2}>2 — Careful</option>
+                  <option value={3}>3 — Moderate</option>
+                  <option value={4}>4 — Generous</option>
+                  <option value={5}>5 — Big Spender</option>
+                </select>
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '14px', marginBottom: '8px' }}>Risk Tolerance</label>
+                <select className="input-field" value={riskTolerance} onChange={e => setRiskTolerance(e.target.value)} style={{ cursor: 'pointer' }}>
+                  <option value={1}>1 — Very Conservative</option>
+                  <option value={2}>2 — Conservative</option>
+                  <option value={3}>3 — Moderate</option>
+                  <option value={4}>4 — Aggressive</option>
+                  <option value={5}>5 — Very Aggressive</option>
+                </select>
               </div>
               <button type="submit" className="btn-primary" style={{ marginTop: '8px' }}>Generate Profile</button>
             </form>
