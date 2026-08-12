@@ -247,97 +247,54 @@ public class ForecastService {
 
     /**
      * Calculates the historical accuracy by comparing past predictions with actuals.
-     * 
-     * This method combines two data sources:
-     *   1. SAVED forecasts from the database (real ML predictions that were actually made)
-     *   2. RETROACTIVE backtesting for months that had spending data but no saved forecast
-     *      (uses the math fallback formula: average of prior months * 1.05)
-     * 
-     * This ensures the accuracy chart shows data for multiple months, not just
-     * the months since the ML feature was activated.
      */
     public List<Map<String, Object>> getForecastAccuracyHistory(String userId) {
         YearMonth currentMonth = YearMonth.now(ZoneId.of("Asia/Colombo"));
+        
+        List<ForecastEntity> history = forecastRepository.findByUserIdOrderByForecastMonthDesc(userId)
+            .stream()
+            .filter(f -> {
+                try {
+                    YearMonth ym = YearMonth.parse(f.getForecastMonth());
+                    // A forecast from "2026-07" predicts "2026-08".
+                    // We can only evaluate its accuracy if "2026-08" is completely over,
+                    // meaning the current month must be "2026-09" or later to get a final score.
+                    // Or we can evaluate it while "2026-08" is active to see current accuracy so far.
+                    // Let's evaluate if the target month is BEFORE OR EQUAL to current month.
+                    YearMonth targetMonth = ym.plusMonths(1);
+                    return targetMonth.isBefore(currentMonth) || targetMonth.equals(currentMonth);
+                } catch (Exception e) { return false; }
+            })
+            .collect(Collectors.toList());
 
         List<ExpenseEntity> allExpenses = expenseRepository.findByUserIdAndIsDeletedFalseOrderByDateDesc(userId);
         List<BillEntity> allBills = billRepository.findByUserIdAndIsDeletedFalseOrderByDueDateAsc(userId);
 
-        // ── Build a map of actual monthly totals (expenses + paid bills) ──
-        Map<YearMonth, Double> monthlyActuals = new HashMap<>();
-        for (ExpenseEntity e : allExpenses) {
-            try {
-                YearMonth ym = YearMonth.from(
-                    java.time.Instant.ofEpochMilli(normalizeMs(e.getDate()))
-                        .atZone(ZoneId.of("Asia/Colombo")).toLocalDate());
-                monthlyActuals.merge(ym, e.getAmount().doubleValue(), Double::sum);
-            } catch (Exception ignored) {}
-        }
-        for (BillEntity b : allBills) {
-            if ("paid".equalsIgnoreCase(b.getStatus())) {
-                try {
-                    YearMonth ym = YearMonth.from(
-                        java.time.Instant.ofEpochMilli(normalizeMs(b.getDueDate()))
-                            .atZone(ZoneId.of("Asia/Colombo")).toLocalDate());
-                    monthlyActuals.merge(ym, b.getAmount().doubleValue(), Double::sum);
-                } catch (Exception ignored) {}
-            }
-        }
-
-        // ── Load saved forecasts into a lookup map ──
-        Map<String, ForecastEntity> savedForecasts = new HashMap<>();
-        for (ForecastEntity f : forecastRepository.findByUserIdOrderByForecastMonthDesc(userId)) {
-            savedForecasts.put(f.getForecastMonth(), f);
-        }
-
-        // ── Generate accuracy data for up to 6 past months ──
         List<Map<String, Object>> accuracyData = new ArrayList<>();
 
-        for (int i = 6; i >= 0; i--) {
-            YearMonth targetMonth = currentMonth.minusMonths(i);
-            YearMonth forecastMonth = targetMonth.minusMonths(1); // The forecast for targetMonth was made in forecastMonth
+        for (ForecastEntity f : history) {
+            YearMonth ym = YearMonth.parse(f.getForecastMonth());
+            // The forecast saved with month "2026-07" predicts the NEXT month (August 2026).
+            // So we must compare the prediction against the actuals of the TARGET month (M + 1).
+            YearMonth targetMonth = ym.plusMonths(1);
+            
+            long monthStart = targetMonth.atDay(1).atStartOfDay(ZoneId.of("Asia/Colombo")).toInstant().toEpochMilli();
+            long monthEnd = targetMonth.atEndOfMonth().atTime(23, 59, 59).atZone(ZoneId.of("Asia/Colombo")).toInstant().toEpochMilli();
 
-            double totalActual = monthlyActuals.getOrDefault(targetMonth, 0.0);
+            double actualExpenses = allExpenses.stream()
+                .filter(e -> { long ms = normalizeMs(e.getDate()); return ms >= monthStart && ms <= monthEnd; })
+                .mapToDouble(e -> e.getAmount().doubleValue())
+                .sum();
 
-            // Skip months with no actual spending data
-            if (totalActual <= 0) continue;
+            double actualBills = allBills.stream()
+                .filter(b -> "paid".equalsIgnoreCase(b.getStatus()))
+                .filter(b -> { long ms = normalizeMs(b.getDueDate()); return ms >= monthStart && ms <= monthEnd; })
+                .mapToDouble(b -> b.getAmount().doubleValue())
+                .sum();
 
-            double predicted = 0;
-            boolean isFallback = true;
-            String method = "backtested";
-
-            // Check if we have a real saved forecast for this month
-            ForecastEntity savedForecast = savedForecasts.get(forecastMonth.toString());
-            if (savedForecast != null && savedForecast.getPredictedExpense() != null
-                    && savedForecast.getPredictedExpense().doubleValue() > 0) {
-                // Use the actual saved prediction
-                predicted = savedForecast.getPredictedExpense().doubleValue();
-                isFallback = savedForecast.getModelVersion() != null
-                        && savedForecast.getModelVersion().contains("fallback");
-                method = "live";
-            } else {
-                // Retroactive backtesting: calculate what we WOULD have predicted
-                // using the math fallback formula (average of prior months * 1.05)
-                double sumPrior = 0;
-                int countPrior = 0;
-                for (int j = 1; j <= 6; j++) {
-                    YearMonth priorMonth = targetMonth.minusMonths(j);
-                    Double priorActual = monthlyActuals.get(priorMonth);
-                    if (priorActual != null && priorActual > 0) {
-                        sumPrior += priorActual;
-                        countPrior++;
-                    }
-                }
-
-                if (countPrior >= 1) {
-                    // Math fallback: average of prior months * 1.05 (5% buffer)
-                    predicted = (sumPrior / countPrior) * 1.05;
-                    isFallback = true;
-                } else {
-                    // No prior data to base a prediction on — skip this month
-                    continue;
-                }
-            }
-
+            double totalActual = actualExpenses + actualBills;
+            double predicted = f.getPredictedExpense() != null ? f.getPredictedExpense().doubleValue() : 0.0;
+            
             double accuracy = 0;
             if (totalActual > 0) {
                 double diff = Math.abs(predicted - totalActual);
@@ -345,17 +302,18 @@ public class ForecastService {
             }
 
             Map<String, Object> data = new HashMap<>();
-            data.put("month", targetMonth.toString());
+            data.put("month", targetMonth.toString()); // Show the target month it predicted for
             data.put("predicted", Math.round(predicted * 100.0) / 100.0);
             data.put("actual", Math.round(totalActual * 100.0) / 100.0);
             data.put("accuracy", Math.round(accuracy * 10.0) / 10.0);
-            data.put("is_fallback", isFallback);
-            data.put("method", method); // "live" = real ML prediction, "backtested" = retroactive calculation
-
+            data.put("is_fallback", f.getModelVersion() != null && f.getModelVersion().contains("fallback"));
+            data.put("method", "live");
+            
             accuracyData.add(data);
         }
 
-        // Already chronological (oldest to newest) since we loop from i=6 down to i=0
+        // Return chronological (oldest to newest)
+        Collections.reverse(accuracyData);
         return accuracyData;
     }
 }
